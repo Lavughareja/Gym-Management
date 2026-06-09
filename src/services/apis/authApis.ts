@@ -14,6 +14,7 @@ export interface LoginPayload {
 export interface RegisterOwnerPayload {
   fullName: string;
   email: string;
+  mobileNo: string;
   password: string;
   gymName: string;
   plan: PlanType;
@@ -48,5 +49,16 @@ export const logoutApi = async () => {
  */
 export const registerOwnerApi = async (payload: RegisterOwnerPayload) => {
   const response = await AxiosInstance.post(apiRoutes.registerOwner, payload);
+  return response;
+};
+
+export interface ManagerSetupPayload {
+  token: string;
+  password?: string;
+  confirmPassword?: string;
+}
+
+export const managerSetupApi = async (payload: ManagerSetupPayload) => {
+  const response = await AxiosInstance.post(apiRoutes.managerSetup, payload);
   return response;
 };

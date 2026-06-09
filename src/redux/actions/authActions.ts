@@ -60,7 +60,11 @@ export const registerOwnerAction = createAsyncThunk(
   async (payload: RegisterOwnerPayload, { rejectWithValue, dispatch }) => {
     try {
       const response = await registerOwnerApi(payload);
-      dispatch(showSnackbar({ message: response?.data?.message || "Registration successful! Please login.", type: "success" }));
+      const token = response?.data?.token;
+      if (token) {
+        localStorage.setItem(AUTH_TOKEN_KEY, token);
+      }
+      dispatch(showSnackbar({ message: response?.data?.message || "Registration successful!", type: "success" }));
       return response.data;
     } catch (error: any) {
       const message = error?.response?.data?.message || "Registration failed. Please try again.";

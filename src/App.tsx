@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense, useState, useEffect } from "react";
 import { Loader } from "lucide-react";
 import { SidebarLayout } from "./components/SidebarLayout";
 import GlobalSnackbar from "./components/GlobalSnackbar/GlobalSnackbar";
@@ -11,9 +11,10 @@ const Features     = lazy(() => import("./pages/Features").then((m) => ({ defaul
 const Pricing      = lazy(() => import("./pages/Pricing").then((m)  => ({ default: m.Pricing })));
 const About        = lazy(() => import("./pages/About").then((m)    => ({ default: m.About })));
 const Contact      = lazy(() => import("./pages/Contact").then((m)  => ({ default: m.Contact })));
-// These are loaded ONLY after payment / registration — keeps initial bundle small
 const RegisterOwner = lazy(() => import("./pages/RegisterOwner"));
 const GymDashboard  = lazy(() => import("./pages/GymDashboard"));
+const Login         = lazy(() => import("./pages/Login").then((m) => ({ default: m.Login })));
+const ManagerSetup  = lazy(() => import("./pages/ManagerSetup").then((m) => ({ default: m.ManagerSetup })));
 
 // ── Shared page-level loading fallback ──────────────────────────────────────
 const PageLoader = () => (
@@ -24,17 +25,17 @@ const PageLoader = () => (
 );
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Shared types — exported so Pricing / RegisterOwner can import them
+// Shared types
 // ─────────────────────────────────────────────────────────────────────────────
-export type AppMode = "public" | "register" | "dashboard";
+export type AppMode = "public" | "register" | "dashboard" | "login" | "manager-setup";
 
 export interface DashboardUser {
   ownerName:  string;
   gymName:    string;
   ownerEmail: string;
+  role?:      string;
 }
 
-// Payload passed from Pricing → App when payment is verified
 export interface PaymentVerifiedPayload {
   plan:         PlanType;
   email:        string;
@@ -43,47 +44,75 @@ export interface PaymentVerifiedPayload {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // App root
-// Three top-level modes that completely replace each other (no sidebar overlap):
-//   "public"    → landing site with sidebar (Home / Features / Pricing …)
-//   "register"  → full-screen RegisterOwner form (after payment success)
-//   "dashboard" → full-screen GymDashboard (after registration success)
 // ─────────────────────────────────────────────────────────────────────────────
 function App() {
   const [mode, setMode] = useState<AppMode>("public");
   const [paymentPayload, setPaymentPayload] = useState<PaymentVerifiedPayload | null>(null);
   const [dashUser,       setDashUser]       = useState<DashboardUser | null>(null);
 
-  // ── Called by Pricing when payment verify-signature succeeds ──────────────
+  // Intercept URLs on mount
+  useEffect(() => {
+    const path = window.location.pathname;
+    if (path === "/manager-setup") {
+      setMode("manager-setup");
+    } else if (path === "/login") {
+      setMode("login");
+    }
+  }, []);
+
   const handlePaymentVerified = (payload: PaymentVerifiedPayload) => {
     setPaymentPayload(payload);
-    setMode("register"); // ← switch to FULL-SCREEN register, no sidebar
+    setMode("register");
   };
 
-  // ── Called by RegisterOwner when registration API succeeds ────────────────
   const handleRegistrationSuccess = (gymName: string, ownerName: string) => {
     setDashUser({
       ownerName:  ownerName  || "Gym Owner",
       gymName:    gymName    || "My Gym",
       ownerEmail: paymentPayload?.email || "",
+      role: "admin",
     });
     setPaymentPayload(null);
-    setMode("dashboard"); // ← switch to FULL-SCREEN dashboard
+    setMode("dashboard");
+    // Optionally clean URL if they were on a specific path
+    window.history.pushState({}, "", "/");
   };
 
-  // ── Called by GymDashboard logout button ──────────────────────────────────
+  const handleLoginSuccess = (userPayload: any) => {
+    // For now we set dummy dashboard user details if not provided,
+    // in real app, these should come from user profile API.
+    setDashUser({
+      ownerName:  "User",
+      gymName:    "IronPulse Gym",
+      ownerEmail: "",
+      role: userPayload?.role || "member",
+    });
+    setMode("dashboard");
+    window.history.pushState({}, "", "/");
+  };
+
   const handleLogout = () => {
     setDashUser(null);
     setMode("public");
+    window.history.pushState({}, "", "/");
   };
 
   return (
     <>
-      {/* Global MUI Snackbar — shown in every mode */}
       <GlobalSnackbar />
-
       <Suspense fallback={<PageLoader />}>
 
-        {/* ── MODE: register — full screen, NO sidebar ─────────────────── */}
+        {mode === "login" && (
+          <Login 
+            onSuccess={handleLoginSuccess}
+            onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} 
+          />
+        )}
+
+        {mode === "manager-setup" && (
+          <ManagerSetup onSuccess={handleLoginSuccess} />
+        )}
+
         {mode === "register" && paymentPayload && (
           <RegisterOwner
             plan={paymentPayload.plan}
@@ -97,19 +126,18 @@ function App() {
           />
         )}
 
-        {/* ── MODE: dashboard — full screen, NO sidebar ────────────────── */}
         {mode === "dashboard" && dashUser && (
           <GymDashboard
             ownerName={dashUser.ownerName}
             gymName={dashUser.gymName}
             ownerEmail={dashUser.ownerEmail}
+            role={dashUser.role}
             onLogout={handleLogout}
           />
         )}
 
-        {/* ── MODE: public — landing site with sidebar ─────────────────── */}
         {mode === "public" && (
-          <SidebarLayout>
+          <SidebarLayout onLoginClick={() => { setMode("login"); window.history.pushState({}, "", "/login"); }}>
             {(activeTab) => (
               <Suspense fallback={<PageLoader />}>
                 {activeTab === "home"     && <Home />}

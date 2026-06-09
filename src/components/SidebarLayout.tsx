@@ -9,17 +9,19 @@ import {
   Mail, 
   Sun, 
   Moon, 
-  User 
+  User,
+  LogIn
 } from 'lucide-react';
 
 interface SidebarLayoutProps {
+  onLoginClick?: () => void;
   children: (
     activeTab: string, 
     setActiveTab: (tab: string) => void
   ) => React.ReactNode;
 }
 
-export const SidebarLayout: React.FC<SidebarLayoutProps> = ({ children }) => {
+export const SidebarLayout: React.FC<SidebarLayoutProps> = ({ children, onLoginClick }) => {
   const [activeTab, setActiveTab] = useState<string>('home');
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
   const [isDarkMode, setIsDarkMode] = useState<boolean>(false);
@@ -34,7 +36,6 @@ export const SidebarLayout: React.FC<SidebarLayoutProps> = ({ children }) => {
       setIsDarkMode(false);
       document.documentElement.classList.remove('dark-theme');
     } else {
-      // Default to light mode (as requested: "theme is white background black text")
       setIsDarkMode(false);
       document.documentElement.classList.remove('dark-theme');
     }
@@ -124,16 +125,16 @@ export const SidebarLayout: React.FC<SidebarLayoutProps> = ({ children }) => {
             </label>
           </div>
 
-          {/* User Profile Card */}
-          <div className="profile-card">
-            <div className="profile-avatar">
-              <User size={18} />
-            </div>
-            <div className="profile-info">
-              <span className="profile-name">Dev Workspace</span>
-              <span className="profile-email">dev@gmail.com</span>
-            </div>
-          </div>
+          {/* Login Button */}
+          {onLoginClick && (
+            <button 
+              onClick={onLoginClick}
+              className="btn-blue-outline" 
+              style={{ width: '100%', justifyContent: 'center', marginTop: 12 }}
+            >
+              <LogIn size={16} /> Login
+            </button>
+          )}
         </div>
       </aside>
 
@@ -156,7 +157,17 @@ export const SidebarLayout: React.FC<SidebarLayoutProps> = ({ children }) => {
             <span className="brand-name" style={{ fontSize: '1rem' }}>IRONPULSE</span>
           </div>
 
-          <div style={{ width: 40 }} /> {/* Spacer for centering branding */}
+          <div style={{ width: 40 }}>
+            {/* Mobile login icon */}
+            {onLoginClick && (
+              <button 
+                onClick={onLoginClick}
+                style={{ background: 'none', border: 'none', color: 'var(--primary)' }}
+              >
+                <LogIn size={20} />
+              </button>
+            )}
+          </div>
         </header>
 
         {/* Render Active Children Page */}

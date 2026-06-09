@@ -24,6 +24,7 @@ const RegisterOwner: React.FC<Props> = ({ plan, email, paymentToken, onSuccess, 
   const [form, setForm] = useState({
     fullName: "",
     email: email,
+    mobileNo: "",
     password: "",
     confirmPassword: "",
     gymName: "",
@@ -56,6 +57,7 @@ const RegisterOwner: React.FC<Props> = ({ plan, email, paymentToken, onSuccess, 
       registerOwnerAction({
         fullName:     form.fullName,
         email:        form.email,
+        mobileNo:     form.mobileNo,
         password:     form.password,
         gymName:      form.gymName,
         plan,
@@ -113,6 +115,19 @@ const RegisterOwner: React.FC<Props> = ({ plan, email, paymentToken, onSuccess, 
               onChange={handleChange}
               required
               placeholder="owner@example.com"
+              style={inputStyle}
+            />
+          </div>
+
+          <div>
+            <label style={labelStyle}>Mobile Number</label>
+            <input
+              name="mobileNo"
+              type="tel"
+              value={form.mobileNo}
+              onChange={handleChange}
+              required
+              placeholder="1234567890"
               style={inputStyle}
             />
           </div>
