@@ -24,6 +24,7 @@ const GlobalSnackbar: React.FC = () => {
       autoHideDuration={4000}
       onClose={handleClose}
       anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      sx={{ zIndex: 99999 }}
     >
       {/* Alert is always rendered so MUI transition works correctly */}
       <Alert
