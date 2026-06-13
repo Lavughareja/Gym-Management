@@ -30,10 +30,10 @@ const PageLoader = () => (
 export type AppMode = "public" | "register" | "dashboard" | "login" | "manager-setup" | "trainer-setup";
 
 export interface DashboardUser {
-  ownerName:  string;
-  gymName:    string;
-  ownerEmail: string;
-  role?:      string;
+  ownerName:    string;
+  email:        string;
+  role:         "admin" | "superadmin" | "gymmanager" | "trainer" | "member";
+  canAddMember?: boolean;
 }
 
 export interface PaymentVerifiedPayload {
@@ -70,9 +70,9 @@ function App() {
   const handleRegistrationSuccess = (gymName: string, ownerName: string) => {
     setDashUser({
       ownerName:  ownerName  || "Gym Owner",
-      gymName:    gymName    || "My Gym",
-      ownerEmail: paymentPayload?.email || "",
-      role: "admin",
+      email:      paymentPayload?.email || "",
+      role:       "admin",
+      canAddMember: true
     });
     setPaymentPayload(null);
     setMode("dashboard");
@@ -84,10 +84,10 @@ function App() {
     // For now we set dummy dashboard user details if not provided,
     // in real app, these should come from user profile API.
     setDashUser({
-      ownerName:  "User",
-      gymName:    "IronPulse Gym",
-      ownerEmail: "",
-      role: userPayload?.role || "member",
+      ownerName:    userPayload?.fullName || "User",
+      email:        userPayload?.email || "",
+      role:         userPayload?.role || "member",
+      canAddMember: userPayload?.canAddMember || false
     });
     setMode("dashboard");
     window.history.pushState({}, "", "/");
@@ -131,9 +131,10 @@ function App() {
         {mode === "dashboard" && dashUser && (
           <GymDashboard
             ownerName={dashUser.ownerName}
-            gymName={dashUser.gymName}
-            ownerEmail={dashUser.ownerEmail}
+            gymName="IronPulse Gym"
+            ownerEmail={dashUser.email}
             role={dashUser.role}
+            canAddMember={dashUser.canAddMember}
             onLogout={handleLogout}
           />
         )}

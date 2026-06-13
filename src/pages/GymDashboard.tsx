@@ -8,6 +8,7 @@ import { useAppDispatch, useAppSelector } from "../utils/reduxHooks";
 import { logoutAction } from "../redux/actions/authActions";
 import { getManagersApi, inviteManagerApi, resendInvitationApi } from "../services/apis/managerApis";
 import { getTrainersApi, inviteTrainerApi, resendTrainerInvitationApi } from "../services/apis/trainerApis";
+import { updatePermissionApi } from "../services/apis/permissionApis";
 import { showSnackbar } from "../redux/slices/snackbarSlice";
 import { Loader } from "lucide-react";
 
@@ -49,6 +50,7 @@ interface Props {
   gymName?: string;
   ownerEmail?: string;
   role?: string;
+  canAddMember?: boolean;
 }
 
 const GymDashboard: React.FC<Props> = ({
@@ -57,6 +59,7 @@ const GymDashboard: React.FC<Props> = ({
   gymName   = "IronPulse Gym",
   ownerEmail = "owner@gymmanagement.com",
   role = "admin",
+  canAddMember = false,
 }) => {
   const dispatch = useAppDispatch();
   const { loading } = useAppSelector((s) => s.auth);
@@ -147,7 +150,7 @@ const GymDashboard: React.FC<Props> = ({
     { id: "plans" as DashTab,     label: "Plans",       icon: CreditCard as any },
     { id: "settings" as DashTab,  label: "Settings",    icon: Settings as any },
   ].filter(item => {
-    // Hide managers tab from gym managers
+    if (role === "trainer" && (item.id === "plans" || item.id === "managers")) return false;
     if (role === "gymmanager" && item.id === "managers") return false;
     return true;
   });
@@ -533,7 +536,29 @@ const GymDashboard: React.FC<Props> = ({
                   <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginTop: 2 }}>Trainer</div>
                 </div>
               </div>
-              <span className={`checkin-status ${t.isActive ? "status-active" : "status-inactive"}`}>{t.isActive ? "Active" : "Pending Setup"}</span>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
+                <span className={`checkin-status ${t.isActive ? "status-active" : "status-inactive"}`}>{t.isActive ? "Active" : "Pending Setup"}</span>
+                {(role === "admin" || role === "superadmin" || role === "gymmanager") && t.isActive && (
+                  <label style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontSize: "0.75rem", color: "var(--text-muted)", marginTop: 4 }}>
+                    <input 
+                      type="checkbox" 
+                      checked={!!t.canAddMember} 
+                      onChange={async (e) => {
+                        const val = e.target.checked;
+                        setTrainers(prev => prev.map(tr => tr._id === t._id ? { ...tr, canAddMember: val } : tr));
+                        try {
+                          await updatePermissionApi(t._id, { canAddMember: val });
+                          dispatch(showSnackbar({ message: "Permissions updated", type: "success" }));
+                        } catch (err: any) {
+                          setTrainers(prev => prev.map(tr => tr._id === t._id ? { ...tr, canAddMember: !val } : tr));
+                          dispatch(showSnackbar({ message: err?.response?.data?.message || "Failed to update permissions", type: "error" }));
+                        }
+                      }} 
+                    />
+                    Can Add Members
+                  </label>
+                )}
+              </div>
             </div>
             {!t.isActive && (
               <button className="btn-blue-outline" style={{ fontSize: "0.75rem", padding: "4px 8px", width: "100%", justifyContent: "center", marginTop: "10px" }}
@@ -660,6 +685,26 @@ const GymDashboard: React.FC<Props> = ({
                       <span className={`checkin-status ${m.isActive ? "status-active" : "status-inactive"}`}>
                         {m.isActive ? "Active" : "Pending Setup"}
                       </span>
+                      {(role === "admin" || role === "superadmin") && m.isActive && (
+                        <label style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontSize: "0.75rem", color: "var(--text-muted)", marginTop: 8 }}>
+                          <input 
+                            type="checkbox" 
+                            checked={!!m.canAddMember} 
+                            onChange={async (e) => {
+                              const val = e.target.checked;
+                              setManagers(prev => prev.map(mgr => mgr._id === m._id ? { ...mgr, canAddMember: val } : mgr));
+                              try {
+                                await updatePermissionApi(m._id, { canAddMember: val });
+                                dispatch(showSnackbar({ message: "Permissions updated", type: "success" }));
+                              } catch (err: any) {
+                                setManagers(prev => prev.map(mgr => mgr._id === m._id ? { ...mgr, canAddMember: !val } : mgr));
+                                dispatch(showSnackbar({ message: err?.response?.data?.message || "Failed to update permissions", type: "error" }));
+                              }
+                            }} 
+                          />
+                          Can Add Members
+                        </label>
+                      )}
                     </td>
                     <td style={{ padding: "14px 16px" }}>
                       {!m.isActive && (
