@@ -7,9 +7,10 @@ import { showSnackbar } from "../redux/slices/snackbarSlice";
 
 interface Props {
   onSuccess: (user: any) => void;
+  role?: "Manager" | "Trainer";
 }
 
-export const ManagerSetup: React.FC<Props> = ({ onSuccess }) => {
+export const ManagerSetup: React.FC<Props> = ({ onSuccess, role = "Manager" }) => {
   const dispatch = useAppDispatch();
   const [token, setToken] = useState("");
   const [password, setPassword] = useState("");
@@ -76,7 +77,7 @@ export const ManagerSetup: React.FC<Props> = ({ onSuccess }) => {
           </div>
         </div>
         
-        <h2 className="page-title" style={{ fontSize: "1.75rem", marginBottom: 8 }}>Manager Setup</h2>
+        <h2 className="page-title" style={{ fontSize: "1.75rem", marginBottom: 8 }}>{role} Setup</h2>
         <p className="page-subtitle" style={{ marginBottom: 32 }}>Set your password to activate your account</p>
 
         <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 20 }}>

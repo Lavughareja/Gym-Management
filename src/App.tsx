@@ -27,7 +27,7 @@ const PageLoader = () => (
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared types
 // ─────────────────────────────────────────────────────────────────────────────
-export type AppMode = "public" | "register" | "dashboard" | "login" | "manager-setup";
+export type AppMode = "public" | "register" | "dashboard" | "login" | "manager-setup" | "trainer-setup";
 
 export interface DashboardUser {
   ownerName:  string;
@@ -55,6 +55,8 @@ function App() {
     const path = window.location.pathname;
     if (path === "/manager-setup") {
       setMode("manager-setup");
+    } else if (path === "/trainer-setup") {
+      setMode("trainer-setup");
     } else if (path === "/login") {
       setMode("login");
     }
@@ -109,8 +111,8 @@ function App() {
           />
         )}
 
-        {mode === "manager-setup" && (
-          <ManagerSetup onSuccess={handleLoginSuccess} />
+        {(mode === "manager-setup" || mode === "trainer-setup") && (
+          <ManagerSetup onSuccess={handleLoginSuccess} role={mode === "trainer-setup" ? "Trainer" : "Manager"} />
         )}
 
         {mode === "register" && paymentPayload && (

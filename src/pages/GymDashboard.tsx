@@ -7,6 +7,7 @@ import {
 import { useAppDispatch, useAppSelector } from "../utils/reduxHooks";
 import { logoutAction } from "../redux/actions/authActions";
 import { getManagersApi, inviteManagerApi, resendInvitationApi } from "../services/apis/managerApis";
+import { getTrainersApi, inviteTrainerApi, resendTrainerInvitationApi } from "../services/apis/trainerApis";
 import { showSnackbar } from "../redux/slices/snackbarSlice";
 import { Loader } from "lucide-react";
 
@@ -67,7 +68,9 @@ const GymDashboard: React.FC<Props> = ({
   const [showAddMember,  setShowAddMember]  = useState(false);
   const [showAddTrainer, setShowAddTrainer] = useState(false);
   const [members,        setMembers]        = useState<Member[]>(MEMBERS);
-  const [trainers,       setTrainers]       = useState<Trainer[]>(TRAINERS);
+  const [trainers,       setTrainers]       = useState<any[]>([]);
+  const [isTrainersLoading, setIsTrainersLoading] = useState(false);
+  const [inviteTrainerLoading, setInviteTrainerLoading] = useState(false);
   
   // Manager State
   const [managers,       setManagers]       = useState<any[]>([]);
@@ -80,6 +83,9 @@ const GymDashboard: React.FC<Props> = ({
     if (role === "admin" || role === "superadmin") {
       fetchManagers();
     }
+    if (role === "admin" || role === "superadmin" || role === "gymmanager") {
+      fetchTrainers();
+    }
   }, [role]);
 
   const fetchManagers = async () => {
@@ -91,6 +97,18 @@ const GymDashboard: React.FC<Props> = ({
       console.error(err);
     } finally {
       setIsManagersLoading(false);
+    }
+  };
+
+  const fetchTrainers = async () => {
+    try {
+      setIsTrainersLoading(true);
+      const res = await getTrainersApi();
+      setTrainers(res.data.trainers || []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsTrainersLoading(false);
     }
   };
 
@@ -122,12 +140,12 @@ const GymDashboard: React.FC<Props> = ({
   ];
 
   const navItems: { id: DashTab; label: string; icon: React.FC<{size?: number}> }[] = [
-    { id: "overview",  label: "Overview",    icon: LayoutDashboard },
-    { id: "members",   label: "Members",     icon: Users },
-    { id: "trainers",  label: "Trainers",    icon: Dumbbell },
-    { id: "managers",  label: "Managers",    icon: UserCog },
-    { id: "plans",     label: "Plans",       icon: CreditCard },
-    { id: "settings",  label: "Settings",    icon: Settings },
+    { id: "overview" as DashTab,  label: "Overview",    icon: LayoutDashboard as any },
+    { id: "members" as DashTab,   label: "Members",     icon: Users as any },
+    { id: "trainers" as DashTab,  label: "Trainers",    icon: Dumbbell as any },
+    { id: "managers" as DashTab,  label: "Managers",    icon: UserCog as any },
+    { id: "plans" as DashTab,     label: "Plans",       icon: CreditCard as any },
+    { id: "settings" as DashTab,  label: "Settings",    icon: Settings as any },
   ].filter(item => {
     // Hide managers tab from gym managers
     if (role === "gymmanager" && item.id === "managers") return false;
@@ -439,7 +457,7 @@ const GymDashboard: React.FC<Props> = ({
   );
 
   // ── Trainers panel ───────────────────────────────────────────────────────
-  const [newTrainer, setNewTrainer] = useState({ name: "", specialty: "" });
+  const [newTrainer, setNewTrainer] = useState({ fullName: "", email: "", mobileNo: "" });
 
   const TrainersPanel = (
     <div className="page-container">
@@ -463,21 +481,35 @@ const GymDashboard: React.FC<Props> = ({
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <div>
                 <label className="form-label">Full Name</label>
-                <input type="text" value={newTrainer.name} onChange={e => setNewTrainer({ ...newTrainer, name: e.target.value })} placeholder="Trainer Name" className="form-input" />
+                <input type="text" value={newTrainer.fullName} onChange={e => setNewTrainer({ ...newTrainer, fullName: e.target.value })} placeholder="Trainer Name" className="form-input" />
               </div>
               <div>
-                <label className="form-label">Specialty</label>
-                <input type="text" value={newTrainer.specialty} onChange={e => setNewTrainer({ ...newTrainer, specialty: e.target.value })} placeholder="e.g. Strength & Conditioning" className="form-input" />
+                <label className="form-label">Email Address</label>
+                <input type="email" value={newTrainer.email} onChange={e => setNewTrainer({ ...newTrainer, email: e.target.value })} placeholder="trainer@example.com" className="form-input" />
+              </div>
+              <div>
+                <label className="form-label">Mobile Number</label>
+                <input type="tel" value={newTrainer.mobileNo} onChange={e => setNewTrainer({ ...newTrainer, mobileNo: e.target.value })} placeholder="1234567890" className="form-input" />
               </div>
               <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
                 <button className="btn-blue" style={{ flex: 1, justifyContent: "center" }}
-                  onClick={() => {
-                    if (!newTrainer.name.trim()) return;
-                    setTrainers(prev => [...prev, { id: Date.now(), name: newTrainer.name, specialty: newTrainer.specialty || "General Fitness", members: 0, status: "Active", rating: 5.0 }]);
-                    setNewTrainer({ name: "", specialty: "" });
-                    setShowAddTrainer(false);
+                  disabled={inviteTrainerLoading}
+                  onClick={async () => {
+                    if (!newTrainer.fullName || !newTrainer.email || !newTrainer.mobileNo) return;
+                    setInviteTrainerLoading(true);
+                    try {
+                      const res = await inviteTrainerApi(newTrainer);
+                      dispatch(showSnackbar({ message: res.data.message || "Invitation sent!", type: "success" }));
+                      setShowAddTrainer(false);
+                      setNewTrainer({ fullName: "", email: "", mobileNo: "" });
+                      fetchTrainers();
+                    } catch (error: any) {
+                      dispatch(showSnackbar({ message: error?.response?.data?.message || "Failed to invite trainer", type: "error" }));
+                    } finally {
+                      setInviteTrainerLoading(false);
+                    }
                   }}>
-                  Add Trainer
+                  {inviteTrainerLoading ? <Loader size={16} style={{ animation: "spin 1s linear infinite" }} /> : "Send Invite"}
                 </button>
                 <button className="btn-blue-outline" style={{ flex: 1, justifyContent: "center" }} onClick={() => setShowAddTrainer(false)}>Cancel</button>
               </div>
@@ -487,30 +519,47 @@ const GymDashboard: React.FC<Props> = ({
       )}
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 20 }}>
-        {trainers.map(t => (
-          <div key={t.id} className="gym-card">
+        {isTrainersLoading ? (
+          <div style={{ textAlign: "center", padding: "40px", gridColumn: "1 / -1" }}><Loader size={32} style={{ animation: "spin 1s linear infinite", color: "var(--primary)" }} /></div>
+        ) : trainers.map(t => (
+          <div key={t._id} className="gym-card">
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 16 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                 <div style={{ width: 52, height: 52, borderRadius: "50%", background: "rgba(245,158,11,0.1)", color: "#f59e0b", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1rem", fontWeight: 700, flexShrink: 0 }}>
-                  {t.name.slice(0, 2).toUpperCase()}
+                  {t.fullName?.slice(0, 2).toUpperCase() || "??"}
                 </div>
                 <div>
-                  <div style={{ fontWeight: 700, fontSize: "0.95rem", color: "var(--text-primary)" }}>{t.name}</div>
-                  <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginTop: 2 }}>{t.specialty}</div>
+                  <div style={{ fontWeight: 700, fontSize: "0.95rem", color: "var(--text-primary)" }}>{t.fullName}</div>
+                  <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginTop: 2 }}>Trainer</div>
                 </div>
               </div>
-              <span className={`checkin-status ${t.status === "Active" ? "status-active" : "status-inactive"}`}>{t.status}</span>
+              <span className={`checkin-status ${t.isActive ? "status-active" : "status-inactive"}`}>{t.isActive ? "Active" : "Pending Setup"}</span>
             </div>
-            <div style={{ display: "flex", gap: 20, paddingTop: 14, borderTop: "1px solid var(--border-color)" }}>
-              <div style={{ textAlign: "center", flex: 1 }}>
-                <div style={{ fontSize: "1.2rem", fontWeight: 700, color: "var(--text-primary)" }}>{t.members}</div>
-                <div style={{ fontSize: "0.72rem", color: "var(--text-muted)", marginTop: 2 }}>Members</div>
+            {!t.isActive && (
+              <button className="btn-blue-outline" style={{ fontSize: "0.75rem", padding: "4px 8px", width: "100%", justifyContent: "center", marginTop: "10px" }}
+                onClick={async () => {
+                  try {
+                    const res = await resendTrainerInvitationApi({ email: t.email });
+                    dispatch(showSnackbar({ message: res.data.message || "Invitation resent!", type: "success" }));
+                  } catch (err: any) {
+                    dispatch(showSnackbar({ message: err?.response?.data?.message || "Failed to resend invite", type: "error" }));
+                  }
+                }}>
+                Resend Invite
+              </button>
+            )}
+            {t.isActive && (
+              <div style={{ display: "flex", gap: 20, paddingTop: 14, borderTop: "1px solid var(--border-color)", marginTop: "10px" }}>
+                <div style={{ textAlign: "center", flex: 1 }}>
+                  <div style={{ fontSize: "1.2rem", fontWeight: 700, color: "var(--text-primary)" }}>0</div>
+                  <div style={{ fontSize: "0.72rem", color: "var(--text-muted)", marginTop: 2 }}>Members</div>
+                </div>
+                <div style={{ textAlign: "center", flex: 1 }}>
+                  <div style={{ fontSize: "1.2rem", fontWeight: 700, color: "#f59e0b" }}>⭐ 5.0</div>
+                  <div style={{ fontSize: "0.72rem", color: "var(--text-muted)", marginTop: 2 }}>Rating</div>
+                </div>
               </div>
-              <div style={{ textAlign: "center", flex: 1 }}>
-                <div style={{ fontSize: "1.2rem", fontWeight: 700, color: "#f59e0b" }}>⭐ {t.rating}</div>
-                <div style={{ fontSize: "0.72rem", color: "var(--text-muted)", marginTop: 2 }}>Rating</div>
-              </div>
-            </div>
+            )}
           </div>
         ))}
       </div>
