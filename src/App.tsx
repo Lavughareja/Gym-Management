@@ -46,9 +46,18 @@ export interface PaymentVerifiedPayload {
 // App root
 // ─────────────────────────────────────────────────────────────────────────────
 function App() {
-  const [mode, setMode] = useState<AppMode>("public");
+  const [mode, setMode] = useState<AppMode>(() => {
+    const hasDashUser = !!localStorage.getItem("dashUser");
+    if (hasDashUser && window.location.pathname === "/") {
+      return "dashboard";
+    }
+    return "public";
+  });
   const [paymentPayload, setPaymentPayload] = useState<PaymentVerifiedPayload | null>(null);
-  const [dashUser,       setDashUser]       = useState<DashboardUser | null>(null);
+  const [dashUser, setDashUser] = useState<DashboardUser | null>(() => {
+    const saved = localStorage.getItem("dashUser");
+    return saved ? JSON.parse(saved) : null;
+  });
 
   // Intercept URLs on mount
   useEffect(() => {
@@ -68,12 +77,14 @@ function App() {
   };
 
   const handleRegistrationSuccess = (gymName: string, ownerName: string) => {
-    setDashUser({
+    const newUser: DashboardUser = {
       ownerName:  ownerName  || "Gym Owner",
       email:      paymentPayload?.email || "",
       role:       "admin",
       canAddMember: true
-    });
+    };
+    setDashUser(newUser);
+    localStorage.setItem("dashUser", JSON.stringify(newUser));
     setPaymentPayload(null);
     setMode("dashboard");
     // Optionally clean URL if they were on a specific path
@@ -83,18 +94,21 @@ function App() {
   const handleLoginSuccess = (userPayload: any) => {
     // For now we set dummy dashboard user details if not provided,
     // in real app, these should come from user profile API.
-    setDashUser({
+    const newUser: DashboardUser = {
       ownerName:    userPayload?.fullName || "User",
       email:        userPayload?.email || "",
       role:         userPayload?.role || "member",
       canAddMember: userPayload?.canAddMember || false
-    });
+    };
+    setDashUser(newUser);
+    localStorage.setItem("dashUser", JSON.stringify(newUser));
     setMode("dashboard");
     window.history.pushState({}, "", "/");
   };
 
   const handleLogout = () => {
     setDashUser(null);
+    localStorage.removeItem("dashUser");
     setMode("public");
     window.history.pushState({}, "", "/");
   };

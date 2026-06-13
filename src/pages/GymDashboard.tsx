@@ -300,7 +300,7 @@ const GymDashboard: React.FC<Props> = ({
             <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "var(--text-primary)", marginBottom: 16 }}>Quick Actions</h3>
             <div className="actions-grid">
               {[
-                { label: "Add Member",  icon: UserPlus,     action: () => { setActiveTab("members"); setShowAddMember(true); } },
+                { label: "Add Member",  icon: UserPlus,     action: () => { setActiveTab("members"); setShowAddMember(true); }, hide: !canAddMember },
                 { label: "Add Trainer", icon: Dumbbell,     action: () => { setActiveTab("trainers"); setShowAddTrainer(true); } },
                 { label: "View Plans",  icon: ClipboardList, action: () => setActiveTab("plans") },
                 { label: "Managers",    icon: UserCog,      action: () => setActiveTab("managers"), hide: role === "gymmanager" },
@@ -345,9 +345,11 @@ const GymDashboard: React.FC<Props> = ({
           <h2 className="page-title">Members</h2>
           <p className="page-subtitle">{members.length} total members registered</p>
         </div>
-        <button className="btn-blue" onClick={() => setShowAddMember(true)}>
-          <Plus size={16} /> Add Member
-        </button>
+        {canAddMember && (
+          <button className="btn-blue" onClick={() => setShowAddMember(true)}>
+            <Plus size={16} /> Add Member
+          </button>
+        )}
       </div>
 
       {/* Search */}
@@ -521,73 +523,97 @@ const GymDashboard: React.FC<Props> = ({
         </div>
       )}
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 20 }}>
-        {isTrainersLoading ? (
-          <div style={{ textAlign: "center", padding: "40px", gridColumn: "1 / -1" }}><Loader size={32} style={{ animation: "spin 1s linear infinite", color: "var(--primary)" }} /></div>
-        ) : trainers.map(t => (
-          <div key={t._id} className="gym-card">
-            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 16 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                <div style={{ width: 52, height: 52, borderRadius: "50%", background: "rgba(245,158,11,0.1)", color: "#f59e0b", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1rem", fontWeight: 700, flexShrink: 0 }}>
-                  {t.fullName?.slice(0, 2).toUpperCase() || "??"}
-                </div>
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: "0.95rem", color: "var(--text-primary)" }}>{t.fullName}</div>
-                  <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginTop: 2 }}>Trainer</div>
-                </div>
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
-                <span className={`checkin-status ${t.isActive ? "status-active" : "status-inactive"}`}>{t.isActive ? "Active" : "Pending Setup"}</span>
-                {(role === "admin" || role === "superadmin" || role === "gymmanager") && t.isActive && (
-                  <label style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontSize: "0.75rem", color: "var(--text-muted)", marginTop: 4 }}>
-                    <input 
-                      type="checkbox" 
-                      checked={!!t.canAddMember} 
-                      onChange={async (e) => {
-                        const val = e.target.checked;
-                        setTrainers(prev => prev.map(tr => tr._id === t._id ? { ...tr, canAddMember: val } : tr));
-                        try {
-                          await updatePermissionApi(t._id, { canAddMember: val });
-                          dispatch(showSnackbar({ message: "Permissions updated", type: "success" }));
-                        } catch (err: any) {
-                          setTrainers(prev => prev.map(tr => tr._id === t._id ? { ...tr, canAddMember: !val } : tr));
-                          dispatch(showSnackbar({ message: err?.response?.data?.message || "Failed to update permissions", type: "error" }));
-                        }
-                      }} 
-                    />
-                    Can Add Members
-                  </label>
-                )}
-              </div>
-            </div>
-            {!t.isActive && (
-              <button className="btn-blue-outline" style={{ fontSize: "0.75rem", padding: "4px 8px", width: "100%", justifyContent: "center", marginTop: "10px" }}
-                onClick={async () => {
-                  try {
-                    const res = await resendTrainerInvitationApi({ email: t.email });
-                    dispatch(showSnackbar({ message: res.data.message || "Invitation resent!", type: "success" }));
-                  } catch (err: any) {
-                    dispatch(showSnackbar({ message: err?.response?.data?.message || "Failed to resend invite", type: "error" }));
-                  }
-                }}>
-                Resend Invite
-              </button>
-            )}
-            {t.isActive && (
-              <div style={{ display: "flex", gap: 20, paddingTop: 14, borderTop: "1px solid var(--border-color)", marginTop: "10px" }}>
-                <div style={{ textAlign: "center", flex: 1 }}>
-                  <div style={{ fontSize: "1.2rem", fontWeight: 700, color: "var(--text-primary)" }}>0</div>
-                  <div style={{ fontSize: "0.72rem", color: "var(--text-muted)", marginTop: 2 }}>Members</div>
-                </div>
-                <div style={{ textAlign: "center", flex: 1 }}>
-                  <div style={{ fontSize: "1.2rem", fontWeight: 700, color: "#f59e0b" }}>⭐ 5.0</div>
-                  <div style={{ fontSize: "0.72rem", color: "var(--text-muted)", marginTop: 2 }}>Rating</div>
-                </div>
-              </div>
-            )}
+      {isTrainersLoading ? (
+        <div style={{ textAlign: "center", padding: "40px" }}><Loader size={32} style={{ animation: "spin 1s linear infinite", color: "var(--primary)" }} /></div>
+      ) : trainers.length === 0 ? (
+        <div className="gym-card" style={{ textAlign: "center", padding: "60px 32px" }}>
+          <Dumbbell size={48} style={{ color: "var(--text-muted)", margin: "0 auto 16px" }} />
+          <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text-primary)", marginBottom: 8 }}>No Trainers Yet</h3>
+          <p style={{ color: "var(--text-secondary)", fontSize: "0.875rem", marginBottom: 24 }}>Add trainers to your team to start managing your members.</p>
+          <button className="btn-blue" style={{ justifyContent: "center" }} onClick={() => setShowAddTrainer(true)}>
+            <Plus size={16} /> Add Trainer
+          </button>
+        </div>
+      ) : (
+        <div className="gym-card" style={{ padding: 0, overflow: "hidden" }}>
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse" }}>
+              <thead>
+                <tr style={{ background: "var(--bg-secondary)", borderBottom: "1px solid var(--border-color)" }}>
+                  <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", whiteSpace: "nowrap" }}>Name</th>
+                  <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", whiteSpace: "nowrap" }}>Email</th>
+                  <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", whiteSpace: "nowrap" }}>Status</th>
+                  {(role === "admin" || role === "superadmin" || role === "gymmanager") && (
+                    <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", whiteSpace: "nowrap" }}>Can Add Members</th>
+                  )}
+                  <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", whiteSpace: "nowrap" }}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {trainers.map(t => (
+                  <tr key={t._id} style={{ borderBottom: "1px solid var(--border-color)", transition: "background 0.1s" }}
+                    onMouseEnter={e => (e.currentTarget.style.background = "var(--bg-secondary)")}
+                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
+                    <td style={{ padding: "14px 16px", fontWeight: 600, fontSize: "0.875rem", color: "var(--text-primary)" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                        <div style={{ width: 32, height: 32, borderRadius: "50%", background: "rgba(245,158,11,0.1)", color: "#f59e0b", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.8rem", fontWeight: 700, flexShrink: 0 }}>
+                          {t.fullName?.slice(0, 2).toUpperCase() || "??"}
+                        </div>
+                        {t.fullName}
+                      </div>
+                    </td>
+                    <td style={{ padding: "14px 16px", fontSize: "0.875rem", color: "var(--text-secondary)" }}>{t.email}</td>
+                    <td style={{ padding: "14px 16px" }}>
+                      <span className={`checkin-status ${t.isActive ? "status-active" : "status-inactive"}`}>
+                        {t.isActive ? "Active" : "Pending Setup"}
+                      </span>
+                    </td>
+                    {(role === "admin" || role === "superadmin" || role === "gymmanager") && (
+                      <td style={{ padding: "14px 16px" }}>
+                        {t.isActive && (
+                          <label className="switch" style={{ transform: "scale(0.8)", margin: 0 }}>
+                            <input 
+                              type="checkbox" 
+                              checked={!!t.canAddMember} 
+                              onChange={async (e) => {
+                                const val = e.target.checked;
+                                setTrainers(prev => prev.map(tr => tr._id === t._id ? { ...tr, canAddMember: val } : tr));
+                                try {
+                                  await updatePermissionApi(t._id, { canAddMember: val });
+                                  dispatch(showSnackbar({ message: "Permissions updated", type: "success" }));
+                                } catch (err: any) {
+                                  setTrainers(prev => prev.map(tr => tr._id === t._id ? { ...tr, canAddMember: !val } : tr));
+                                  dispatch(showSnackbar({ message: err?.response?.data?.message || "Failed to update permissions", type: "error" }));
+                                }
+                              }} 
+                            />
+                            <span className="slider" />
+                          </label>
+                        )}
+                      </td>
+                    )}
+                    <td style={{ padding: "14px 16px" }}>
+                      {!t.isActive && (
+                        <button className="btn-blue-outline" style={{ fontSize: "0.75rem", padding: "4px 8px" }}
+                          onClick={async () => {
+                            try {
+                              const res = await resendTrainerInvitationApi({ email: t.email });
+                              dispatch(showSnackbar({ message: res.data.message || "Invitation resent!", type: "success" }));
+                            } catch (err: any) {
+                              dispatch(showSnackbar({ message: err?.response?.data?.message || "Failed to resend invite", type: "error" }));
+                            }
+                          }}>
+                          Resend Invite
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        ))}
-      </div>
+        </div>
+      )}
     </div>
   );
 
@@ -671,6 +697,9 @@ const GymDashboard: React.FC<Props> = ({
                   <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", whiteSpace: "nowrap" }}>Name</th>
                   <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", whiteSpace: "nowrap" }}>Email</th>
                   <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", whiteSpace: "nowrap" }}>Status</th>
+                  {(role === "admin" || role === "superadmin") && (
+                    <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", whiteSpace: "nowrap" }}>Can Add Members</th>
+                  )}
                   <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", whiteSpace: "nowrap" }}>Actions</th>
                 </tr>
               </thead>
@@ -685,27 +714,31 @@ const GymDashboard: React.FC<Props> = ({
                       <span className={`checkin-status ${m.isActive ? "status-active" : "status-inactive"}`}>
                         {m.isActive ? "Active" : "Pending Setup"}
                       </span>
-                      {(role === "admin" || role === "superadmin") && m.isActive && (
-                        <label style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontSize: "0.75rem", color: "var(--text-muted)", marginTop: 8 }}>
-                          <input 
-                            type="checkbox" 
-                            checked={!!m.canAddMember} 
-                            onChange={async (e) => {
-                              const val = e.target.checked;
-                              setManagers(prev => prev.map(mgr => mgr._id === m._id ? { ...mgr, canAddMember: val } : mgr));
-                              try {
-                                await updatePermissionApi(m._id, { canAddMember: val });
-                                dispatch(showSnackbar({ message: "Permissions updated", type: "success" }));
-                              } catch (err: any) {
-                                setManagers(prev => prev.map(mgr => mgr._id === m._id ? { ...mgr, canAddMember: !val } : mgr));
-                                dispatch(showSnackbar({ message: err?.response?.data?.message || "Failed to update permissions", type: "error" }));
-                              }
-                            }} 
-                          />
-                          Can Add Members
-                        </label>
-                      )}
                     </td>
+                    {(role === "admin" || role === "superadmin") && (
+                      <td style={{ padding: "14px 16px" }}>
+                        {m.isActive && (
+                          <label className="switch" style={{ transform: "scale(0.8)", margin: 0 }}>
+                            <input 
+                              type="checkbox" 
+                              checked={!!m.canAddMember} 
+                              onChange={async (e) => {
+                                const val = e.target.checked;
+                                setManagers(prev => prev.map(mgr => mgr._id === m._id ? { ...mgr, canAddMember: val } : mgr));
+                                try {
+                                  await updatePermissionApi(m._id, { canAddMember: val });
+                                  dispatch(showSnackbar({ message: "Permissions updated", type: "success" }));
+                                } catch (err: any) {
+                                  setManagers(prev => prev.map(mgr => mgr._id === m._id ? { ...mgr, canAddMember: !val } : mgr));
+                                  dispatch(showSnackbar({ message: err?.response?.data?.message || "Failed to update permissions", type: "error" }));
+                                }
+                              }} 
+                            />
+                            <span className="slider" />
+                          </label>
+                        )}
+                      </td>
+                    )}
                     <td style={{ padding: "14px 16px" }}>
                       {!m.isActive && (
                         <button className="btn-blue-outline" style={{ fontSize: "0.75rem", padding: "4px 8px" }}
