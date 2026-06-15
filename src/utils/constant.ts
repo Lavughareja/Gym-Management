@@ -29,9 +29,10 @@ export const PAYMENT_TOKEN_KEY = "gym_payment_token";
 
 // Plan identifiers
 export const PLANS = {
-  WITHOUT_BIOMATRIX: "without_biomatrix",
-  WITH_BIOMATRIX:    "with_biomatrix",
-  ADDITIONAL_PLAN:   "additional_plan",
+  STARTER:      "starter",
+  PLUS:         "plus",
+  PROFESSIONAL: "professional",
+  ENTERPRISE:   "enterprise",
 } as const;
 
 export type PlanType = (typeof PLANS)[keyof typeof PLANS];

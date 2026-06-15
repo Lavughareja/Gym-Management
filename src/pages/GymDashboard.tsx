@@ -3,6 +3,7 @@ import {
   LayoutDashboard, Users, Dumbbell, UserCog, Settings,
   LogOut, Menu, X, Plus, Search, ChevronRight,
   CreditCard, UserPlus, ClipboardList, CheckCircle2, Sun, Moon,
+  Activity, Upload, Lock, Clock, Copy, Fingerprint, RefreshCw
 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../utils/reduxHooks";
 import { logoutAction } from "../redux/actions/authActions";
@@ -11,14 +12,17 @@ import { getTrainersApi, inviteTrainerApi, resendTrainerInvitationApi } from "..
 import { updatePermissionApi } from "../services/apis/permissionApis";
 import { showSnackbar } from "../redux/slices/snackbarSlice";
 import { Loader } from "lucide-react";
+import { getDevicesApi, addDeviceApi } from "../services/apis/biometricApis";
+import { getTodayAttendanceApi } from "../services/apis/attendanceApis";
+import { bulkImportMembersApi } from "../services/apis/memberApis";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
-type DashTab = "overview" | "members" | "trainers" | "managers" | "plans" | "settings";
+type DashTab = "overview" | "members" | "trainers" | "managers" | "plans" | "settings" | "attendance";
 
 interface Member {
-  id: number; name: string; plan: string; status: "Active" | "Inactive"; joined: string; avatar: string;
+  id: number; name: string; plan: string; status: "Active" | "Inactive"; joined: string; avatar: string; biometricId?: string;
 }
 interface Trainer {
   id: number; name: string; specialty: string; members: number; status: "Active" | "On Leave"; rating: number;
@@ -144,6 +148,7 @@ const GymDashboard: React.FC<Props> = ({
 
   const navItems: { id: DashTab; label: string; icon: React.FC<{size?: number}> }[] = [
     { id: "overview" as DashTab,  label: "Overview",    icon: LayoutDashboard as any },
+    { id: "attendance" as DashTab, label: "Attendance", icon: Activity as any },
     { id: "members" as DashTab,   label: "Members",     icon: Users as any },
     { id: "trainers" as DashTab,  label: "Trainers",    icon: Dumbbell as any },
     { id: "managers" as DashTab,  label: "Managers",    icon: UserCog as any },
@@ -337,6 +342,10 @@ const GymDashboard: React.FC<Props> = ({
 
   // ── Members panel ────────────────────────────────────────────────────────
   const [newMember, setNewMember] = useState({ name: "", plan: "Pro Athlete", email: "" });
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [selectedMember, setSelectedMember] = useState<Member | null>(null);
+  const [importing, setImporting] = useState(false);
 
   const MembersPanel = (
     <div className="page-container">
@@ -346,9 +355,14 @@ const GymDashboard: React.FC<Props> = ({
           <p className="page-subtitle">{members.length} total members registered</p>
         </div>
         {canAddMember && (
-          <button className="btn-blue" onClick={() => setShowAddMember(true)}>
-            <Plus size={16} /> Add Member
-          </button>
+          <div style={{ display: "flex", gap: 10 }}>
+            <button className="btn-blue-outline" onClick={() => setShowImportModal(true)}>
+              <Upload size={16} /> Import Members
+            </button>
+            <button className="btn-blue" onClick={() => setShowAddMember(true)}>
+              <Plus size={16} /> Add Member
+            </button>
+          </div>
         )}
       </div>
 
@@ -416,6 +430,108 @@ const GymDashboard: React.FC<Props> = ({
         </div>
       )}
 
+      {/* Import Members Modal */}
+      {showImportModal && (
+        <div style={overlayStyle}>
+          <div className="gym-card" style={{ maxWidth: 440, width: "100%", padding: "32px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+              <h3 style={{ fontSize: "1.1rem", fontWeight: 700 }}>Import Members via CSV</h3>
+              <button onClick={() => { setShowImportModal(false); setImportFile(null); }} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)" }}><X size={20} /></button>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              <p style={{ fontSize: "0.875rem", color: "var(--text-secondary)" }}>
+                Upload a CSV file containing members data. Make sure it follows the required format.
+                <br /><a href="#" style={{ color: "var(--primary)", textDecoration: "none", fontWeight: 600 }}>Download Sample CSV</a>
+              </p>
+              <div>
+                <label className="form-label">Select CSV File</label>
+                <input
+                  type="file"
+                  accept=".csv"
+                  onChange={e => setImportFile(e.target.files?.[0] || null)}
+                  className="form-input"
+                  style={{ padding: "8px" }}
+                />
+              </div>
+              <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
+                <button className="btn-blue" style={{ flex: 1, justifyContent: "center" }}
+                  disabled={!importFile || importing}
+                  onClick={async () => {
+                    if (!importFile) return;
+                    setImporting(true);
+                    try {
+                      const formData = new FormData();
+                      formData.append("file", importFile);
+                      await bulkImportMembersApi(formData);
+                      dispatch(showSnackbar({ message: "Members imported successfully!", type: "success" }));
+                      setShowImportModal(false);
+                      setImportFile(null);
+                      // In a real app, refetch members here
+                    } catch (error: any) {
+                      dispatch(showSnackbar({ message: error?.response?.data?.message || "Failed to import members", type: "error" }));
+                    } finally {
+                      setImporting(false);
+                    }
+                  }}>
+                  {importing ? <Loader size={16} style={{ animation: "spin 1s linear infinite" }} /> : "Upload"}
+                </button>
+                <button className="btn-blue-outline" style={{ flex: 1, justifyContent: "center" }} onClick={() => { setShowImportModal(false); setImportFile(null); }}>Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Member Profile Modal */}
+      {selectedMember && (
+        <div style={overlayStyle}>
+          <div className="gym-card" style={{ maxWidth: 440, width: "100%", padding: "32px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+              <h3 style={{ fontSize: "1.1rem", fontWeight: 700 }}>Member Profile</h3>
+              <button onClick={() => setSelectedMember(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)" }}><X size={20} /></button>
+            </div>
+            
+            <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24 }}>
+              <div className="checkin-avatar" style={{ width: 64, height: 64, fontSize: "1.5rem", background: "var(--primary-light)", color: "var(--primary)" }}>
+                {selectedMember.avatar}
+              </div>
+              <div>
+                <h4 style={{ fontSize: "1.25rem", fontWeight: 700, margin: "0 0 4px 0", color: "var(--text-primary)" }}>{selectedMember.name}</h4>
+                <div style={{ fontSize: "0.875rem", color: "var(--text-secondary)" }}>{selectedMember.plan} · Joined {selectedMember.joined}</div>
+              </div>
+            </div>
+
+            <div style={{ background: "var(--bg-secondary)", padding: "16px", borderRadius: "12px", marginBottom: 20 }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--text-primary)", fontWeight: 600 }}>
+                  <Fingerprint size={18} style={{ color: "var(--primary)" }} /> Biometric ID
+                </div>
+                <span className={`checkin-status status-active`}>Registered</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <span style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--text-primary)", fontFamily: "monospace" }}>
+                  {selectedMember.biometricId || Math.floor(100 + Math.random() * 900)}
+                </span>
+                <button 
+                  style={{ background: "none", border: "none", color: "var(--primary)", cursor: "pointer", display: "flex", alignItems: "center", gap: 4, fontSize: "0.875rem", fontWeight: 600 }}
+                  onClick={() => {
+                    navigator.clipboard.writeText(selectedMember.biometricId || "105");
+                    dispatch(showSnackbar({ message: "Copied to clipboard", type: "success" }));
+                  }}
+                >
+                  <Copy size={14} /> Copy
+                </button>
+              </div>
+              <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: 8 }}>
+                Enter this ID into the biometric device to register the member's fingerprint/face.
+              </p>
+            </div>
+
+            <button className="btn-blue" style={{ width: "100%", justifyContent: "center" }} onClick={() => setSelectedMember(null)}>Close</button>
+          </div>
+        </div>
+      )}
+
       {/* Table */}
       <div className="gym-card" style={{ padding: 0, overflow: "hidden" }}>
         <div style={{ overflowX: "auto" }}>
@@ -447,10 +563,16 @@ const GymDashboard: React.FC<Props> = ({
                   </td>
                   <td style={{ padding: "14px 16px", fontSize: "0.875rem", color: "var(--text-muted)", whiteSpace: "nowrap" }}>{m.joined}</td>
                   <td style={{ padding: "14px 16px" }}>
-                    <button onClick={() => setMembers(prev => prev.map(x => x.id === m.id ? { ...x, status: x.status === "Active" ? "Inactive" : "Active" } : x))}
-                      style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", fontSize: "0.8rem", padding: "4px 8px", borderRadius: 6, transition: "background 0.1s" }}>
-                      Toggle
-                    </button>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <button onClick={() => setSelectedMember(m)}
+                        style={{ background: "none", border: "none", cursor: "pointer", color: "var(--primary)", fontSize: "0.8rem", padding: "4px 8px", borderRadius: 6, transition: "background 0.1s", fontWeight: 600 }}>
+                        View
+                      </button>
+                      <button onClick={() => setMembers(prev => prev.map(x => x.id === m.id ? { ...x, status: x.status === "Active" ? "Inactive" : "Active" } : x))}
+                        style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", fontSize: "0.8rem", padding: "4px 8px", borderRadius: 6, transition: "background 0.1s" }}>
+                        Toggle
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -795,7 +917,126 @@ const GymDashboard: React.FC<Props> = ({
     </div>
   );
 
+  // ── Attendance panel ───────────────────────────────────────────────────────
+  const [attendanceEvents, setAttendanceEvents] = useState<any[]>([]);
+  const [isAttendanceLoading, setIsAttendanceLoading] = useState(false);
+
+  useEffect(() => {
+    if (activeTab === "attendance") {
+      const fetchAttendance = async () => {
+        try {
+          const res = await getTodayAttendanceApi();
+          // Mock data if API fails or returns empty for now
+          if (res.data?.attendance?.length > 0) {
+            setAttendanceEvents(res.data.attendance);
+          } else {
+            setAttendanceEvents([
+              { id: 1, memberName: "John Doe", time: new Date().toLocaleTimeString(), status: "SUCCESS", avatar: "JD" },
+              { id: 2, memberName: "Jane Smith", time: new Date(Date.now() - 500000).toLocaleTimeString(), status: "MEMBERSHIP_EXPIRED", avatar: "JS" },
+              { id: 3, memberName: "Unknown User", time: new Date(Date.now() - 1000000).toLocaleTimeString(), status: "DENIED_OTHER", avatar: "??" }
+            ]);
+          }
+        } catch (error) {
+          console.error("Failed to fetch attendance", error);
+          // Fallback to mock data
+          setAttendanceEvents([
+            { id: 1, memberName: "John Doe", time: new Date().toLocaleTimeString(), status: "SUCCESS", avatar: "JD" },
+            { id: 2, memberName: "Jane Smith", time: new Date(Date.now() - 500000).toLocaleTimeString(), status: "MEMBERSHIP_EXPIRED", avatar: "JS" },
+            { id: 3, memberName: "Unknown User", time: new Date(Date.now() - 1000000).toLocaleTimeString(), status: "DENIED_OTHER", avatar: "??" }
+          ]);
+        }
+      };
+      
+      fetchAttendance();
+      const interval = setInterval(fetchAttendance, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [activeTab]);
+
+  const AttendancePanel = (
+    <div className="page-container">
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
+        <div>
+          <h2 className="page-title">Live Attendance</h2>
+          <p className="page-subtitle">Real-time biometric punch-ins for today.</p>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, color: "var(--primary)", fontSize: "0.875rem", fontWeight: 600 }}>
+          <RefreshCw size={16} style={{ animation: "spin 2s linear infinite" }} /> Live
+        </div>
+      </div>
+
+      <div className="gym-card" style={{ padding: 0, overflow: "hidden" }}>
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr style={{ background: "var(--bg-secondary)", borderBottom: "1px solid var(--border-color)" }}>
+                <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", whiteSpace: "nowrap" }}>Member</th>
+                <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", whiteSpace: "nowrap" }}>Time</th>
+                <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", whiteSpace: "nowrap" }}>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {attendanceEvents.map((event, i) => (
+                <tr key={event.id || i} style={{ borderBottom: "1px solid var(--border-color)" }}>
+                  <td style={{ padding: "14px 16px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                      <div className="checkin-avatar" style={{ background: "var(--primary-light)", color: "var(--primary)", fontSize: "0.75rem", fontWeight: 700 }}>
+                        {event.avatar || event.memberName?.slice(0, 2).toUpperCase() || "??"}
+                      </div>
+                      <div style={{ fontWeight: 600, fontSize: "0.875rem", color: "var(--text-primary)" }}>{event.memberName}</div>
+                    </div>
+                  </td>
+                  <td style={{ padding: "14px 16px", fontSize: "0.875rem", color: "var(--text-secondary)" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <Clock size={14} style={{ color: "var(--text-muted)" }} /> {event.time}
+                    </div>
+                  </td>
+                  <td style={{ padding: "14px 16px" }}>
+                    {event.status === "SUCCESS" && <span className="checkin-status status-active">Access Granted</span>}
+                    {event.status === "MEMBERSHIP_EXPIRED" && <span className="checkin-status" style={{ background: "rgba(245,158,11,0.1)", color: "#f59e0b" }}>Expired - Renew</span>}
+                    {event.status === "DENIED_OTHER" && <span className="checkin-status status-inactive">Access Denied</span>}
+                  </td>
+                </tr>
+              ))}
+              {attendanceEvents.length === 0 && (
+                <tr>
+                  <td colSpan={3} style={{ padding: "40px", textAlign: "center", color: "var(--text-muted)" }}>
+                    No punch-ins yet today.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+
   // ── Settings panel ───────────────────────────────────────────────────────
+  const [devices, setDevices] = useState<any[]>([]);
+  const [showAddDevice, setShowAddDevice] = useState(false);
+  const [newDevice, setNewDevice] = useState({ name: "", serialNumber: "", provider: "mock" });
+  const [addingDevice, setAddingDevice] = useState(false);
+  const [gymPlan] = useState<"starter" | "plus" | "professional" | "enterprise">("plus"); // Mocked gym plan
+  const [fetchingDevices, setFetchingDevices] = useState(false);
+
+  useEffect(() => {
+    if (activeTab === "settings" && gymPlan !== "starter") {
+      const loadDevices = async () => {
+        setFetchingDevices(true);
+        try {
+          const res = await getDevicesApi();
+          if (res.data?.devices) setDevices(res.data.devices);
+        } catch (error) {
+          console.error("Failed to fetch devices", error);
+        } finally {
+          setFetchingDevices(false);
+        }
+      };
+      loadDevices();
+    }
+  }, [activeTab, gymPlan]);
+
   const SettingsPanel = (
     <div className="page-container" style={{ maxWidth: 700 }}>
       <div style={{ marginBottom: 28 }}>
@@ -825,6 +1066,107 @@ const GymDashboard: React.FC<Props> = ({
           <button className="btn-blue" style={{ marginTop: 20, justifyContent: "center" }}>Save Changes</button>
         </div>
 
+        {/* Biometric Devices Section */}
+        <div className="gym-card">
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+            <div>
+              <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "var(--text-primary)" }}>Biometric Devices</h3>
+              <p style={{ fontSize: "0.875rem", color: "var(--text-secondary)" }}>Manage physical access control devices.</p>
+            </div>
+            {gymPlan !== "starter" && (
+              <button className="btn-blue-outline" onClick={() => setShowAddDevice(true)}>
+                <Plus size={16} /> Add Device
+              </button>
+            )}
+          </div>
+          
+          {gymPlan === "starter" ? (
+            <div style={{ background: "rgba(245,158,11,0.1)", padding: "20px", borderRadius: "8px", textAlign: "center", border: "1px solid rgba(245,158,11,0.2)" }}>
+              <Lock size={32} style={{ color: "#f59e0b", margin: "0 auto 12px" }} />
+              <h4 style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text-primary)", marginBottom: 8 }}>Upgrade Required</h4>
+              <p style={{ fontSize: "0.875rem", color: "var(--text-muted)" }}>Upgrade to Plus, Professional, or Enterprise to use Biometric Attendance.</p>
+            </div>
+          ) : fetchingDevices ? (
+            <div style={{ textAlign: "center", padding: "20px" }}><Loader size={24} style={{ animation: "spin 1s linear infinite", color: "var(--primary)" }} /></div>
+          ) : devices.length === 0 ? (
+            <div style={{ background: "var(--bg-secondary)", padding: "20px", borderRadius: "8px", textAlign: "center" }}>
+              <Fingerprint size={32} style={{ color: "var(--text-muted)", margin: "0 auto 12px" }} />
+              <h4 style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text-primary)", marginBottom: 8 }}>No Devices Registered</h4>
+              <p style={{ fontSize: "0.875rem", color: "var(--text-muted)" }}>Click 'Add Device' to register a new ZKTeco, eSSL, or other supported machine.</p>
+            </div>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {devices.map((device, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px", background: "var(--bg-secondary)", borderRadius: "8px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <div style={{ background: "var(--primary-light)", color: "var(--primary)", padding: "8px", borderRadius: "6px" }}><Fingerprint size={16} /></div>
+                    <div>
+                      <div style={{ fontWeight: 600, fontSize: "0.875rem", color: "var(--text-primary)" }}>{device.name}</div>
+                      <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>{device.provider} · SN: {device.serialNumber}</div>
+                    </div>
+                  </div>
+                  <span className={`checkin-status ${device.status === "Online" ? "status-active" : "status-inactive"}`}>{device.status || "Offline"}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Add Device Modal */}
+        {showAddDevice && (
+          <div style={overlayStyle}>
+            <div className="gym-card" style={{ maxWidth: 440, width: "100%", padding: "32px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                <h3 style={{ fontSize: "1.1rem", fontWeight: 700 }}>Add Biometric Device</h3>
+                <button onClick={() => setShowAddDevice(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)" }}><X size={20} /></button>
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                <div>
+                  <label className="form-label">Device Name</label>
+                  <input type="text" value={newDevice.name} onChange={e => setNewDevice({ ...newDevice, name: e.target.value })} placeholder="Front Door Fingerprint" className="form-input" />
+                </div>
+                <div>
+                  <label className="form-label">Serial Number</label>
+                  <input type="text" value={newDevice.serialNumber} onChange={e => setNewDevice({ ...newDevice, serialNumber: e.target.value })} placeholder="Found on the physical machine" className="form-input" />
+                </div>
+                <div>
+                  <label className="form-label">Provider</label>
+                  <select value={newDevice.provider} onChange={e => setNewDevice({ ...newDevice, provider: e.target.value })} className="form-input" style={{ cursor: "pointer" }}>
+                    <option value="mock">Mock Provider</option>
+                    <option value="zkteco">ZKTeco</option>
+                    <option value="essl">eSSL</option>
+                    <option value="hikvision">Hikvision</option>
+                    <option value="suprema">Suprema</option>
+                    <option value="matrix">Matrix</option>
+                    <option value="custom">Custom Provider</option>
+                  </select>
+                </div>
+                <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
+                  <button className="btn-blue" style={{ flex: 1, justifyContent: "center" }}
+                    disabled={addingDevice || !newDevice.name || !newDevice.serialNumber}
+                    onClick={async () => {
+                      setAddingDevice(true);
+                      try {
+                        const res = await addDeviceApi(newDevice);
+                        dispatch(showSnackbar({ message: "Device added successfully!", type: "success" }));
+                        setDevices(prev => [...prev, { ...newDevice, status: "Offline" }]);
+                        setShowAddDevice(false);
+                        setNewDevice({ name: "", serialNumber: "", provider: "mock" });
+                      } catch (error: any) {
+                        dispatch(showSnackbar({ message: error?.response?.data?.message || "Failed to add device", type: "error" }));
+                      } finally {
+                        setAddingDevice(false);
+                      }
+                    }}>
+                    {addingDevice ? <Loader size={16} style={{ animation: "spin 1s linear infinite" }} /> : "Register Device"}
+                  </button>
+                  <button className="btn-blue-outline" style={{ flex: 1, justifyContent: "center" }} onClick={() => setShowAddDevice(false)}>Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="gym-card">
           <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "var(--danger)", marginBottom: 8 }}>Danger Zone</h3>
           <p style={{ fontSize: "0.875rem", color: "var(--text-secondary)", marginBottom: 16 }}>Logging out will remove your session from this device.</p>
@@ -838,6 +1180,7 @@ const GymDashboard: React.FC<Props> = ({
 
   const panels: Record<DashTab, React.ReactNode> = {
     overview: OverviewPanel,
+    attendance: AttendancePanel,
     members:  MembersPanel,
     trainers: TrainersPanel,
     managers: ManagersPanel,

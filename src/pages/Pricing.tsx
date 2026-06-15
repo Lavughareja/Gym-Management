@@ -69,7 +69,7 @@ export const Pricing: React.FC<PricingProps> = ({ onPaymentVerified }) => {
   const plans: PricingPlan[] = [
     {
       name: "Basic Strength",
-      apiPlan: "without_biomatrix",
+      apiPlan: "starter",
       priceMonthly: 29,
       priceYearly: 23,
       desc: "Perfect for self-starters who want premium gym floor access.",
@@ -86,7 +86,7 @@ export const Pricing: React.FC<PricingProps> = ({ onPaymentVerified }) => {
     },
     {
       name: "Pro Athlete",
-      apiPlan: "with_biomatrix",
+      apiPlan: "plus",
       priceMonthly: 59,
       priceYearly: 47,
       desc: "Our most popular plan. Access classes and extra benefits.",
@@ -103,7 +103,7 @@ export const Pricing: React.FC<PricingProps> = ({ onPaymentVerified }) => {
     },
     {
       name: "VIP Elite",
-      apiPlan: "additional_plan",
+      apiPlan: "professional",
       priceMonthly: 99,
       priceYearly: 79,
       desc: "The ultimate fitness journey. Complete with dedicated coaches.",

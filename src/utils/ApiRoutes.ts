@@ -17,4 +17,13 @@ export const apiRoutes = {
   managers: "/managers",
   inviteManager: "/managers/invite",
   resendInvitation: "/managers/resend-invitation",
+
+  // ── Biometric Devices ─────────────────────────────────────────────────────
+  devices: "/manager/devices",
+  
+  // ── Attendance ────────────────────────────────────────────────────────────
+  attendanceToday: "/attendance/today",
+  
+  // ── Members ───────────────────────────────────────────────────────────────
+  bulkImportMembers: "/manager/members/bulk-import",
 } as const;
