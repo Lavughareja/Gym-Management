@@ -25,3 +25,8 @@ export const resendInvitationApi = async (payload: ResendInvitationPayload) => {
   const response = await AxiosInstance.post(apiRoutes.resendInvitation, payload);
   return response;
 };
+
+export const deleteManagerApi = async (id: string) => {
+  const response = await AxiosInstance.delete(`/managers/${id}`);
+  return response;
+};

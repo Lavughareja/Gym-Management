@@ -11,3 +11,7 @@ export const resendTrainerInvitationApi = (data: { email: string }) => {
 export const getTrainersApi = () => {
   return AxiosInstance.get('/trainers');
 };
+
+export const deleteTrainerApi = (id: string) => {
+  return AxiosInstance.delete(`/trainers/${id}`);
+};

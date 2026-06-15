@@ -7,12 +7,12 @@ import {
 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../utils/reduxHooks";
 import { logoutAction } from "../redux/actions/authActions";
-import { getManagersApi, inviteManagerApi, resendInvitationApi } from "../services/apis/managerApis";
-import { getTrainersApi, inviteTrainerApi, resendTrainerInvitationApi } from "../services/apis/trainerApis";
+import { getManagersApi, inviteManagerApi, resendInvitationApi, deleteManagerApi } from "../services/apis/managerApis";
+import { getTrainersApi, inviteTrainerApi, resendTrainerInvitationApi, deleteTrainerApi } from "../services/apis/trainerApis";
 import { updatePermissionApi } from "../services/apis/permissionApis";
 import { showSnackbar } from "../redux/slices/snackbarSlice";
 import { Loader } from "lucide-react";
-import { getDevicesApi, addDeviceApi } from "../services/apis/biometricApis";
+import { getDevicesApi, addDeviceApi, deleteDeviceApi } from "../services/apis/biometricApis";
 import { getTodayAttendanceApi } from "../services/apis/attendanceApis";
 import { bulkImportMembersApi } from "../services/apis/memberApis";
 
@@ -306,7 +306,7 @@ const GymDashboard: React.FC<Props> = ({
             <div className="actions-grid">
               {[
                 { label: "Add Member",  icon: UserPlus,     action: () => { setActiveTab("members"); setShowAddMember(true); }, hide: !canAddMember },
-                { label: "Add Trainer", icon: Dumbbell,     action: () => { setActiveTab("trainers"); setShowAddTrainer(true); } },
+                { label: "Add Trainer", icon: Dumbbell,     action: () => { setActiveTab("trainers"); setShowAddTrainer(true); }, hide: role === "trainer" },
                 { label: "View Plans",  icon: ClipboardList, action: () => setActiveTab("plans") },
                 { label: "Managers",    icon: UserCog,      action: () => setActiveTab("managers"), hide: role === "gymmanager" },
               ].filter(a => !a.hide).map(({ label, icon: Icon, action }) => (
@@ -584,7 +584,7 @@ const GymDashboard: React.FC<Props> = ({
   );
 
   // ── Trainers panel ───────────────────────────────────────────────────────
-  const [newTrainer, setNewTrainer] = useState({ fullName: "", email: "", mobileNo: "" });
+  const [newTrainer, setNewTrainer] = useState({ fullName: "", email: "", mobileNo: "", canAddMember: false });
 
   const TrainersPanel = (
     <div className="page-container">
@@ -593,9 +593,11 @@ const GymDashboard: React.FC<Props> = ({
           <h2 className="page-title">Trainers</h2>
           <p className="page-subtitle">{trainers.length} trainers on your team</p>
         </div>
-        <button className="btn-blue" onClick={() => setShowAddTrainer(true)}>
-          <Plus size={16} /> Add Trainer
-        </button>
+        {role !== "trainer" && (
+          <button className="btn-blue" onClick={() => setShowAddTrainer(true)}>
+            <Plus size={16} /> Add Trainer
+          </button>
+        )}
       </div>
 
       {showAddTrainer && (
@@ -617,6 +619,25 @@ const GymDashboard: React.FC<Props> = ({
               <div>
                 <label className="form-label">Mobile Number</label>
                 <input type="tel" value={newTrainer.mobileNo} onChange={e => setNewTrainer({ ...newTrainer, mobileNo: e.target.value })} placeholder="1234567890" className="form-input" />
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 4, marginBottom: 8, padding: "8px 0" }}>
+                  <div>
+                    <h4 style={{ fontSize: "0.9rem", fontWeight: 600, color: "var(--text-primary)" }}>Can Add Members</h4>
+                    <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: 2 }}>Allow this trainer to register new members</p>
+                  </div>
+                  <div 
+                    onClick={() => setNewTrainer({ ...newTrainer, canAddMember: !newTrainer.canAddMember })}
+                    style={{
+                      width: 44, height: 24, borderRadius: 12, background: newTrainer.canAddMember ? "var(--primary)" : "var(--border)",
+                      position: "relative", cursor: "pointer", transition: "all 0.3s ease"
+                    }}
+                  >
+                    <div style={{
+                      width: 20, height: 20, background: "#fff", borderRadius: "50%",
+                      position: "absolute", top: 2, left: newTrainer.canAddMember ? 22 : 2,
+                      transition: "all 0.3s ease", boxShadow: "0 2px 4px rgba(0,0,0,0.2)"
+                    }} />
+                  </div>
+                </div>
               </div>
               <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
                 <button className="btn-blue" style={{ flex: 1, justifyContent: "center" }}
@@ -628,7 +649,7 @@ const GymDashboard: React.FC<Props> = ({
                       const res = await inviteTrainerApi(newTrainer);
                       dispatch(showSnackbar({ message: res.data.message || "Invitation sent!", type: "success" }));
                       setShowAddTrainer(false);
-                      setNewTrainer({ fullName: "", email: "", mobileNo: "" });
+                      setNewTrainer({ fullName: "", email: "", mobileNo: "", canAddMember: false });
                       fetchTrainers();
                     } catch (error: any) {
                       dispatch(showSnackbar({ message: error?.response?.data?.message || "Failed to invite trainer", type: "error" }));
@@ -652,9 +673,11 @@ const GymDashboard: React.FC<Props> = ({
           <Dumbbell size={48} style={{ color: "var(--text-muted)", margin: "0 auto 16px" }} />
           <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text-primary)", marginBottom: 8 }}>No Trainers Yet</h3>
           <p style={{ color: "var(--text-secondary)", fontSize: "0.875rem", marginBottom: 24 }}>Add trainers to your team to start managing your members.</p>
-          <button className="btn-blue" style={{ justifyContent: "center" }} onClick={() => setShowAddTrainer(true)}>
-            <Plus size={16} /> Add Trainer
-          </button>
+          {role !== "trainer" && (
+            <button className="btn-blue" style={{ justifyContent: "center" }} onClick={() => setShowAddTrainer(true)}>
+              <Plus size={16} /> Add Trainer
+            </button>
+          )}
         </div>
       ) : (
         <div className="gym-card" style={{ padding: 0, overflow: "hidden" }}>
@@ -726,6 +749,21 @@ const GymDashboard: React.FC<Props> = ({
                             }
                           }}>
                           Resend Invite
+                        </button>
+                      )}
+                      {(role === "admin" || role === "superadmin" || role === "gymmanager") && (
+                        <button className="btn-blue-outline" style={{ fontSize: "0.75rem", padding: "4px 8px", borderColor: "#ef4444", color: "#ef4444" }}
+                          onClick={async () => {
+                            if (!window.confirm(`Are you sure you want to delete ${t.fullName}?`)) return;
+                            try {
+                              await deleteTrainerApi(t._id);
+                              dispatch(showSnackbar({ message: "Trainer deleted", type: "success" }));
+                              fetchTrainers();
+                            } catch (err: any) {
+                              dispatch(showSnackbar({ message: err?.response?.data?.message || "Failed to delete trainer", type: "error" }));
+                            }
+                          }}>
+                          Delete
                         </button>
                       )}
                     </td>
@@ -875,6 +913,21 @@ const GymDashboard: React.FC<Props> = ({
                           Resend Invite
                         </button>
                       )}
+                      {(role === "admin" || role === "superadmin") && (
+                        <button className="btn-blue-outline" style={{ fontSize: "0.75rem", padding: "4px 8px", borderColor: "#ef4444", color: "#ef4444", marginLeft: "8px" }}
+                          onClick={async () => {
+                            if (!window.confirm(`Are you sure you want to delete ${m.fullName}?`)) return;
+                            try {
+                              await deleteManagerApi(m._id);
+                              dispatch(showSnackbar({ message: "Manager deleted", type: "success" }));
+                              fetchManagers();
+                            } catch (err: any) {
+                              dispatch(showSnackbar({ message: err?.response?.data?.message || "Failed to delete manager", type: "error" }));
+                            }
+                          }}>
+                          Delete
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -1020,20 +1073,21 @@ const GymDashboard: React.FC<Props> = ({
   const [gymPlan] = useState<"starter" | "plus" | "professional" | "enterprise">("plus"); // Mocked gym plan
   const [fetchingDevices, setFetchingDevices] = useState(false);
 
+  const fetchDevices = async () => {
+    setFetchingDevices(true);
+    try {
+      const res = await getDevicesApi();
+      if (res.data?.devices) setDevices(res.data.devices);
+    } catch (error) {
+      console.error("Failed to fetch devices", error);
+    } finally {
+      setFetchingDevices(false);
+    }
+  };
+
   useEffect(() => {
     if (activeTab === "settings" && gymPlan !== "starter") {
-      const loadDevices = async () => {
-        setFetchingDevices(true);
-        try {
-          const res = await getDevicesApi();
-          if (res.data?.devices) setDevices(res.data.devices);
-        } catch (error) {
-          console.error("Failed to fetch devices", error);
-        } finally {
-          setFetchingDevices(false);
-        }
-      };
-      loadDevices();
+      fetchDevices();
     }
   }, [activeTab, gymPlan]);
 
@@ -1105,7 +1159,22 @@ const GymDashboard: React.FC<Props> = ({
                       <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>{device.provider} · SN: {device.serialNumber}</div>
                     </div>
                   </div>
-                  <span className={`checkin-status ${device.status === "Online" ? "status-active" : "status-inactive"}`}>{device.status || "Offline"}</span>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <span className={`checkin-status ${device.status === "Online" ? "status-active" : "status-inactive"}`}>{device.status || "Offline"}</span>
+                    <button className="btn-blue-outline" style={{ fontSize: "0.75rem", padding: "4px 8px", borderColor: "#ef4444", color: "#ef4444" }}
+                      onClick={async () => {
+                        if (!window.confirm(`Are you sure you want to remove ${device.name}?`)) return;
+                        try {
+                          await deleteDeviceApi(device.id);
+                          dispatch(showSnackbar({ message: "Device removed successfully", type: "success" }));
+                          fetchDevices();
+                        } catch (err: any) {
+                          dispatch(showSnackbar({ message: err?.response?.data?.message || "Failed to remove device", type: "error" }));
+                        }
+                      }}>
+                      Remove
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -1149,7 +1218,7 @@ const GymDashboard: React.FC<Props> = ({
                       try {
                         const res = await addDeviceApi(newDevice);
                         dispatch(showSnackbar({ message: "Device added successfully!", type: "success" }));
-                        setDevices(prev => [...prev, { ...newDevice, status: "Offline" }]);
+                        fetchDevices();
                         setShowAddDevice(false);
                         setNewDevice({ name: "", serialNumber: "", provider: "mock" });
                       } catch (error: any) {
