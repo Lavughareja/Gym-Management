@@ -14,7 +14,8 @@ import { showSnackbar } from "../redux/slices/snackbarSlice";
 import { Loader } from "lucide-react";
 import { getDevicesApi, addDeviceApi, deleteDeviceApi } from "../services/apis/biometricApis";
 import { getTodayAttendanceApi } from "../services/apis/attendanceApis";
-import { bulkImportMembersApi } from "../services/apis/memberApis";
+import { bulkImportMembersApi, addMemberApi, getMembersApi } from "../services/apis/memberApis";
+import { getPlansApi, createPlanApi, deletePlanApi } from "../services/apis/planApis";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -30,19 +31,19 @@ interface Trainer {
 
 // ── Seed data ──────────────────────────────────────────────────────────────
 const MEMBERS: Member[] = [
-  { id: 1, name: "Aarav Shah",    plan: "Pro Athlete",    status: "Active",   joined: "Jan 12, 2025", avatar: "AS" },
-  { id: 2, name: "Priya Mehta",   plan: "Basic Strength", status: "Active",   joined: "Feb 3, 2025",  avatar: "PM" },
-  { id: 3, name: "Rohan Desai",   plan: "VIP Elite",      status: "Active",   joined: "Mar 8, 2025",  avatar: "RD" },
-  { id: 4, name: "Sneha Kapoor",  plan: "Pro Athlete",    status: "Inactive", joined: "Apr 1, 2025",  avatar: "SK" },
-  { id: 5, name: "Vikram Nair",   plan: "Basic Strength", status: "Active",   joined: "Apr 22, 2025", avatar: "VN" },
-  { id: 6, name: "Ananya Joshi",  plan: "VIP Elite",      status: "Active",   joined: "May 5, 2025",  avatar: "AJ" },
+  { id: 1, name: "Aarav Shah", plan: "Pro Athlete", status: "Active", joined: "Jan 12, 2025", avatar: "AS" },
+  { id: 2, name: "Priya Mehta", plan: "Basic Strength", status: "Active", joined: "Feb 3, 2025", avatar: "PM" },
+  { id: 3, name: "Rohan Desai", plan: "VIP Elite", status: "Active", joined: "Mar 8, 2025", avatar: "RD" },
+  { id: 4, name: "Sneha Kapoor", plan: "Pro Athlete", status: "Inactive", joined: "Apr 1, 2025", avatar: "SK" },
+  { id: 5, name: "Vikram Nair", plan: "Basic Strength", status: "Active", joined: "Apr 22, 2025", avatar: "VN" },
+  { id: 6, name: "Ananya Joshi", plan: "VIP Elite", status: "Active", joined: "May 5, 2025", avatar: "AJ" },
 ];
 
 const TRAINERS: Trainer[] = [
-  { id: 1, name: "Raj Fitness",   specialty: "Strength & Conditioning", members: 18, status: "Active",   rating: 4.9 },
-  { id: 2, name: "Meera Yoga",    specialty: "Yoga & Flexibility",      members: 12, status: "Active",   rating: 4.7 },
-  { id: 3, name: "Arjun Cardio",  specialty: "HIIT & Cardio",           members: 22, status: "On Leave", rating: 4.8 },
-  { id: 4, name: "Divya Pilates", specialty: "Pilates & Core",          members: 10, status: "Active",   rating: 4.6 },
+  { id: 1, name: "Raj Fitness", specialty: "Strength & Conditioning", members: 18, status: "Active", rating: 4.9 },
+  { id: 2, name: "Meera Yoga", specialty: "Yoga & Flexibility", members: 12, status: "Active", rating: 4.7 },
+  { id: 3, name: "Arjun Cardio", specialty: "HIIT & Cardio", members: 22, status: "On Leave", rating: 4.8 },
+  { id: 4, name: "Divya Pilates", specialty: "Pilates & Core", members: 10, status: "Active", rating: 4.6 },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -60,7 +61,7 @@ interface Props {
 const GymDashboard: React.FC<Props> = ({
   onLogout,
   ownerName = "Gym Owner",
-  gymName   = "IronPulse Gym",
+  gymName = "IronPulse Gym",
   ownerEmail = "owner@gymmanagement.com",
   role = "admin",
   canAddMember = false,
@@ -68,23 +69,31 @@ const GymDashboard: React.FC<Props> = ({
   const dispatch = useAppDispatch();
   const { loading } = useAppSelector((s) => s.auth);
 
-  const [activeTab,      setActiveTab]      = useState<DashTab>("overview");
-  const [sidebarOpen,    setSidebarOpen]    = useState(false);
-  const [isDark,         setIsDark]         = useState(() => document.documentElement.classList.contains("dark-theme"));
-  const [memberSearch,   setMemberSearch]   = useState("");
-  const [showAddMember,  setShowAddMember]  = useState(false);
+  const [activeTab, setActiveTab] = useState<DashTab>("overview");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains("dark-theme"));
+  const [memberSearch, setMemberSearch] = useState("");
+  const [showAddMember, setShowAddMember] = useState(false);
   const [showAddTrainer, setShowAddTrainer] = useState(false);
-  const [members,        setMembers]        = useState<Member[]>(MEMBERS);
-  const [trainers,       setTrainers]       = useState<any[]>([]);
+  const [members, setMembers] = useState<any[]>([]);
+  const [isMembersLoading, setIsMembersLoading] = useState(false);
+  const [trainers, setTrainers] = useState<any[]>([]);
   const [isTrainersLoading, setIsTrainersLoading] = useState(false);
   const [inviteTrainerLoading, setInviteTrainerLoading] = useState(false);
-  
+
   // Manager State
-  const [managers,       setManagers]       = useState<any[]>([]);
+  const [managers, setManagers] = useState<any[]>([]);
   const [showAddManager, setShowAddManager] = useState(false);
-  const [newManager,     setNewManager]     = useState({ fullName: "", email: "", mobileNo: "" });
+  const [newManager, setNewManager] = useState({ fullName: "", email: "", mobileNo: "", canAddMember: false });
   const [isManagersLoading, setIsManagersLoading] = useState(false);
-  const [inviteLoading,  setInviteLoading]  = useState(false);
+  const [inviteLoading, setInviteLoading] = useState(false);
+
+  // Plans State
+  const [plans, setPlans] = useState<any[]>([]);
+  const [isPlansLoading, setIsPlansLoading] = useState(false);
+  const [showAddPlan, setShowAddPlan] = useState(false);
+  const [newPlan, setNewPlan] = useState({ name: "", level: "", basePrice: "", durationMonths: "1", features: "" });
+  const [addingPlan, setAddingPlan] = useState(false);
 
   useEffect(() => {
     if (role === "admin" || role === "superadmin") {
@@ -92,8 +101,44 @@ const GymDashboard: React.FC<Props> = ({
     }
     if (role === "admin" || role === "superadmin" || role === "gymmanager") {
       fetchTrainers();
+      fetchMembers();
     }
+    fetchPlans();
   }, [role]);
+
+  const fetchMembers = async () => {
+    try {
+      setIsMembersLoading(true);
+      const res = await getMembersApi();
+      if (res.data?.members) {
+        setMembers(res.data.members.map((m: any) => ({
+          ...m,
+          id: m._id,
+          name: m.fullName,
+          avatar: m.fullName.substring(0, 2).toUpperCase(),
+          plan: m.planId?.name || "No Plan",
+          status: m.isActive ? "Active" : "Inactive",
+          joined: new Date(m.createdAt).toLocaleDateString(),
+        })));
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsMembersLoading(false);
+    }
+  };
+
+  const fetchPlans = async () => {
+    try {
+      setIsPlansLoading(true);
+      const res = await getPlansApi();
+      if (res.data?.plans) setPlans(res.data.plans);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsPlansLoading(false);
+    }
+  };
 
   const fetchManagers = async () => {
     try {
@@ -140,20 +185,20 @@ const GymDashboard: React.FC<Props> = ({
 
   // ── Stats ───────────────────────────────────────────────────────────────
   const stats = [
-    { label: "Total Members",  value: members.length,                       icon: Users,       color: "#2563eb", bg: "rgba(37,99,235,0.1)"  },
+    { label: "Total Members", value: members.length, icon: Users, color: "#2563eb", bg: "rgba(37,99,235,0.1)" },
     { label: "Active Members", value: members.filter(m => m.status === "Active").length, icon: CheckCircle2, color: "#10b981", bg: "rgba(16,185,129,0.1)" },
-    { label: "Trainers",       value: trainers.length,                      icon: Dumbbell,    color: "#f59e0b", bg: "rgba(245,158,11,0.1)" },
-    { label: "Revenue (Mo.)",  value: "₹1,24,500",                          icon: CreditCard,  color: "#8b5cf6", bg: "rgba(139,92,246,0.1)" },
+    { label: "Trainers", value: trainers.length, icon: Dumbbell, color: "#f59e0b", bg: "rgba(245,158,11,0.1)" },
+    { label: "Revenue (Mo.)", value: "₹1,24,500", icon: CreditCard, color: "#8b5cf6", bg: "rgba(139,92,246,0.1)" },
   ];
 
-  const navItems: { id: DashTab; label: string; icon: React.FC<{size?: number}> }[] = [
-    { id: "overview" as DashTab,  label: "Overview",    icon: LayoutDashboard as any },
+  const navItems: { id: DashTab; label: string; icon: React.FC<{ size?: number }> }[] = [
+    { id: "overview" as DashTab, label: "Overview", icon: LayoutDashboard as any },
     { id: "attendance" as DashTab, label: "Attendance", icon: Activity as any },
-    { id: "members" as DashTab,   label: "Members",     icon: Users as any },
-    { id: "trainers" as DashTab,  label: "Trainers",    icon: Dumbbell as any },
-    { id: "managers" as DashTab,  label: "Managers",    icon: UserCog as any },
-    { id: "plans" as DashTab,     label: "Plans",       icon: CreditCard as any },
-    { id: "settings" as DashTab,  label: "Settings",    icon: Settings as any },
+    { id: "members" as DashTab, label: "Members", icon: Users as any },
+    { id: "trainers" as DashTab, label: "Trainers", icon: Dumbbell as any },
+    { id: "managers" as DashTab, label: "Managers", icon: UserCog as any },
+    { id: "plans" as DashTab, label: "Plans", icon: CreditCard as any },
+    { id: "settings" as DashTab, label: "Settings", icon: Settings as any },
   ].filter(item => {
     if (role === "trainer" && (item.id === "plans" || item.id === "managers")) return false;
     if (role === "gymmanager" && item.id === "managers") return false;
@@ -305,10 +350,10 @@ const GymDashboard: React.FC<Props> = ({
             <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "var(--text-primary)", marginBottom: 16 }}>Quick Actions</h3>
             <div className="actions-grid">
               {[
-                { label: "Add Member",  icon: UserPlus,     action: () => { setActiveTab("members"); setShowAddMember(true); }, hide: !canAddMember },
-                { label: "Add Trainer", icon: Dumbbell,     action: () => { setActiveTab("trainers"); setShowAddTrainer(true); }, hide: role === "trainer" },
-                { label: "View Plans",  icon: ClipboardList, action: () => setActiveTab("plans") },
-                { label: "Managers",    icon: UserCog,      action: () => setActiveTab("managers"), hide: role === "gymmanager" },
+                { label: "Add Member", icon: UserPlus, action: () => { setActiveTab("members"); setShowAddMember(true); }, hide: !canAddMember },
+                { label: "Add Trainer", icon: Dumbbell, action: () => { setActiveTab("trainers"); setShowAddTrainer(true); }, hide: role === "trainer" },
+                { label: "View Plans", icon: ClipboardList, action: () => setActiveTab("plans") },
+                { label: "Managers", icon: UserCog, action: () => setActiveTab("managers"), hide: role === "gymmanager" },
               ].filter(a => !a.hide).map(({ label, icon: Icon, action }) => (
                 <button key={label} className="action-btn" onClick={action}>
                   <Icon size={20} />
@@ -341,7 +386,8 @@ const GymDashboard: React.FC<Props> = ({
   );
 
   // ── Members panel ────────────────────────────────────────────────────────
-  const [newMember, setNewMember] = useState({ name: "", plan: "Pro Athlete", email: "" });
+  const [newMember, setNewMember] = useState({ name: "", planId: "", durationMonths: "1", extraDays: "0", email: "", mobileNo: "", secondaryPhone: "", emergencyNumber: "", bloodGroup: "", amountPaid: "", startDate: "" });
+  const [addingMember, setAddingMember] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [importFile, setImportFile] = useState<File | null>(null);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
@@ -354,7 +400,7 @@ const GymDashboard: React.FC<Props> = ({
           <h2 className="page-title">Members</h2>
           <p className="page-subtitle">{members.length} total members registered</p>
         </div>
-        {canAddMember && (
+        {(canAddMember || role === "admin" || role === "superadmin") && (
           <div style={{ display: "flex", gap: 10 }}>
             <button className="btn-blue-outline" onClick={() => setShowImportModal(true)}>
               <Upload size={16} /> Import Members
@@ -380,7 +426,7 @@ const GymDashboard: React.FC<Props> = ({
       {/* Add Member Modal */}
       {showAddMember && (
         <div style={overlayStyle}>
-          <div className="gym-card" style={{ maxWidth: 440, width: "100%", padding: "32px" }}>
+          <div className="gym-card" style={{ maxWidth: 440, width: "100%", padding: "32px", maxHeight: "90vh", overflowY: "auto" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
               <h3 style={{ fontSize: "1.1rem", fontWeight: 700 }}>Add New Member</h3>
               <button onClick={() => setShowAddMember(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)" }}><X size={20} /></button>
@@ -388,7 +434,11 @@ const GymDashboard: React.FC<Props> = ({
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               {[
                 { label: "Full Name", field: "name", placeholder: "John Doe", type: "text" },
-                { label: "Email",     field: "email", placeholder: "john@example.com", type: "email" },
+                { label: "Email", field: "email", placeholder: "john@example.com", type: "email" },
+                { label: "Mobile", field: "mobileNo", placeholder: "1234567890", type: "tel" },
+                { label: "Secondary Phone (Optional)", field: "secondaryPhone", placeholder: "0987654321", type: "tel" },
+                { label: "Emergency Number (Optional)", field: "emergencyNumber", placeholder: "1122334455", type: "tel" },
+                { label: "Blood Group (Optional)", field: "bloodGroup", placeholder: "O+", type: "text" },
               ].map(({ label, field, placeholder, type }) => (
                 <div key={field}>
                   <label className="form-label">{label}</label>
@@ -401,27 +451,94 @@ const GymDashboard: React.FC<Props> = ({
                   />
                 </div>
               ))}
-              <div>
-                <label className="form-label">Plan</label>
-                <select
-                  value={newMember.plan}
-                  onChange={e => setNewMember({ ...newMember, plan: e.target.value })}
+              <div style={{ display: "flex", gap: 10 }}>
+                <div style={{ flex: 1 }}>
+                  <label className="form-label">Start Date</label>
+                  <input
+                    type="date"
+                    value={(newMember as any).startDate}
+                    onChange={e => setNewMember({ ...newMember, startDate: e.target.value })}
+                    className="form-input"
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label className="form-label">Duration (Months)</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={newMember.durationMonths}
+                    onChange={e => setNewMember({ ...newMember, durationMonths: e.target.value })}
+                    className="form-input"
+                  />
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: 10, marginTop: 12 }}>
+                <div style={{ flex: 1 }}>
+                  <label className="form-label">Extra Days (Optional)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={(newMember as any).extraDays}
+                    onChange={e => setNewMember({ ...newMember, extraDays: e.target.value })}
+                    className="form-input"
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label className="form-label">Calculated End Date</label>
+                  <div style={{ padding: "10px 12px", background: "var(--bg-primary)", borderRadius: 6, border: "1px solid var(--border-color)", fontSize: "0.95rem", fontWeight: 600, color: "var(--text-primary)" }}>
+                    {(() => {
+                      if (!(newMember as any).startDate || !newMember.durationMonths) return "-";
+                      const end = new Date((newMember as any).startDate);
+                      end.setMonth(end.getMonth() + Number(newMember.durationMonths));
+                      if ((newMember as any).extraDays) end.setDate(end.getDate() + Number((newMember as any).extraDays));
+                      return end.toLocaleDateString();
+                    })()}
+                  </div>
+                </div>
+              </div>
+              <div style={{ marginBottom: 12 }}>
+                <label className="form-label">Amount Paid</label>
+                <input
+                  type="number"
+                  value={(newMember as any).amountPaid}
+                  onChange={e => setNewMember({ ...newMember, amountPaid: e.target.value })}
+                  placeholder="e.g. 5000"
                   className="form-input"
-                  style={{ cursor: "pointer" }}
-                >
-                  {["Basic Strength", "Pro Athlete", "VIP Elite"].map(p => <option key={p}>{p}</option>)}
-                </select>
+                />
               </div>
               <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
                 <button className="btn-blue" style={{ flex: 1, justifyContent: "center" }}
-                  onClick={() => {
-                    if (!newMember.name.trim()) return;
-                    const initials = newMember.name.split(" ").map(w => w[0]).join("").slice(0, 2).toUpperCase();
-                    setMembers(prev => [...prev, { id: Date.now(), name: newMember.name, plan: newMember.plan, status: "Active", joined: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }), avatar: initials }]);
-                    setNewMember({ name: "", plan: "Pro Athlete", email: "" });
-                    setShowAddMember(false);
+                  disabled={addingMember}
+                  onClick={async () => {
+                    if (!newMember.name.trim() || !newMember.email.trim() || !newMember.durationMonths || !(newMember as any).startDate) {
+                      dispatch(showSnackbar({ message: "Please fill all required fields.", type: "error" }));
+                      return;
+                    }
+                    setAddingMember(true);
+                    try {
+                      await addMemberApi({
+                        fullName: newMember.name,
+                        email: newMember.email,
+                        mobileNo: newMember.mobileNo || "0000000000",
+                        durationMonths: newMember.durationMonths,
+                        extraDays: (newMember as any).extraDays,
+                        secondaryPhone: (newMember as any).secondaryPhone,
+                        emergencyNumber: (newMember as any).emergencyNumber,
+                        bloodGroup: (newMember as any).bloodGroup,
+                        amountPaid: (newMember as any).amountPaid,
+                        startDate: (newMember as any).startDate,
+                      });
+                      dispatch(showSnackbar({ message: "Member added successfully!", type: "success" }));
+                      setShowAddMember(false);
+                      setNewMember({ name: "", planId: "", durationMonths: "1", extraDays: "0", email: "", mobileNo: "", secondaryPhone: "", emergencyNumber: "", bloodGroup: "", amountPaid: "", startDate: "" });
+                      fetchMembers();
+                    } catch (error: any) {
+                      dispatch(showSnackbar({ message: error?.response?.data?.message || "Failed to add member", type: "error" }));
+                    } finally {
+                      setAddingMember(false);
+                    }
                   }}>
-                  Add Member
+                  {addingMember ? <Loader size={16} style={{ animation: "spin 1s linear infinite" }} /> : "Add Member"}
                 </button>
                 <button className="btn-blue-outline" style={{ flex: 1, justifyContent: "center" }} onClick={() => setShowAddMember(false)}>Cancel</button>
               </div>
@@ -490,7 +607,7 @@ const GymDashboard: React.FC<Props> = ({
               <h3 style={{ fontSize: "1.1rem", fontWeight: 700 }}>Member Profile</h3>
               <button onClick={() => setSelectedMember(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)" }}><X size={20} /></button>
             </div>
-            
+
             <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24 }}>
               <div className="checkin-avatar" style={{ width: 64, height: 64, fontSize: "1.5rem", background: "var(--primary-light)", color: "var(--primary)" }}>
                 {selectedMember.avatar}
@@ -512,7 +629,7 @@ const GymDashboard: React.FC<Props> = ({
                 <span style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--text-primary)", fontFamily: "monospace" }}>
                   {selectedMember.biometricId || Math.floor(100 + Math.random() * 900)}
                 </span>
-                <button 
+                <button
                   style={{ background: "none", border: "none", color: "var(--primary)", cursor: "pointer", display: "flex", alignItems: "center", gap: 4, fontSize: "0.875rem", fontWeight: 600 }}
                   onClick={() => {
                     navigator.clipboard.writeText(selectedMember.biometricId || "105");
@@ -538,7 +655,7 @@ const GymDashboard: React.FC<Props> = ({
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead>
               <tr style={{ background: "var(--bg-secondary)", borderBottom: "1px solid var(--border-color)" }}>
-                {["Member", "Plan", "Status", "Joined", ""].map(h => (
+                {["Member", "Plan", "Status", "Joined", "Expires On", ""].map(h => (
                   <th key={h} style={{ padding: "12px 16px", textAlign: "left", fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", whiteSpace: "nowrap" }}>{h}</th>
                 ))}
               </tr>
@@ -562,6 +679,7 @@ const GymDashboard: React.FC<Props> = ({
                     <span className={`checkin-status ${m.status === "Active" ? "status-active" : "status-inactive"}`}>{m.status}</span>
                   </td>
                   <td style={{ padding: "14px 16px", fontSize: "0.875rem", color: "var(--text-muted)", whiteSpace: "nowrap" }}>{m.joined}</td>
+                  <td style={{ padding: "14px 16px", fontSize: "0.875rem", color: "var(--text-muted)", whiteSpace: "nowrap" }}>{m.planEndDate ? new Date(m.planEndDate).toLocaleDateString() : "-"}</td>
                   <td style={{ padding: "14px 16px" }}>
                     <div style={{ display: "flex", gap: 8 }}>
                       <button onClick={() => setSelectedMember(m)}
@@ -624,7 +742,7 @@ const GymDashboard: React.FC<Props> = ({
                     <h4 style={{ fontSize: "0.9rem", fontWeight: 600, color: "var(--text-primary)" }}>Can Add Members</h4>
                     <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: 2 }}>Allow this trainer to register new members</p>
                   </div>
-                  <div 
+                  <div
                     onClick={() => setNewTrainer({ ...newTrainer, canAddMember: !newTrainer.canAddMember })}
                     style={{
                       width: 44, height: 24, borderRadius: 12, background: newTrainer.canAddMember ? "var(--primary)" : "var(--border)",
@@ -717,9 +835,9 @@ const GymDashboard: React.FC<Props> = ({
                       <td style={{ padding: "14px 16px" }}>
                         {t.isActive && (
                           <label className="switch" style={{ transform: "scale(0.8)", margin: 0 }}>
-                            <input 
-                              type="checkbox" 
-                              checked={!!t.canAddMember} 
+                            <input
+                              type="checkbox"
+                              checked={!!t.canAddMember}
                               onChange={async (e) => {
                                 const val = e.target.checked;
                                 setTrainers(prev => prev.map(tr => tr._id === t._id ? { ...tr, canAddMember: val } : tr));
@@ -730,7 +848,7 @@ const GymDashboard: React.FC<Props> = ({
                                   setTrainers(prev => prev.map(tr => tr._id === t._id ? { ...tr, canAddMember: !val } : tr));
                                   dispatch(showSnackbar({ message: err?.response?.data?.message || "Failed to update permissions", type: "error" }));
                                 }
-                              }} 
+                              }}
                             />
                             <span className="slider" />
                           </label>
@@ -809,6 +927,25 @@ const GymDashboard: React.FC<Props> = ({
               <div>
                 <label className="form-label">Mobile Number</label>
                 <input type="tel" value={newManager.mobileNo} onChange={e => setNewManager({ ...newManager, mobileNo: e.target.value })} placeholder="1234567890" className="form-input" />
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 4, marginBottom: 8, padding: "8px 0" }}>
+                  <div>
+                    <h4 style={{ fontSize: "0.9rem", fontWeight: 600, color: "var(--text-primary)" }}>Can Add Members</h4>
+                    <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: 2 }}>Allow this manager to register new members</p>
+                  </div>
+                  <div
+                    onClick={() => setNewManager({ ...newManager, canAddMember: !newManager.canAddMember })}
+                    style={{
+                      width: 44, height: 24, borderRadius: 12, background: newManager.canAddMember ? "var(--primary)" : "var(--border)",
+                      position: "relative", cursor: "pointer", transition: "all 0.3s ease"
+                    }}
+                  >
+                    <div style={{
+                      width: 20, height: 20, background: "#fff", borderRadius: "50%",
+                      position: "absolute", top: 2, left: newManager.canAddMember ? 22 : 2,
+                      transition: "all 0.3s ease", boxShadow: "0 2px 4px rgba(0,0,0,0.2)"
+                    }} />
+                  </div>
+                </div>
               </div>
               <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
                 <button className="btn-blue" style={{ flex: 1, justifyContent: "center" }}
@@ -820,7 +957,7 @@ const GymDashboard: React.FC<Props> = ({
                       const res = await inviteManagerApi(newManager);
                       dispatch(showSnackbar({ message: res.data.message || "Invitation sent!", type: "success" }));
                       setShowAddManager(false);
-                      setNewManager({ fullName: "", email: "", mobileNo: "" });
+                      setNewManager({ fullName: "", email: "", mobileNo: "", canAddMember: false });
                       fetchManagers();
                     } catch (error: any) {
                       dispatch(showSnackbar({ message: error?.response?.data?.message || "Failed to invite manager", type: "error" }));
@@ -879,9 +1016,9 @@ const GymDashboard: React.FC<Props> = ({
                       <td style={{ padding: "14px 16px" }}>
                         {m.isActive && (
                           <label className="switch" style={{ transform: "scale(0.8)", margin: 0 }}>
-                            <input 
-                              type="checkbox" 
-                              checked={!!m.canAddMember} 
+                            <input
+                              type="checkbox"
+                              checked={!!m.canAddMember}
                               onChange={async (e) => {
                                 const val = e.target.checked;
                                 setManagers(prev => prev.map(mgr => mgr._id === m._id ? { ...mgr, canAddMember: val } : mgr));
@@ -892,7 +1029,7 @@ const GymDashboard: React.FC<Props> = ({
                                   setManagers(prev => prev.map(mgr => mgr._id === m._id ? { ...mgr, canAddMember: !val } : mgr));
                                   dispatch(showSnackbar({ message: err?.response?.data?.message || "Failed to update permissions", type: "error" }));
                                 }
-                              }} 
+                              }}
                             />
                             <span className="slider" />
                           </label>
@@ -942,31 +1079,124 @@ const GymDashboard: React.FC<Props> = ({
   // ── Plans panel ──────────────────────────────────────────────────────────
   const PlansPanel = (
     <div className="page-container">
-      <div style={{ marginBottom: 24 }}>
-        <h2 className="page-title">Membership Plans</h2>
-        <p className="page-subtitle">Plans currently active at {gymName}.</p>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24, flexWrap: "wrap", gap: 12 }}>
+        <div>
+          <h2 className="page-title">Membership Plans</h2>
+          <p className="page-subtitle">Plans currently active at {gymName}.</p>
+        </div>
+        <button className="btn-blue" onClick={() => setShowAddPlan(true)}>
+          <Plus size={16} /> Add Plan
+        </button>
       </div>
-      <div className="pricing-grid">
-        {[
-          { name: "Basic Strength",  price: "₹999",   desc: "Gym floor access, locker rooms.",                  count: members.filter(m => m.plan === "Basic Strength").length,  color: "#2563eb" },
-          { name: "Pro Athlete",     price: "₹1,999", desc: "All classes, 24/7 access.",                        count: members.filter(m => m.plan === "Pro Athlete").length,     color: "#10b981" },
-          { name: "VIP Elite",       price: "₹4,999", desc: "Personal trainer, custom plans.",                   count: members.filter(m => m.plan === "VIP Elite").length,       color: "#8b5cf6" },
-        ].map(p => (
-          <div key={p.name} className="gym-card pricing-card" style={{ borderTop: `3px solid ${p.color}` }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-              <h3 className="plan-name">{p.name}</h3>
-              <span style={{ fontSize: "0.72rem", background: "var(--bg-secondary)", color: "var(--text-muted)", padding: "3px 8px", borderRadius: 12, fontWeight: 600 }}>
-                {p.count} members
-              </span>
+
+      {showAddPlan && (
+        <div style={overlayStyle}>
+          <div className="gym-card" style={{ maxWidth: 440, width: "100%", padding: "32px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+              <h3 style={{ fontSize: "1.1rem", fontWeight: 700 }}>Add New Plan</h3>
+              <button onClick={() => setShowAddPlan(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)" }}><X size={20} /></button>
             </div>
-            <div className="plan-price-wrapper">
-              <span className="plan-price" style={{ color: p.color }}>{p.price}</span>
-              <span className="plan-period">/month</span>
+            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              <div>
+                <label className="form-label">Plan Name</label>
+                <input type="text" value={newPlan.name} onChange={e => setNewPlan({ ...newPlan, name: e.target.value })} placeholder="e.g. Gold Plan" className="form-input" />
+              </div>
+              <div style={{ display: "flex", gap: 10 }}>
+                <div style={{ flex: 1 }}>
+                  <label className="form-label">Level</label>
+                  <input type="text" value={newPlan.level} onChange={e => setNewPlan({ ...newPlan, level: e.target.value })} placeholder="e.g. Advanced" className="form-input" />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label className="form-label">Base Price</label>
+                  <input type="number" value={newPlan.basePrice} onChange={e => setNewPlan({ ...newPlan, basePrice: e.target.value })} placeholder="e.g. 1999" className="form-input" />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <label className="form-label">Duration</label>
+                  <select value={newPlan.durationMonths} onChange={e => setNewPlan({ ...newPlan, durationMonths: e.target.value })} className="form-input">
+                    <option value="1">1 Month</option>
+                    <option value="3">3 Months</option>
+                    <option value="6">6 Months</option>
+                    <option value="12">12 Months</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="form-label">Features (comma separated)</label>
+                <textarea
+                  value={newPlan.features}
+                  onChange={e => setNewPlan({ ...newPlan, features: e.target.value })}
+                  placeholder="BMI Report, Personal Trainer..."
+                  className="form-input"
+                  rows={3}
+                  style={{ resize: "vertical", fontFamily: "inherit" }}
+                />
+              </div>
+              <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
+                <button className="btn-blue" style={{ flex: 1, justifyContent: "center" }}
+                  disabled={addingPlan}
+                  onClick={async () => {
+                    if (!newPlan.name || !newPlan.level || !newPlan.basePrice) return;
+                    setAddingPlan(true);
+                    try {
+                      await createPlanApi({
+                        name: newPlan.name,
+                        level: newPlan.level,
+                        basePrice: Number(newPlan.basePrice),
+                        durationMonths: Number(newPlan.durationMonths) || 1,
+                        features: newPlan.features.split(',').map(f => f.trim()).filter(f => f)
+                      });
+                      dispatch(showSnackbar({ message: "Plan created!", type: "success" }));
+                      setShowAddPlan(false);
+                      setNewPlan({ name: "", level: "", basePrice: "", durationMonths: "1", features: "" });
+                      fetchPlans();
+                    } catch (error: any) {
+                      dispatch(showSnackbar({ message: error?.response?.data?.message || "Failed to create plan", type: "error" }));
+                    } finally {
+                      setAddingPlan(false);
+                    }
+                  }}>
+                  {addingPlan ? <Loader size={16} style={{ animation: "spin 1s linear infinite" }} /> : "Create Plan"}
+                </button>
+                <button className="btn-blue-outline" style={{ flex: 1, justifyContent: "center" }} onClick={() => setShowAddPlan(false)}>Cancel</button>
+              </div>
             </div>
-            <p style={{ fontSize: "0.875rem", color: "var(--text-secondary)" }}>{p.desc}</p>
           </div>
-        ))}
-      </div>
+        </div>
+      )}
+
+      {isPlansLoading ? (
+        <div style={{ textAlign: "center", padding: "40px" }}><Loader size={32} style={{ animation: "spin 1s linear infinite", color: "var(--primary)" }} /></div>
+      ) : plans.length === 0 ? (
+        <p style={{ color: "var(--text-muted)" }}>No plans created yet. Add one to get started!</p>
+      ) : (
+        <div className="pricing-grid">
+          {plans.map(p => (
+            <div key={p._id} className="gym-card pricing-card" style={{ borderTop: `3px solid var(--primary)` }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                <div>
+                  <h3 className="plan-name">{p.name}</h3>
+                  <p style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>Level: {p.level}</p>
+                </div>
+                <button style={{ background: "none", border: "none", color: "var(--danger)", cursor: "pointer" }} onClick={async () => {
+                  if (window.confirm("Delete this plan?")) {
+                    await deletePlanApi(p._id);
+                    fetchPlans();
+                  }
+                }}>
+                  <X size={16} />
+                </button>
+              </div>
+              <div className="plan-price-wrapper">
+                <span className="plan-price" style={{ color: "var(--primary)" }}>₹{p.basePrice}</span>
+                <span className="plan-period">/ {p.durationMonths} month(s)</span>
+              </div>
+              <ul style={{ paddingLeft: 20, fontSize: "0.875rem", color: "var(--text-secondary)", marginTop: 10 }}>
+                {p.features.map((f: string, i: number) => <li key={i}>{f}</li>)}
+              </ul>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 
@@ -999,7 +1229,7 @@ const GymDashboard: React.FC<Props> = ({
           ]);
         }
       };
-      
+
       fetchAttendance();
       const interval = setInterval(fetchAttendance, 5000);
       return () => clearInterval(interval);
@@ -1102,10 +1332,10 @@ const GymDashboard: React.FC<Props> = ({
           <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "var(--text-primary)", marginBottom: 20 }}>Gym Profile</h3>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
             {[
-              { label: "Gym Name",     val: gymName,     placeholder: "Your Gym Name" },
-              { label: "Owner Name",   val: ownerName,   placeholder: "Full Name" },
-              { label: "Email",        val: ownerEmail,  placeholder: "Email Address" },
-              { label: "Phone",        val: "",          placeholder: "+91 00000 00000" },
+              { label: "Gym Name", val: gymName, placeholder: "Your Gym Name" },
+              { label: "Owner Name", val: ownerName, placeholder: "Full Name" },
+              { label: "Email", val: ownerEmail, placeholder: "Email Address" },
+              { label: "Phone", val: "", placeholder: "+91 00000 00000" },
             ].map(f => (
               <div key={f.label}>
                 <label className="form-label">{f.label}</label>
@@ -1133,7 +1363,7 @@ const GymDashboard: React.FC<Props> = ({
               </button>
             )}
           </div>
-          
+
           {gymPlan === "starter" ? (
             <div style={{ background: "rgba(245,158,11,0.1)", padding: "20px", borderRadius: "8px", textAlign: "center", border: "1px solid rgba(245,158,11,0.2)" }}>
               <Lock size={32} style={{ color: "#f59e0b", margin: "0 auto 12px" }} />
@@ -1250,10 +1480,10 @@ const GymDashboard: React.FC<Props> = ({
   const panels: Record<DashTab, React.ReactNode> = {
     overview: OverviewPanel,
     attendance: AttendancePanel,
-    members:  MembersPanel,
+    members: MembersPanel,
     trainers: TrainersPanel,
     managers: ManagersPanel,
-    plans:    PlansPanel,
+    plans: PlansPanel,
     settings: SettingsPanel,
   };
 

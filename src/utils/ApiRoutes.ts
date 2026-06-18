@@ -26,4 +26,17 @@ export const apiRoutes = {
   
   // ── Members ───────────────────────────────────────────────────────────────
   bulkImportMembers: "/manager/members/bulk-import",
+  addMember: "/members",
+  getMembers: "/members",
+  memberSetup: "/members/setup",
+
+  // ── Workouts ──────────────────────────────────────────────────────────────
+  workouts: "/workouts",
+  logWorkout: "/workouts/log",
+  workoutReport: "/workouts/report",
+
+  // ── Plans ─────────────────────────────────────────────────────────────────
+  createPlan: "/plans",
+  getPlans: "/plans",
+  deletePlan: "/plans/:planId",
 } as const;

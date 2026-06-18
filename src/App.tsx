@@ -15,6 +15,8 @@ const RegisterOwner = lazy(() => import("./pages/RegisterOwner"));
 const GymDashboard  = lazy(() => import("./pages/GymDashboard"));
 const Login         = lazy(() => import("./pages/Login").then((m) => ({ default: m.Login })));
 const ManagerSetup  = lazy(() => import("./pages/ManagerSetup").then((m) => ({ default: m.ManagerSetup })));
+const MemberSetup   = lazy(() => import("./pages/MemberSetup").then((m) => ({ default: m.MemberSetup })));
+const MemberDashboard = lazy(() => import("./pages/MemberDashboard").then((m) => ({ default: m.MemberDashboard })));
 
 // ── Shared page-level loading fallback ──────────────────────────────────────
 const PageLoader = () => (
@@ -27,7 +29,7 @@ const PageLoader = () => (
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared types
 // ─────────────────────────────────────────────────────────────────────────────
-export type AppMode = "public" | "register" | "dashboard" | "login" | "manager-setup" | "trainer-setup";
+export type AppMode = "public" | "register" | "dashboard" | "login" | "manager-setup" | "trainer-setup" | "member-setup";
 
 export interface DashboardUser {
   ownerName:    string;
@@ -66,6 +68,8 @@ function App() {
       setMode("manager-setup");
     } else if (path === "/trainer-setup") {
       setMode("trainer-setup");
+    } else if (path === "/member-setup") {
+      setMode("member-setup");
     } else if (path === "/login") {
       setMode("login");
     }
@@ -129,6 +133,10 @@ function App() {
           <ManagerSetup onSuccess={handleLoginSuccess} role={mode === "trainer-setup" ? "Trainer" : "Manager"} />
         )}
 
+        {mode === "member-setup" && (
+          <MemberSetup onSuccess={handleLoginSuccess} />
+        )}
+
         {mode === "register" && paymentPayload && (
           <RegisterOwner
             plan={paymentPayload.plan}
@@ -143,14 +151,21 @@ function App() {
         )}
 
         {mode === "dashboard" && dashUser && (
-          <GymDashboard
-            ownerName={dashUser.ownerName}
-            gymName="IronPulse Gym"
-            ownerEmail={dashUser.email}
-            role={dashUser.role}
-            canAddMember={dashUser.canAddMember}
-            onLogout={handleLogout}
-          />
+          dashUser.role === "member" ? (
+            <MemberDashboard
+              userName={dashUser.ownerName}
+              onLogout={handleLogout}
+            />
+          ) : (
+            <GymDashboard
+              ownerName={dashUser.ownerName}
+              gymName="IronPulse Gym"
+              ownerEmail={dashUser.email}
+              role={dashUser.role}
+              canAddMember={dashUser.canAddMember}
+              onLogout={handleLogout}
+            />
+          )
         )}
 
         {mode === "public" && (

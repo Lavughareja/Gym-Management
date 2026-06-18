@@ -72,9 +72,10 @@ const RegisterOwner: React.FC<Props> = ({ plan, email, paymentToken, onSuccess, 
   };
 
   const planLabels: Record<PlanType, string> = {
-    without_biomatrix: "Basic (No Biometrics)",
-    with_biomatrix:    "Pro (With Biometrics)",
-    additional_plan:   "Additional Plan",
+    starter: "Starter Plan",
+    plus: "Plus Plan",
+    professional: "Professional Plan",
+    enterprise: "Enterprise Plan",
   };
 
   return (
