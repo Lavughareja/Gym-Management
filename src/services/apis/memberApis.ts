@@ -28,3 +28,6 @@ export const getMeApi = async () => {
   return await AxiosInstance.get(`${apiRoutes.getMembers}/me`);
 };
 
+export const getWeeklyStatsApi = async () => {
+  return await AxiosInstance.get(`${apiRoutes.getMembers}/weekly-stats`);
+};
