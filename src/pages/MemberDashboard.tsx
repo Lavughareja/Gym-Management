@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import logoImg from "../assets/logo/logo.png";
 import { LogOut, Activity, Dumbbell, BarChart3, Clock, Play, Square, Loader, Menu, X, Moon, Sun, LayoutDashboard, CreditCard, ChevronRight, CheckCircle2, User, KeyRound } from "lucide-react";
 import ChangePasswordModal from "../components/ChangePasswordModal/ChangePasswordModal";
 import { getTodayAttendanceApi } from "../services/apis/attendanceApis";
@@ -38,7 +39,7 @@ interface Props {
 
 type Tab = "overview" | "workouts" | "reports" | "plans";
 
-export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName = "IronPulse Gym" }) => {
+export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName = "Trainix Gym" }) => {
   const dispatch = useAppDispatch();
   const [activeTab, setActiveTab] = useState<Tab>("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -710,11 +711,11 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
       <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
         {/* Brand */}
         <div className="sidebar-brand">
-          <div className="brand-icon-wrapper">
-            <Dumbbell size={22} strokeWidth={2.5} />
+          <div className="brand-icon-wrapper" style={{ background: 'none', boxShadow: 'none', padding: 0 }}>
+            <img src={logoImg} alt="IronPulse Logo" style={{ width: 44, height: 44, objectFit: 'contain', borderRadius: 10 }} />
           </div>
           <div>
-            <h1 className="brand-name">{gymName.toUpperCase().slice(0, 10)}</h1>
+            <h1 className="brand-name">TRAINIX</h1>
             <p className="brand-subtitle">Member Portal</p>
           </div>
         </div>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import logoImg from '../assets/logo/logo.png';
 import { 
   Menu, 
-  Dumbbell, 
   LayoutDashboard, 
   Activity, 
   DollarSign, 
@@ -74,8 +74,8 @@ export const SidebarLayout: React.FC<SidebarLayoutProps> = ({ children, onLoginC
       <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
         {/* Brand Section */}
         <div className="sidebar-brand">
-          <div className="brand-icon-wrapper">
-            <Dumbbell size={22} strokeWidth={2.5} />
+          <div className="brand-icon-wrapper" style={{ background: 'none', boxShadow: 'none', padding: 0 }}>
+            <img src={logoImg} alt="IronPulse Logo" style={{ width: 44, height: 44, objectFit: 'contain', borderRadius: 10 }} />
           </div>
           <div>
             <h1 className="brand-name">IRONPULSE</h1>
@@ -151,9 +151,7 @@ export const SidebarLayout: React.FC<SidebarLayoutProps> = ({ children, onLoginC
           </button>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div className="brand-icon-wrapper" style={{ width: 32, height: 32 }}>
-              <Dumbbell size={16} />
-            </div>
+            <img src={logoImg} alt="IronPulse Logo" style={{ width: 32, height: 32, objectFit: 'contain', borderRadius: 8 }} />
             <span className="brand-name" style={{ fontSize: '1rem' }}>IRONPULSE</span>
           </div>
 
