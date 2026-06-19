@@ -62,7 +62,7 @@ interface Props {
 const GymDashboard: React.FC<Props> = ({
   onLogout,
   ownerName = "Gym Owner",
-  gymName = "IronPulse Gym",
+  gymName = "Trainix Gym",
   ownerEmail = "owner@gymmanagement.com",
   role = "admin",
   canAddMember = false,
@@ -224,11 +224,11 @@ const GymDashboard: React.FC<Props> = ({
       <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
         {/* Brand */}
         <div className="sidebar-brand">
-          <div className="brand-icon-wrapper">
-            <Dumbbell size={22} strokeWidth={2.5} />
+          <div className="brand-icon-wrapper" style={{ background: 'none', boxShadow: 'none', padding: 0 }}>
+            <img src="/logo.png" alt="Trainix Logo" style={{ width: 44, height: 44, objectFit: 'contain', borderRadius: 10 }} />
           </div>
           <div>
-            <h1 className="brand-name">{gymName.toUpperCase().slice(0, 10)}</h1>
+            <h1 className="brand-name">TRAINIX</h1>
             <p className="brand-subtitle">Management Portal</p>
           </div>
         </div>
@@ -1510,10 +1510,8 @@ const GymDashboard: React.FC<Props> = ({
             <Menu />
           </button>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <div className="brand-icon-wrapper" style={{ width: 32, height: 32 }}>
-              <Dumbbell size={16} />
-            </div>
-            <span className="brand-name" style={{ fontSize: "1rem" }}>{gymName.toUpperCase().slice(0, 10)}</span>
+            <img src="/logo.png" alt="Logo" style={{ width: 32, height: 32, objectFit: "contain", borderRadius: 8 }} />
+            <span className="brand-name" style={{ fontSize: "1rem" }}>TRAINIX</span>
           </div>
           <div style={{ width: 40 }} />
         </header>

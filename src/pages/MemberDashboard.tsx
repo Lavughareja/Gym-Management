@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import logoImg from "../assets/logo/logo.png";
 import { LogOut, Activity, Dumbbell, BarChart3, Clock, Play, Square, Loader, Menu, X, Moon, Sun, LayoutDashboard, CreditCard, ChevronRight, CheckCircle2, User, KeyRound } from "lucide-react";
 import ChangePasswordModal from "../components/ChangePasswordModal/ChangePasswordModal";
 import { getTodayAttendanceApi } from "../services/apis/attendanceApis";
@@ -712,7 +711,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
         {/* Brand */}
         <div className="sidebar-brand">
           <div className="brand-icon-wrapper" style={{ background: 'none', boxShadow: 'none', padding: 0 }}>
-            <img src={logoImg} alt="IronPulse Logo" style={{ width: 44, height: 44, objectFit: 'contain', borderRadius: 10 }} />
+            <img src="/logo.png" alt="IronPulse Logo" style={{ width: 44, height: 44, objectFit: 'contain', borderRadius: 10 }} />
           </div>
           <div>
             <h1 className="brand-name">TRAINIX</h1>
@@ -802,7 +801,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
             <Menu />
           </button>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <img src={logoImg} alt="Logo" style={{ width: 32, height: 32, objectFit: "contain", borderRadius: 8 }} />
+            <img src="/logo.png" alt="Logo" style={{ width: 32, height: 32, objectFit: "contain", borderRadius: 8 }} />
             <span className="brand-name" style={{ fontSize: "1rem" }}>TRAINIX</span>
           </div>
           <div style={{ width: 40 }} />

@@ -63,13 +63,13 @@ export const Login: React.FC<Props> = ({ onSuccess, onBack }) => {
 
       <div className="gym-card" style={{ maxWidth: 420, width: "100%", padding: "40px", textAlign: "center" }}>
         <div style={{ display: "flex", justifyContent: "center", marginBottom: 24 }}>
-          <div className="brand-icon-wrapper" style={{ width: 48, height: 48 }}>
-            <Dumbbell size={24} strokeWidth={2.5} />
+          <div className="brand-icon-wrapper" style={{ width: 48, height: 48, background: 'none', boxShadow: 'none' }}>
+            <img src="/logo.png" alt="Trainix Logo" style={{ width: 48, height: 48, objectFit: 'contain', borderRadius: 10 }} />
           </div>
         </div>
         
         <h2 className="page-title" style={{ fontSize: "1.75rem", marginBottom: 8 }}>Welcome Back</h2>
-        <p className="page-subtitle" style={{ marginBottom: 32 }}>Sign in to your IronPulse account</p>
+        <p className="page-subtitle" style={{ marginBottom: 32 }}>Sign in to your Trainix account</p>
 
         <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           <div style={{ textAlign: "left" }}>

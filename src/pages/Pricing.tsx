@@ -186,7 +186,7 @@ export const Pricing: React.FC<PricingProps> = ({ onPaymentVerified }) => {
       key:         import.meta.env.VITE_RAZORPAY_KEY_ID ?? "", // set in .env
       amount:      price * 100,   // Razorpay expects paise
       currency,
-      name:        "IronPulse Gym",
+      name:        "Trainix Gym",
       description: `${selectedPlan.name} Membership`,
       order_id:    orderId,
       prefill:     { email: ownerEmail },

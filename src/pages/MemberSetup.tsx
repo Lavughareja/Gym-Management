@@ -71,8 +71,8 @@ export const MemberSetup: React.FC<Props> = ({ onSuccess }) => {
     <div className="page-container" style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg-secondary)" }}>
       <div className="gym-card" style={{ maxWidth: 420, width: "100%", padding: "40px", textAlign: "center" }}>
         <div style={{ display: "flex", justifyContent: "center", marginBottom: 24 }}>
-          <div className="brand-icon-wrapper" style={{ width: 48, height: 48 }}>
-            <Dumbbell size={24} strokeWidth={2.5} />
+          <div className="brand-icon-wrapper" style={{ width: 48, height: 48, background: 'none', boxShadow: 'none' }}>
+            <img src="/logo.png" alt="Trainix Logo" style={{ width: 48, height: 48, objectFit: 'contain', borderRadius: 10 }} />
           </div>
         </div>
         

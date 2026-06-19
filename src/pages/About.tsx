@@ -109,9 +109,9 @@ export const About: React.FC = () => {
       {/* Philosophy and Facility Info */}
       <div className="about-grid">
         <div className="about-content">
-          <h3>The IronPulse Philosophy</h3>
+          <h3>The Trainix Philosophy</h3>
           <p>
-            Established in 2018, IronPulse was founded on the idea that high-quality fitness coaching should be supported by professional-grade equipment. We strip away the gimmicks of corporate clubs to focus entirely on results-driven strength, cardiovascular endurance, and recovery.
+            Established in 2018, Trainix was founded on the idea that high-quality fitness coaching should be supported by professional-grade equipment. We strip away the gimmicks of corporate clubs to focus entirely on results-driven strength, cardiovascular endurance, and recovery.
           </p>
           
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', margin: '24px 0' }}>

@@ -97,7 +97,7 @@ export const Contact: React.FC = () => {
                 </div>
                 <div>
                   <span className="contact-info-title">Email Address</span>
-                  <p className="contact-info-text">support@ironpulse.com</p>
+                  <p className="contact-info-text">support@trainix.com</p>
                 </div>
               </div>
             </div>
@@ -140,7 +140,7 @@ export const Contact: React.FC = () => {
                 {/* SVG representing location nodes */}
                 <div style={{ display: 'flex', gap: 6, alignItems: 'center', margin: '0 auto 8px' }}>
                   <Navigation size={18} style={{ color: 'var(--primary)', transform: 'rotate(45deg)', animation: 'pulse 2s infinite' }} />
-                  <span className="map-badge">IronPulse Gym Headquarters</span>
+                  <span className="map-badge">Trainix Gym Headquarters</span>
                 </div>
                 <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Intersection of Core St & Calbell Ave</span>
                 <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>GPS: 40.7128° N, 74.0060° W</span>

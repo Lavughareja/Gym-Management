@@ -169,7 +169,7 @@ function App() {
           ) : (
             <GymDashboard
               ownerName={dashUser.ownerName}
-              gymName="IronPulse Gym"
+              gymName="Trainix Gym"
               ownerEmail={dashUser.email}
               role={dashUser.role}
               canAddMember={dashUser.canAddMember}
