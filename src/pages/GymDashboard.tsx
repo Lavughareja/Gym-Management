@@ -5,7 +5,7 @@ import {
   CreditCard, UserPlus, ClipboardList, CheckCircle2, Sun, Moon,
   Activity, Upload, Lock, Clock, Copy, Fingerprint, RefreshCw, KeyRound
 } from "lucide-react";
-import ChangePasswordModal from "../components/ChangePasswordModal/ChangePasswordModal";
+import UserProfileModal from "../components/UserProfileModal/UserProfileModal";
 import { useAppDispatch, useAppSelector } from "../utils/reduxHooks";
 import { logoutAction } from "../redux/actions/authActions";
 import { getManagersApi, inviteManagerApi, resendInvitationApi, deleteManagerApi } from "../services/apis/managerApis";
@@ -277,7 +277,7 @@ const GymDashboard: React.FC<Props> = ({
               <div className="profile-info">
                 <span className="profile-name">{ownerName}</span>
                 <span className="profile-email" style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                  <KeyRound size={10} /> Change Password
+                  <UserCog size={10} /> View Profile
                 </span>
               </div>
             </div>
@@ -1499,7 +1499,10 @@ const GymDashboard: React.FC<Props> = ({
   return (
     <div className="app-container">
       {showChangePassword && (
-        <ChangePasswordModal onClose={() => setShowChangePassword(false)} />
+        <UserProfileModal
+          user={{ fullName: ownerName, email: ownerEmail, role: role }}
+          onClose={() => setShowChangePassword(false)}
+        />
       )}
       {Sidebar}
 

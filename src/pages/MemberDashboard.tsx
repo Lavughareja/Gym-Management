@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { LogOut, Activity, Dumbbell, BarChart3, Clock, Play, Square, Loader, Menu, X, Moon, Sun, LayoutDashboard, CreditCard, ChevronRight, CheckCircle2, User, KeyRound } from "lucide-react";
-import ChangePasswordModal from "../components/ChangePasswordModal/ChangePasswordModal";
+import UserProfileModal from "../components/UserProfileModal/UserProfileModal";
 import { getTodayAttendanceApi } from "../services/apis/attendanceApis";
 import { getWorkoutsApi, createWorkoutApi, logWorkoutApi, getWorkoutReportApi } from "../services/apis/workoutApis";
 import { getMeApi } from "../services/apis/memberApis";
 import { getPlansApi } from "../services/apis/planApis";
-import { useAppDispatch } from "../utils/reduxHooks";
+import { useAppDispatch, useAppSelector } from "../utils/reduxHooks";
 import { showSnackbar } from "../redux/slices/snackbarSlice";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { getWeeklyStatsApi } from "../services/apis/memberApis";
@@ -40,6 +40,7 @@ type Tab = "overview" | "workouts" | "reports" | "plans";
 
 export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName = "Trainix Gym" }) => {
   const dispatch = useAppDispatch();
+  const { user } = useAppSelector((state) => state.auth);
   const [activeTab, setActiveTab] = useState<Tab>("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains("dark-theme"));
@@ -763,7 +764,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
               <div className="profile-info">
                 <span className="profile-name">{userName}</span>
                 <span className="profile-email" style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                  <KeyRound size={10} /> Change Password
+                  <User size={10} /> View Profile
                 </span>
               </div>
             </div>
@@ -790,7 +791,10 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
   return (
     <div className="app-container">
       {showChangePassword && (
-        <ChangePasswordModal onClose={() => setShowChangePassword(false)} />
+        <UserProfileModal
+          user={{ fullName: userName, email: (user?.email as string) || profile?.email || "", role: "member" }}
+          onClose={() => setShowChangePassword(false)}
+        />
       )}
       {Sidebar}
 

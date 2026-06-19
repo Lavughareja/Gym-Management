@@ -182,8 +182,8 @@ export const Login: React.FC<Props> = ({ onSuccess, onBack }) => {
                   <button type="button" className="btn-blue-outline" style={{ flex: 1, justifyContent: "center", padding: "10px" }} onClick={() => setShowForgot(false)}>
                     Cancel
                   </button>
-                  <button type="submit" className="btn-blue" style={{ flex: 1, justifyContent: "center", padding: "10px" }} disabled={forgotLoading}>
-                    {forgotLoading ? <Loader size={16} style={{ animation: "spin 1s linear infinite" }} /> : "Send Link"}
+                  <button type="submit" className="btn-blue" style={{ flex: 1, justifyContent: "center", padding: "10px", display: "flex", alignItems: "center", gap: "8px" }} disabled={forgotLoading}>
+                    {forgotLoading ? <><Loader size={16} style={{ animation: "spin 1s linear infinite" }} /> Sending...</> : "Send Link"}
                   </button>
                 </div>
               </form>
