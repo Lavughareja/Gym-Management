@@ -62,3 +62,18 @@ export const managerSetupApi = async (payload: ManagerSetupPayload) => {
   const response = await AxiosInstance.post(apiRoutes.managerSetup, payload);
   return response;
 };
+
+export const forgotPasswordApi = async (email: string) => {
+  const response = await AxiosInstance.post(apiRoutes.forgotPassword, { email });
+  return response;
+};
+
+export const resetPasswordApi = async (token: string, newPassword: string, confirmPassword: string) => {
+  const response = await AxiosInstance.post(apiRoutes.resetPassword, { token, newPassword, confirmPassword });
+  return response;
+};
+
+export const changePasswordApi = async (currentPassword: string, newPassword: string, confirmPassword: string) => {
+  const response = await AxiosInstance.post(apiRoutes.changePassword, { currentPassword, newPassword, confirmPassword });
+  return response;
+};

@@ -17,6 +17,7 @@ const Login         = lazy(() => import("./pages/Login").then((m) => ({ default:
 const ManagerSetup  = lazy(() => import("./pages/ManagerSetup").then((m) => ({ default: m.ManagerSetup })));
 const MemberSetup   = lazy(() => import("./pages/MemberSetup").then((m) => ({ default: m.MemberSetup })));
 const MemberDashboard = lazy(() => import("./pages/MemberDashboard").then((m) => ({ default: m.MemberDashboard })));
+const ResetPassword = lazy(() => import("./pages/ResetPassword").then((m) => ({ default: m.ResetPassword })));
 
 // ── Shared page-level loading fallback ──────────────────────────────────────
 const PageLoader = () => (
@@ -29,7 +30,7 @@ const PageLoader = () => (
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared types
 // ─────────────────────────────────────────────────────────────────────────────
-export type AppMode = "public" | "register" | "dashboard" | "login" | "manager-setup" | "trainer-setup" | "member-setup";
+export type AppMode = "public" | "register" | "dashboard" | "login" | "manager-setup" | "trainer-setup" | "member-setup" | "reset-password";
 
 export interface DashboardUser {
   ownerName:    string;
@@ -72,6 +73,8 @@ function App() {
       setMode("member-setup");
     } else if (path === "/login") {
       setMode("login");
+    } else if (path === "/reset-password") {
+      setMode("reset-password");
     }
   }, []);
 
@@ -126,6 +129,13 @@ function App() {
           <Login 
             onSuccess={handleLoginSuccess}
             onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} 
+          />
+        )}
+
+        {mode === "reset-password" && (
+          <ResetPassword
+            token={new URLSearchParams(window.location.search).get("token") || ""}
+            onGoToLogin={() => { setMode("login"); window.history.pushState({}, "", "/login"); }}
           />
         )}
 

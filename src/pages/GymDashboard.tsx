@@ -3,8 +3,9 @@ import {
   LayoutDashboard, Users, Dumbbell, UserCog, Settings,
   LogOut, Menu, X, Plus, Search, ChevronRight,
   CreditCard, UserPlus, ClipboardList, CheckCircle2, Sun, Moon,
-  Activity, Upload, Lock, Clock, Copy, Fingerprint, RefreshCw
+  Activity, Upload, Lock, Clock, Copy, Fingerprint, RefreshCw, KeyRound
 } from "lucide-react";
+import ChangePasswordModal from "../components/ChangePasswordModal/ChangePasswordModal";
 import { useAppDispatch, useAppSelector } from "../utils/reduxHooks";
 import { logoutAction } from "../redux/actions/authActions";
 import { getManagersApi, inviteManagerApi, resendInvitationApi, deleteManagerApi } from "../services/apis/managerApis";
@@ -94,6 +95,7 @@ const GymDashboard: React.FC<Props> = ({
   const [showAddPlan, setShowAddPlan] = useState(false);
   const [newPlan, setNewPlan] = useState({ name: "", level: "", basePrice: "", durationMonths: "1", features: "" });
   const [addingPlan, setAddingPlan] = useState(false);
+  const [showChangePassword, setShowChangePassword] = useState(false);
 
   useEffect(() => {
     if (role === "admin" || role === "superadmin") {
@@ -264,13 +266,19 @@ const GymDashboard: React.FC<Props> = ({
 
           {/* Profile */}
           <div className="profile-card" style={{ justifyContent: "space-between" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div
+              style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}
+              onClick={() => setShowChangePassword(true)}
+              title="Click to change password"
+            >
               <div className="profile-avatar">
                 {ownerName.slice(0, 2).toUpperCase()}
               </div>
               <div className="profile-info">
                 <span className="profile-name">{ownerName}</span>
-                <span className="profile-email">{ownerEmail}</span>
+                <span className="profile-email" style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                  <KeyRound size={10} /> Change Password
+                </span>
               </div>
             </div>
             <button
@@ -1490,6 +1498,9 @@ const GymDashboard: React.FC<Props> = ({
   // ─────────────────────────────────────────────────────────────────────────
   return (
     <div className="app-container">
+      {showChangePassword && (
+        <ChangePasswordModal onClose={() => setShowChangePassword(false)} />
+      )}
       {Sidebar}
 
       <div className="main-content">

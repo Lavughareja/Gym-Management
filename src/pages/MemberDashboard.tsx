@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { LogOut, Activity, Dumbbell, BarChart3, Clock, Play, Square, Loader, Menu, X, Moon, Sun, LayoutDashboard, CreditCard, ChevronRight, CheckCircle2 } from "lucide-react";
+import { LogOut, Activity, Dumbbell, BarChart3, Clock, Play, Square, Loader, Menu, X, Moon, Sun, LayoutDashboard, CreditCard, ChevronRight, CheckCircle2, User, KeyRound } from "lucide-react";
+import ChangePasswordModal from "../components/ChangePasswordModal/ChangePasswordModal";
 import { getTodayAttendanceApi } from "../services/apis/attendanceApis";
 import { getWorkoutsApi, createWorkoutApi, logWorkoutApi, getWorkoutReportApi } from "../services/apis/workoutApis";
 import { getMeApi } from "../services/apis/memberApis";
@@ -42,6 +43,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
   const [activeTab, setActiveTab] = useState<Tab>("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains("dark-theme"));
+  const [showChangePassword, setShowChangePassword] = useState(false);
 
   // Daily Log / Overview state
   const [attendance, setAttendance] = useState<any[]>([]);
@@ -750,13 +752,19 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
 
           {/* Profile */}
           <div className="profile-card" style={{ justifyContent: "space-between" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div
+              style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}
+              onClick={() => setShowChangePassword(true)}
+              title="Click to change password"
+            >
               <div className="profile-avatar">
                 {userName.slice(0, 2).toUpperCase()}
               </div>
               <div className="profile-info">
                 <span className="profile-name">{userName}</span>
-                <span className="profile-email">Member</span>
+                <span className="profile-email" style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                  <KeyRound size={10} /> Change Password
+                </span>
               </div>
             </div>
             <button
@@ -781,6 +789,9 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
 
   return (
     <div className="app-container">
+      {showChangePassword && (
+        <ChangePasswordModal onClose={() => setShowChangePassword(false)} />
+      )}
       {Sidebar}
 
       <div className="main-content">

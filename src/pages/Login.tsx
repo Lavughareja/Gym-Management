@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { ArrowLeft, Dumbbell, Loader, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { ArrowLeft, Dumbbell, Loader, Mail, Lock, Eye, EyeOff, X, CheckCircle } from "lucide-react";
 import { useAppDispatch } from "../utils/reduxHooks";
 import { loginAction } from "../redux/actions/authActions";
+import { forgotPasswordApi } from "../services/apis/authApis";
 
 interface Props {
   onSuccess: (user: any) => void;
@@ -15,6 +16,13 @@ export const Login: React.FC<Props> = ({ onSuccess, onBack }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // Forgot Password modal state
+  const [showForgot, setShowForgot] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotSent, setForgotSent] = useState(false);
+  const [forgotError, setForgotError] = useState("");
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password) return;
@@ -25,6 +33,20 @@ export const Login: React.FC<Props> = ({ onSuccess, onBack }) => {
 
     if (loginAction.fulfilled.match(action)) {
       onSuccess(action.payload);
+    }
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setForgotError("");
+    setForgotLoading(true);
+    try {
+      await forgotPasswordApi(forgotEmail);
+      setForgotSent(true);
+    } catch (err: any) {
+      setForgotError(err?.response?.data?.message || "Failed to send reset link. Please try again.");
+    } finally {
+      setForgotLoading(false);
     }
   };
 
@@ -88,7 +110,13 @@ export const Login: React.FC<Props> = ({ onSuccess, onBack }) => {
               </button>
             </div>
             <div style={{ textAlign: "right", marginTop: 8 }}>
-              <a href="#" style={{ fontSize: "0.8rem", color: "var(--primary)", textDecoration: "none" }}>Forgot Password?</a>
+              <button
+                type="button"
+                onClick={() => { setShowForgot(true); setForgotSent(false); setForgotError(""); setForgotEmail(""); }}
+                style={{ fontSize: "0.8rem", color: "var(--primary)", background: "none", border: "none", cursor: "pointer", padding: 0 }}
+              >
+                Forgot Password?
+              </button>
             </div>
           </div>
 
@@ -102,6 +130,67 @@ export const Login: React.FC<Props> = ({ onSuccess, onBack }) => {
           </button>
         </form>
       </div>
+
+      {/* Forgot Password Modal */}
+      {showForgot && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 9999, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+          <div className="gym-card" style={{ width: "100%", maxWidth: 400, padding: "32px", position: "relative" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+              <h3 style={{ fontWeight: 700, fontSize: "1.1rem", margin: 0 }}>Reset Password</h3>
+              <button onClick={() => setShowForgot(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", padding: 4, borderRadius: 6 }}>
+                <X size={20} />
+              </button>
+            </div>
+
+            {forgotSent ? (
+              <div style={{ textAlign: "center", padding: "10px 0 16px" }}>
+                <CheckCircle size={48} style={{ color: "var(--primary)", margin: "0 auto 16px", display: "block" }} />
+                <p style={{ fontWeight: 600, marginBottom: 8 }}>Reset link sent!</p>
+                <p style={{ color: "var(--text-muted)", fontSize: "0.9rem", marginBottom: 20 }}>
+                  Check your email <strong>{forgotEmail}</strong> for the password reset link. It expires in 1 hour.
+                </p>
+                <button className="btn-blue-outline" style={{ width: "100%", justifyContent: "center" }} onClick={() => setShowForgot(false)}>
+                  Back to Login
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleForgotPassword}>
+                <p style={{ color: "var(--text-muted)", fontSize: "0.9rem", marginBottom: 20 }}>
+                  Enter your email address and we'll send you a link to reset your password.
+                </p>
+                {forgotError && (
+                  <div style={{ background: "#fee2e2", border: "1px solid #fca5a5", borderRadius: 8, padding: "10px 14px", marginBottom: 16, color: "#dc2626", fontSize: "0.85rem" }}>
+                    {forgotError}
+                  </div>
+                )}
+                <div style={{ marginBottom: 16 }}>
+                  <label className="form-label">Email Address</label>
+                  <div style={{ position: "relative" }}>
+                    <Mail size={16} style={{ position: "absolute", left: 12, top: 12, color: "var(--text-muted)" }} />
+                    <input
+                      type="email"
+                      value={forgotEmail}
+                      onChange={(e) => setForgotEmail(e.target.value)}
+                      className="form-input"
+                      style={{ paddingLeft: 36 }}
+                      placeholder="john@example.com"
+                      required
+                    />
+                  </div>
+                </div>
+                <div style={{ display: "flex", gap: 12 }}>
+                  <button type="button" className="btn-blue-outline" style={{ flex: 1, justifyContent: "center", padding: "10px" }} onClick={() => setShowForgot(false)}>
+                    Cancel
+                  </button>
+                  <button type="submit" className="btn-blue" style={{ flex: 1, justifyContent: "center", padding: "10px" }} disabled={forgotLoading}>
+                    {forgotLoading ? <Loader size={16} style={{ animation: "spin 1s linear infinite" }} /> : "Send Link"}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
