@@ -42,7 +42,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
   const [activeTab, setActiveTab] = useState<Tab>("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains("dark-theme"));
-  
+
   // Daily Log / Overview state
   const [attendance, setAttendance] = useState<any[]>([]);
   const [loadingAttendance, setLoadingAttendance] = useState(false);
@@ -53,17 +53,23 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
   const [loadingWorkouts, setLoadingWorkouts] = useState(false);
   const [showAddWorkout, setShowAddWorkout] = useState(false);
   const [newWorkout, setNewWorkout] = useState({ name: "", bodyPart: "Chest" });
-  
+
   // Workout Logging
-  const [activeWorkout, setActiveWorkout] = useState<any | null>(null);
-  const [workoutStartTime, setWorkoutStartTime] = useState<Date | null>(null);
+  const [activeWorkout, setActiveWorkout] = useState<any | null>(() => {
+    const saved = localStorage.getItem("activeWorkout");
+    return saved ? JSON.parse(saved) : null;
+  });
+  const [workoutStartTime, setWorkoutStartTime] = useState<Date | null>(() => {
+    const saved = localStorage.getItem("workoutStartTime");
+    return saved ? new Date(saved) : null;
+  });
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
   // Custom Categories
   const [customCategories, setCustomCategories] = useState<string[]>([]);
   const [showAddCategory, setShowAddCategory] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
-  
+
   // Reports state
   const [reportType, setReportType] = useState<"daily" | "monthly" | "yearly">("daily");
   const [reportDate, setReportDate] = useState<string>(new Date().toISOString().split("T")[0]);
@@ -120,7 +126,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
 
   const fetchAttendance = async () => {
     setLoadingAttendance(true);
-    
+
     try {
       const resAtt = await getTodayAttendanceApi();
       if (resAtt.data?.attendance) {
@@ -151,7 +157,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
     try {
       const res = await getWorkoutsApi();
       const customWorkouts = res.data.workouts || [];
-      
+
       // Merge with default workouts, ensuring no duplicate names in the same category
       const mergedWorkouts = [...DEFAULT_WORKOUTS];
       for (const cw of customWorkouts) {
@@ -195,19 +201,23 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
 
   const handleStartWorkout = (workout: any) => {
     setActiveWorkout(workout);
-    setWorkoutStartTime(new Date());
+    const startTime = new Date();
+    setWorkoutStartTime(startTime);
+    localStorage.setItem("activeWorkout", JSON.stringify(workout));
+    localStorage.setItem("workoutStartTime", startTime.toISOString());
   };
 
   const handleStopWorkout = async () => {
     if (!activeWorkout || !workoutStartTime) return;
-    
+
     const endTime = new Date();
     const durationMs = endTime.getTime() - workoutStartTime.getTime();
     const durationMins = Math.max(1, Math.round(durationMs / 60000));
-    
+
     try {
       await logWorkoutApi({
-        workoutId: activeWorkout._id,
+        workoutName: activeWorkout.name,
+        bodyPart: activeWorkout.bodyPart,
         date: workoutStartTime.toISOString().split("T")[0],
         startTime: workoutStartTime.toTimeString().split(" ")[0].slice(0, 5),
         endTime: endTime.toTimeString().split(" ")[0].slice(0, 5),
@@ -217,6 +227,8 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
       setActiveWorkout(null);
       setWorkoutStartTime(null);
       setElapsedSeconds(0);
+      localStorage.removeItem("activeWorkout");
+      localStorage.removeItem("workoutStartTime");
     } catch (err) {
       dispatch(showSnackbar({ message: "Failed to log workout", type: "error" }));
     }
@@ -244,13 +256,22 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
       return;
     }
     let csvContent = "data:text/csv;charset=utf-8,";
-    csvContent += "Category,Workout Name,Minutes Logged\r\n";
-    
-    Object.entries(reportData.report || {}).forEach(([bodyPart, data]: [string, any]) => {
-      Object.entries(data.workouts).forEach(([name, mins]: [string, any]) => {
-        csvContent += `"${bodyPart}","${name}","${mins}"\r\n`;
+
+    if (reportType === "daily") {
+      csvContent += "Category,Workout Name,Minutes Logged\r\n";
+      Object.entries(reportData.report || {}).forEach(([bodyPart, data]: [string, any]) => {
+        Object.entries(data.workouts).forEach(([name, mins]: [string, any]) => {
+          csvContent += `"${bodyPart}","${name}","${mins}"\r\n`;
+        });
       });
-    });
+    } else {
+      csvContent += "Date,Category,Workout Name,Minutes Logged\r\n";
+      const logs = reportData.logs || [];
+      const sortedLogs = [...logs].sort((a: any, b: any) => b.date.localeCompare(a.date));
+      sortedLogs.forEach((log: any) => {
+        csvContent += `"${log.date}","${log.bodyPart}","${log.workoutName}","${log.duration}"\r\n`;
+      });
+    }
 
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
@@ -274,7 +295,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
   };
 
   // ── Panels ───────────────────────────────────────────────────────────────
-  
+
   const OverviewPanel = (
     <div className="page-container">
       <header className="page-header">
@@ -297,24 +318,24 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
             </div>
           </div>
         )}
-        
+
         {weeklyStats && (
           <div className="gym-card" style={{ padding: "24px" }}>
             <h3 style={{ fontSize: "1.2rem", fontWeight: 700, marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
               <BarChart3 size={20} color="var(--primary)" /> Weekly Overview
             </h3>
-            
+
             <div style={{ height: 300, width: "100%", marginBottom: 24 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={weeklyStats.dailyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorGym" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
                     </linearGradient>
                     <linearGradient id="colorWorkout" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <XAxis dataKey="date" tickFormatter={(val) => new Date(val).toLocaleDateString(undefined, { weekday: 'short' })} style={{ fontSize: 12, fill: "var(--text-secondary)" }} axisLine={false} tickLine={false} />
@@ -355,7 +376,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
             )}
           </div>
         )}
-        
+
         <div className="gym-card">
           <h3 style={{ fontSize: "1.2rem", fontWeight: 700, marginBottom: 16 }}>Today's Check-ins</h3>
           {loadingAttendance ? (
@@ -394,7 +415,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
   const WorkoutsPanel = (() => {
     const baseCategories = ["Chest", "Shoulder", "Legs", "Forearm", "Back", "Core", "Cardio", "Other"];
     const categories = Array.from(new Set([...baseCategories, ...customCategories, ...workouts.map(w => w.bodyPart)])).filter(Boolean);
-    
+
     return (
       <div className="page-container">
         <header className="page-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -459,11 +480,11 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
             <div style={{ display: "flex", gap: 16, marginBottom: 16, flexWrap: "wrap" }}>
               <div style={{ flex: 2, minWidth: 200 }}>
                 <label className="form-label">Workout Name</label>
-                <input type="text" className="form-input" placeholder="e.g. Incline Dumbbell Press" value={newWorkout.name} onChange={e => setNewWorkout({...newWorkout, name: e.target.value})} />
+                <input type="text" className="form-input" placeholder="e.g. Incline Dumbbell Press" value={newWorkout.name} onChange={e => setNewWorkout({ ...newWorkout, name: e.target.value })} />
               </div>
               <div style={{ flex: 1, minWidth: 150 }}>
                 <label className="form-label">Category</label>
-                <select className="form-input" value={newWorkout.bodyPart} onChange={e => setNewWorkout({...newWorkout, bodyPart: e.target.value})}>
+                <select className="form-input" value={newWorkout.bodyPart} onChange={e => setNewWorkout({ ...newWorkout, bodyPart: e.target.value })}>
                   {categories.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
@@ -494,7 +515,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
                     {catWorkouts.map((w, idx) => (
                       <div key={w._id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 20px", borderBottom: idx < catWorkouts.length - 1 ? "1px solid var(--border-color)" : "none", transition: "background 0.2s" }} className="hover-bg-secondary">
                         <span style={{ fontSize: "0.95rem", fontWeight: 500 }}>{w.name}</span>
-                        <button 
+                        <button
                           className="btn-blue"
                           disabled={!!activeWorkout}
                           onClick={() => handleStartWorkout(w)}
@@ -526,12 +547,12 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
             <option value="monthly">Monthly Report</option>
             <option value="yearly">Yearly Report</option>
           </select>
-          <input 
-            type={reportType === "yearly" ? "number" : reportType === "monthly" ? "month" : "date"} 
-            className="form-input" 
+          <input
+            type={reportType === "yearly" ? "number" : reportType === "monthly" ? "month" : "date"}
+            className="form-input"
             style={{ width: 160 }}
-            value={reportDate} 
-            onChange={e => setReportDate(e.target.value)} 
+            value={reportDate}
+            onChange={e => setReportDate(e.target.value)}
           />
           <button className="btn-blue-outline" onClick={downloadReportCSV}>Download CSV</button>
         </div>
@@ -556,7 +577,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
             </div>
             <Activity size={48} style={{ opacity: 0.2 }} />
           </div>
-          
+
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 20 }}>
             {Object.entries(reportData.report || {}).map(([bodyPart, data]: [string, any]) => (
               <div key={bodyPart} className="gym-card">
@@ -578,6 +599,38 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
               </div>
             ))}
           </div>
+
+          {reportType !== "daily" && reportData.logs && reportData.logs.length > 0 && (
+            <div style={{ marginTop: 32 }}>
+              <h3 style={{ fontSize: "1.2rem", fontWeight: 700, marginBottom: 16 }}>Day-wise Breakdown</h3>
+              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                {Object.entries(
+                  reportData.logs.reduce((acc: any, log: any) => {
+                    if (!acc[log.date]) acc[log.date] = [];
+                    acc[log.date].push(log);
+                    return acc;
+                  }, {})
+                ).sort((a: any, b: any) => b[0].localeCompare(a[0]))
+                  .map(([date, logs]: [string, any]) => (
+                    <div key={date} className="gym-card" style={{ padding: "16px 20px" }}>
+                      <h4 style={{ fontSize: "1rem", fontWeight: 700, color: "var(--primary)", borderBottom: "1px solid var(--border-color)", paddingBottom: 8, marginBottom: 12 }}>
+                        {new Date(date).toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}
+                      </h4>
+                      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                        {logs.map((log: any, idx: number) => (
+                          <div key={idx} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "0.95rem" }}>
+                            <span style={{ color: "var(--text-primary)" }}>
+                              {log.workoutName} <span style={{ color: "var(--text-muted)", fontSize: "0.8rem", marginLeft: 4 }}>({log.bodyPart})</span>
+                            </span>
+                            <span style={{ fontWeight: 600 }}>{log.duration} m</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -615,7 +668,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
                 <div style={{ flex: 1 }}>
                   <h4 style={{ fontSize: "0.85rem", textTransform: "uppercase", letterSpacing: "0.5px", fontWeight: 700, color: "var(--text-muted)", marginBottom: 16 }}>Includes</h4>
                   <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 12 }}>
-                    {(p.features || "").split(",").filter((f: string) => f.trim()).map((f: string, i: number) => (
+                    {(Array.isArray(p.features) ? p.features.join(",").split(/[\n,]/) : (p.features || "").split(/[\n,]/)).filter((f: string) => f.trim() && !f.trim().toLowerCase().startsWith('features:')).map((f: string, i: number) => (
                       <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, fontSize: "0.95rem", color: "var(--text-primary)" }}>
                         <CheckCircle2 size={16} style={{ color: "#10b981", flexShrink: 0, marginTop: 2 }} />
                         <span style={{ lineHeight: 1.4 }}>{f.trim()}</span>
@@ -634,7 +687,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
     </div>
   );
 
-  const navItems: { id: Tab; label: string; icon: React.FC<{size?: number}> }[] = [
+  const navItems: { id: Tab; label: string; icon: React.FC<{ size?: number }> }[] = [
     { id: "overview", label: "Overview", icon: LayoutDashboard as any },
     { id: "workouts", label: "Workouts", icon: Dumbbell as any },
     { id: "reports", label: "Reports", icon: BarChart3 as any },

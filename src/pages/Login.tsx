@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ArrowLeft, Dumbbell, Loader, Mail, Lock } from "lucide-react";
+import { ArrowLeft, Dumbbell, Loader, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useAppDispatch } from "../utils/reduxHooks";
 import { loginAction } from "../redux/actions/authActions";
 
@@ -12,6 +12,7 @@ export const Login: React.FC<Props> = ({ onSuccess, onBack }) => {
   const dispatch = useAppDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -70,14 +71,21 @@ export const Login: React.FC<Props> = ({ onSuccess, onBack }) => {
             <div style={{ position: "relative" }}>
               <Lock size={18} style={{ position: "absolute", left: 14, top: 12, color: "var(--text-muted)" }} />
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="form-input"
-                style={{ paddingLeft: 42 }}
+                style={{ paddingLeft: 42, paddingRight: 42 }}
                 placeholder="••••••••"
                 required
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                style={{ position: "absolute", right: 14, top: 12, background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", padding: 0 }}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
             <div style={{ textAlign: "right", marginTop: 8 }}>
               <a href="#" style={{ fontSize: "0.8rem", color: "var(--primary)", textDecoration: "none" }}>Forgot Password?</a>

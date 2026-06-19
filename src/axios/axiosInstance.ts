@@ -37,9 +37,15 @@ AxiosInstance.interceptors.response.use(
     const status = error?.response?.status;
 
     if (status === 401) {
-      // Token expired / unauthorized — clear storage and redirect
-      localStorage.removeItem(AUTH_TOKEN_KEY);
-      window.location.href = "/login";
+      const isLoginRequest = error?.config?.url?.includes('/login');
+      
+      if (!isLoginRequest) {
+        // Token expired / unauthorized — clear storage and redirect
+        localStorage.removeItem(AUTH_TOKEN_KEY);
+        if (window.location.pathname !== "/" && window.location.pathname !== "/login") {
+          window.location.href = "/login";
+        }
+      }
     }
 
     // 403 (device limit reached) is intentionally NOT redirected here;

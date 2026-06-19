@@ -11,7 +11,7 @@ export const createWorkoutApi = async (data: { name: string; bodyPart: string })
   return response;
 };
 
-export const logWorkoutApi = async (data: { workoutId: string; date: string; startTime: string; endTime: string; duration: number }) => {
+export const logWorkoutApi = async (data: { workoutName: string; bodyPart: string; date: string; startTime: string; endTime: string; duration: number }) => {
   const response = await AxiosInstance.post(apiRoutes.logWorkout, data);
   return response;
 };
