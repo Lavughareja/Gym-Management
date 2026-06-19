@@ -802,10 +802,8 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
             <Menu />
           </button>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <div className="brand-icon-wrapper" style={{ width: 32, height: 32 }}>
-              <Dumbbell size={16} />
-            </div>
-            <span className="brand-name" style={{ fontSize: "1rem" }}>{gymName.toUpperCase().slice(0, 10)}</span>
+            <img src={logoImg} alt="Logo" style={{ width: 32, height: 32, objectFit: "contain", borderRadius: 8 }} />
+            <span className="brand-name" style={{ fontSize: "1rem" }}>TRAINIX</span>
           </div>
           <div style={{ width: 40 }} />
         </header>
