@@ -190,15 +190,19 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
   };
 
   const handleCreateWorkout = async () => {
-    if (!newWorkout.name.trim()) return;
+    if (!newWorkout.name.trim()) {
+      dispatch(showSnackbar({ message: "Please enter a workout name", type: "error" }));
+      return;
+    }
     try {
-      const res = await createWorkoutApi(newWorkout);
+      await createWorkoutApi(newWorkout);
       dispatch(showSnackbar({ message: "Workout created!", type: "success" }));
       setShowAddWorkout(false);
       setNewWorkout({ name: "", bodyPart: "Chest" });
       fetchWorkouts();
-    } catch (err) {
-      dispatch(showSnackbar({ message: "Failed to create workout", type: "error" }));
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || "Failed to create workout";
+      dispatch(showSnackbar({ message: msg, type: "error" }));
     }
   };
 
