@@ -42,4 +42,11 @@ export const apiRoutes = {
   createPlan: "/plans",
   getPlans: "/plans",
   deletePlan: "/plans/:planId",
+
+  // ── BMI & Diet ────────────────────────────────────────────────────────────
+  bmi: "/bmi",
+  bmiMember: "/bmi/member",
+  bmiLatest: "/bmi/latest",
+  dietGenerate: "/diet/generate",
+  dietMember: "/diet/member",
 } as const;
