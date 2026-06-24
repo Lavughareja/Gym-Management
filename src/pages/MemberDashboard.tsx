@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { LogOut, Activity, Dumbbell, BarChart3, Clock, Play, Square, Loader, Menu, X, Moon, Sun, LayoutDashboard, CreditCard, ChevronRight, CheckCircle2, User, KeyRound } from "lucide-react";
+import { LogOut, Activity, Dumbbell, BarChart3, Clock, Play, Square, Loader, Menu, X, Moon, Sun, LayoutDashboard, CreditCard, ChevronRight, CheckCircle2, User, KeyRound, Sparkles, ShoppingCart, FileText, Target, ClipboardList, TrendingUp, ShieldCheck, PenLine, Eye, Trash2 } from "lucide-react";
 import UserProfileModal from "../components/UserProfileModal/UserProfileModal";
+import PurchaseAICreditsModal from "../components/PurchaseAICreditsModal/PurchaseAICreditsModal";
+import ConfirmationModal from "../components/ConfirmationModal/ConfirmationModal";
 import { getTodayAttendanceApi } from "../services/apis/attendanceApis";
-import { getWorkoutsApi, createWorkoutApi, logWorkoutApi, getWorkoutReportApi } from "../services/apis/workoutApis";
+import { getWorkoutsApi, createWorkoutApi, logWorkoutApi, getWorkoutReportApi, deleteWorkoutApi } from "../services/apis/workoutApis";
 import { getMeApi } from "../services/apis/memberApis";
 import { getPlansApi } from "../services/apis/planApis";
 import { useAppDispatch, useAppSelector } from "../utils/reduxHooks";
@@ -58,6 +60,12 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
   const [loadingWorkouts, setLoadingWorkouts] = useState(false);
   const [showAddWorkout, setShowAddWorkout] = useState(false);
   const [newWorkout, setNewWorkout] = useState({ name: "", bodyPart: "Chest" });
+  const [workoutToDelete, setWorkoutToDelete] = useState<any>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletedDefaults, setDeletedDefaults] = useState<string[]>(() => {
+    const saved = localStorage.getItem("deletedDefaults");
+    return saved ? JSON.parse(saved) : [];
+  });
 
   // Workout Logging
   const [activeWorkout, setActiveWorkout] = useState<any | null>(() => {
@@ -91,6 +99,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
   const [loadingDiet, setLoadingDiet] = useState(false);
   const [isGeneratingDiet, setIsGeneratingDiet] = useState(false);
   const [dietGoal, setDietGoal] = useState("Weight Loss");
+  const [showAiModal, setShowAiModal] = useState(false);
 
   // Profile
   const [profile, setProfile] = useState<any>(null);
@@ -172,8 +181,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
       const res = await getWorkoutsApi();
       const customWorkouts = res.data.workouts || [];
 
-      // Merge with default workouts, ensuring no duplicate names in the same category
-      const mergedWorkouts = [...DEFAULT_WORKOUTS];
+      const mergedWorkouts = [...DEFAULT_WORKOUTS.filter(dw => !deletedDefaults.includes(dw._id))];
       for (const cw of customWorkouts) {
         if (!mergedWorkouts.some(dw => dw.name.toLowerCase() === cw.name.toLowerCase() && dw.bodyPart === cw.bodyPart)) {
           mergedWorkouts.push(cw);
@@ -182,7 +190,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
       setWorkouts(mergedWorkouts);
     } catch (err) {
       console.error(err);
-      setWorkouts(DEFAULT_WORKOUTS);
+      setWorkouts(DEFAULT_WORKOUTS.filter(dw => !deletedDefaults.includes(dw._id)));
     } finally {
       setLoadingWorkouts(false);
     }
@@ -220,10 +228,20 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
 
 
   const handleGenerateDiet = async (bmiReportId: string) => {
+    if ((profile?.aiCredits || 0) < 1) {
+      dispatch(showSnackbar({ message: "Not enough AI credits! Please purchase credits first.", type: "error" }));
+      setShowAiModal(true);
+      return;
+    }
+
     setIsGeneratingDiet(true);
     try {
-      await generateDietPlanApi({ bmiReportId, goal: dietGoal });
+      const res = await generateDietPlanApi({ bmiReportId, goal: dietGoal });
       dispatch(showSnackbar({ message: "Diet Plan Generated!", type: "success" }));
+      // Update credits locally
+      if (res.data.remainingCredits !== undefined) {
+        setProfile((prev: any) => ({ ...prev, aiCredits: res.data.remainingCredits }));
+      }
       fetchDietData();
     } catch (err: any) {
       dispatch(showSnackbar({ message: err?.response?.data?.message || "Failed to generate diet plan", type: "error" }));
@@ -246,6 +264,33 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
     } catch (err: any) {
       const msg = err?.response?.data?.message || "Failed to create workout";
       dispatch(showSnackbar({ message: msg, type: "error" }));
+    }
+  };
+
+  const handleDeleteWorkout = async () => {
+    if (!workoutToDelete) return;
+    
+    if (workoutToDelete._id.startsWith("def_")) {
+      const updated = [...deletedDefaults, workoutToDelete._id];
+      setDeletedDefaults(updated);
+      localStorage.setItem("deletedDefaults", JSON.stringify(updated));
+      dispatch(showSnackbar({ message: "Workout deleted successfully", type: "success" }));
+      setWorkoutToDelete(null);
+      // We don't necessarily need to call fetchWorkouts from backend here, 
+      // but let's just manually update state for instant feedback.
+      setWorkouts(prev => prev.filter(w => w._id !== workoutToDelete._id));
+      return;
+    }
+
+    try {
+      await deleteWorkoutApi(workoutToDelete._id);
+      dispatch(showSnackbar({ message: "Workout deleted successfully", type: "success" }));
+      fetchWorkouts();
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || "Failed to delete workout";
+      dispatch(showSnackbar({ message: msg, type: "error" }));
+    } finally {
+      setWorkoutToDelete(null);
     }
   };
 
@@ -565,13 +610,24 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
                     {catWorkouts.map((w, idx) => (
                       <div key={w._id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 20px", borderBottom: idx < catWorkouts.length - 1 ? "1px solid var(--border-color)" : "none", transition: "background 0.2s" }} className="hover-bg-secondary">
                         <span style={{ fontSize: "0.95rem", fontWeight: 500 }}>{w.name}</span>
-                        <button
-                          className="btn-blue"
-                          disabled={!!activeWorkout}
-                          onClick={() => handleStartWorkout(w)}
-                          style={{ padding: "8px", width: 36, height: 36, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", opacity: activeWorkout ? 0.5 : 1 }}>
-                          <Play size={16} fill="currentColor" style={{ marginLeft: 2 }} />
-                        </button>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <button
+                            className="btn-blue-outline"
+                            onClick={() => {
+                              setWorkoutToDelete(w);
+                              setShowDeleteModal(true);
+                            }}
+                            style={{ padding: "8px", width: 36, height: 36, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid var(--danger)", color: "var(--danger)" }}>
+                            <Trash2 size={16} />
+                          </button>
+                          <button
+                            className="btn-blue"
+                            disabled={!!activeWorkout}
+                            onClick={() => handleStartWorkout(w)}
+                            style={{ padding: "8px", width: 36, height: 36, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", opacity: activeWorkout ? 0.5 : 1 }}>
+                            <Play size={16} fill="currentColor" style={{ marginLeft: 2 }} />
+                          </button>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -580,6 +636,19 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
             })}
           </div>
         )}
+
+        <ConfirmationModal
+          isOpen={showDeleteModal}
+          onClose={() => {
+            setShowDeleteModal(false);
+            setWorkoutToDelete(null);
+          }}
+          onConfirm={handleDeleteWorkout}
+          title="Delete Workout"
+          message={`Are you sure you want to delete the workout "${workoutToDelete?.name}"? This action cannot be undone.`}
+          confirmText="Delete"
+          isDestructive={true}
+        />
       </div>
     );
   })();
@@ -829,65 +898,238 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
     </>
   );
 
+  const downloadDietPDF = () => {
+    const element = document.getElementById('diet-plan-container');
+    if (!element) return;
+
+    const loadHtml2Pdf = () => new Promise((resolve) => {
+      if ((window as any).html2pdf) return resolve((window as any).html2pdf);
+      const script = document.createElement("script");
+      script.src = "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
+      script.onload = () => resolve((window as any).html2pdf);
+      document.body.appendChild(script);
+    });
+
+    loadHtml2Pdf().then((html2pdf: any) => {
+      const opt = {
+        margin: 10,
+        filename: 'My_7_Day_Diet_Plan.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      html2pdf().set(opt).from(element).save();
+    });
+  };
+
   const DietPanel = (
-    <div className="page-container">
-      <header className="page-header">
-        <h2 className="page-title">My Diet & Health</h2>
-        <p className="page-subtitle">Track your nutrition and physical progress.</p>
+    <div className="page-container" style={{ padding: "16px 24px", maxWidth: "1200px", margin: "0 auto" }}>
+      {/* Header */}
+      <header className="page-header" style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: "16px", alignItems: "center", marginBottom: "24px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <div style={{ background: "white", padding: "10px", borderRadius: "12px", boxShadow: "0 2px 8px rgba(0,0,0,0.05)", border: "1px solid #f3f4f6" }}>
+            <Activity size={24} style={{ color: "#10b981" }} />
+          </div>
+          <div>
+            <h2 className="page-title" style={{ marginBottom: "2px", fontSize: "1.4rem", fontWeight: 800, color: "var(--text-primary)" }}>My Diet & Health</h2>
+            <p className="page-subtitle" style={{ fontSize: "0.85rem", color: "var(--text-secondary)", margin: 0 }}>Track your nutrition and physical progress.</p>
+          </div>
+        </div>
+        <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+          <div style={{ background: "white", border: "1px solid #e5e7eb", padding: "8px 16px", borderRadius: "10px", display: "flex", alignItems: "center", gap: "10px", boxShadow: "0 2px 4px rgba(0,0,0,0.02)" }}>
+            <Sparkles size={18} style={{ color: "#f59e0b" }} />
+            <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.2 }}>
+              <span style={{ fontSize: "0.7rem", color: "var(--primary)", fontWeight: 700 }}>AI Credits</span>
+              <span style={{ fontSize: "0.85rem", fontWeight: 600, color: "#1f2937" }}>{profile?.aiCredits || 0} credit{profile?.aiCredits !== 1 ? 's' : ''}</span>
+            </div>
+          </div>
+          <button className="btn-blue" onClick={() => setShowAiModal(true)} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 20px", borderRadius: "10px", background: "linear-gradient(135deg, #6366f1, #4f46e5)", color: "white", fontWeight: 600, border: "none", cursor: "pointer", boxShadow: "0 4px 10px rgba(99, 102, 241, 0.3)", fontSize: "0.9rem" }}>
+            <ShoppingCart size={16} /> Buy Credits
+          </button>
+        </div>
       </header>
 
       {loadingDiet ? (
         <div style={{ display: "flex", justifyContent: "center", padding: "40px" }}><Loader size={32} style={{ animation: "spin 1s linear infinite", color: "var(--primary)" }} /></div>
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-          {/* Current Diet Plan */}
-          <div className="gym-card">
-            <h3 style={{ fontSize: "1.2rem", fontWeight: 700, marginBottom: 16 }}>Current Diet Plan</h3>
-            {dietPlans.length > 0 ? (
-              <div style={{ background: "var(--bg-secondary)", padding: 16, borderRadius: 8, border: "1px solid var(--border-color)" }}>
-                <div style={{ display: "flex", gap: 16, marginBottom: 16, flexWrap: "wrap" }}>
-                  <div style={{ flex: 1, minWidth: 100 }}><strong style={{ color: "var(--primary)" }}>Calories:</strong> {dietPlans[0].macros?.calories || "N/A"}</div>
-                  <div style={{ flex: 1, minWidth: 100 }}><strong style={{ color: "var(--primary)" }}>Protein:</strong> {dietPlans[0].macros?.protein || "N/A"}</div>
-                  <div style={{ flex: 1, minWidth: 100 }}><strong style={{ color: "var(--primary)" }}>Carbs:</strong> {dietPlans[0].macros?.carbs || "N/A"}</div>
+        <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+
+          {/* Hero Banner */}
+          <div style={{ background: "linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%)", borderRadius: "20px", padding: "32px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", position: "relative", overflow: "hidden", border: "1px solid #e2e8f0", boxShadow: "0 2px 10px rgba(139, 92, 246, 0.05)" }}>
+            <div style={{ position: "absolute", top: "20px", left: "60%", color: "#fcd34d", opacity: 0.8, fontSize: "1.2rem" }}>✨</div>
+            <div style={{ position: "absolute", bottom: "30px", left: "55%", color: "#fcd34d", opacity: 0.8, fontSize: "1.5rem" }}>✨</div>
+            <div style={{ position: "absolute", top: "10%", left: "75%", color: "#fcd34d", opacity: 0.8, fontSize: "1rem" }}>✨</div>
+
+            <div style={{ zIndex: 1, flex: 1, maxWidth: "60%" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
+                <div style={{ background: "linear-gradient(135deg, #6366f1, #4f46e5)", padding: "10px", borderRadius: "50%", color: "white", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 12px rgba(99,102,241,0.3)" }}>
+                  <Sparkles size={20} />
                 </div>
-                <div style={{ fontSize: "0.95rem", display: "flex", flexDirection: "column", gap: 12 }}>
-                  <div><strong style={{ color: "var(--primary)" }}>Breakfast:</strong> <p style={{ margin: "4px 0 0 0", color: "var(--text-secondary)" }}>{dietPlans[0].breakfast || "N/A"}</p></div>
-                  <div><strong style={{ color: "var(--primary)" }}>Lunch:</strong> <p style={{ margin: "4px 0 0 0", color: "var(--text-secondary)" }}>{dietPlans[0].lunch || "N/A"}</p></div>
-                  <div><strong style={{ color: "var(--primary)" }}>Dinner:</strong> <p style={{ margin: "4px 0 0 0", color: "var(--text-secondary)" }}>{dietPlans[0].dinner || "N/A"}</p></div>
+                <h3 style={{ fontSize: "1.6rem", fontWeight: 800, color: "#1e1b4b", margin: 0, letterSpacing: "-0.5px" }}>Generate Your Diet Plan</h3>
+              </div>
+              <p style={{ color: "#4b5563", fontSize: "0.9rem", marginBottom: "24px", fontWeight: 500, lineHeight: 1.5 }}>Get a personalized 7-day diet plan tailored to your goals using your latest BMI report.</p>
+
+              <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", alignItems: "flex-start" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                  <div style={{ display: "flex", gap: "16px" }}>
+                    {/* Latest BMI Report Card */}
+                    <div style={{ background: "white", padding: "12px 16px", borderRadius: "12px", display: "flex", alignItems: "center", gap: "12px", border: "1px solid #e5e7eb", boxShadow: "0 2px 4px rgba(0,0,0,0.02)", width: "260px", position: "relative" }}>
+                      {latestBmiPhoto ? (
+                        <div style={{ width: "36px", height: "36px", borderRadius: "8px", overflow: "hidden", border: "1px solid #e5e7eb", flexShrink: 0 }}>
+                          <img src={latestBmiPhoto.reportImageUrl.startsWith("http") ? latestBmiPhoto.reportImageUrl : `http://localhost:5000${latestBmiPhoto.reportImageUrl}`} alt="BMI Report" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        </div>
+                      ) : (
+                        <div style={{ background: "#d1fae5", padding: "8px", borderRadius: "8px", color: "#10b981", flexShrink: 0 }}>
+                          <FileText size={20} />
+                        </div>
+                      )}
+                      <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
+                        <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#374151", marginBottom: "2px" }}>Latest BMI Report</span>
+                        {latestBmiPhoto ? (
+                          <span style={{ fontSize: "0.7rem", color: "#6b7280", fontWeight: 500 }}>Uploaded on <strong style={{ color: "#4b5563" }}>{new Date(latestBmiPhoto.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</strong></span>
+                        ) : (
+                          <span style={{ fontSize: "0.7rem", color: "#ef4444", fontWeight: 500 }}>No report uploaded</span>
+                        )}
+                      </div>
+                      {latestBmiPhoto && (
+                        <button
+                          onClick={() => window.open(latestBmiPhoto.reportImageUrl.startsWith("http") ? latestBmiPhoto.reportImageUrl : `http://localhost:5000${latestBmiPhoto.reportImageUrl}`, "_blank")}
+                          style={{ background: "#f3f4f6", border: "none", padding: "6px", borderRadius: "6px", color: "#4b5563", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.2s" }}
+                          onMouseOver={(e) => e.currentTarget.style.background = "#e5e7eb"}
+                          onMouseOut={(e) => e.currentTarget.style.background = "#f3f4f6"}
+                          title="View Report"
+                        >
+                          <Eye size={16} />
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Goal Dropdown */}
+                    <div style={{ background: "white", padding: "8px 16px", borderRadius: "12px", border: "1px solid #e5e7eb", display: "flex", flexDirection: "column", justifyContent: "center", width: "160px", boxShadow: "0 2px 4px rgba(0,0,0,0.02)" }}>
+                      <span style={{ fontSize: "0.65rem", color: "#6b7280", marginBottom: "2px", fontWeight: 600 }}>Your Goal</span>
+                      <select value={dietGoal} onChange={e => setDietGoal(e.target.value)} style={{ border: "none", background: "transparent", fontSize: "0.85rem", fontWeight: 700, color: "#1f2937", outline: "none", cursor: "pointer", padding: 0 }}>
+                        <option>Weight Loss</option>
+                        <option>Weight Gain</option>
+                        <option>Maintain Weight</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Generate Button */}
+                  <button
+                    disabled={isGeneratingDiet || !latestBmiPhoto}
+                    onClick={() => handleGenerateDiet(latestBmiPhoto?._id)}
+                    style={{
+                      background: "linear-gradient(135deg, #8b5cf6, #6366f1)",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "20px",
+                      padding: "8px 16px",
+                      fontWeight: 600,
+                      fontSize: "0.8rem",
+                      cursor: (isGeneratingDiet || !latestBmiPhoto) ? "not-allowed" : "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      width: "fit-content",
+                      boxShadow: "0 4px 12px rgba(139, 92, 246, 0.3)",
+                      opacity: (!latestBmiPhoto) ? 0.6 : 1,
+                      transition: "all 0.2s"
+                    }}
+                    onMouseOver={(e) => { if (!isGeneratingDiet && latestBmiPhoto) e.currentTarget.style.transform = "translateY(-1px)" }}
+                    onMouseOut={(e) => { if (!isGeneratingDiet && latestBmiPhoto) e.currentTarget.style.transform = "translateY(0)" }}
+                  >
+                    {isGeneratingDiet ? <Loader size={14} style={{ animation: "spin 1s linear infinite" }} /> : <><Sparkles size={14} /> Generate 7-Day Plan (1 Credit)</>}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ zIndex: 1, width: "35%", display: "flex", justifyContent: "flex-end", paddingRight: "20px" }}>
+              <img src="/hero_diet_illustration.png" alt="Diet Plan Illustration" style={{ width: "100%", maxWidth: "250px", objectFit: "contain", filter: "drop-shadow(0 10px 20px rgba(0,0,0,0.1))" }} />
+            </div>
+          </div>
+
+
+
+          {/* Current 7-Day Diet Plan Card */}
+          <div style={{ background: "white", border: "1px solid #e5e7eb", borderRadius: "20px", padding: "32px", boxShadow: "0 4px 12px rgba(0,0,0,0.03)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px", borderBottom: "1px solid #f3f4f6", paddingBottom: "16px" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <div style={{ background: "#eef2ff", color: "#4f46e5", padding: "10px", borderRadius: "10px" }}><PenLine size={20} /></div>
+                <h3 style={{ fontSize: "1.2rem", fontWeight: 800, color: "#111827", margin: 0 }}>Current 7-Day Diet Plan</h3>
+              </div>
+              {dietPlans.length > 0 && dietPlans[0].days && (
+                <button onClick={downloadDietPDF} style={{ background: "white", border: "1px solid #d1d5db", padding: "8px 16px", borderRadius: "10px", color: "#374151", fontWeight: 600, cursor: "pointer", fontSize: "0.85rem", boxShadow: "0 1px 2px rgba(0,0,0,0.05)", transition: "all 0.2s" }} onMouseOver={(e) => e.currentTarget.style.background = "#f9fafb"} onMouseOut={(e) => e.currentTarget.style.background = "white"}>
+                  Download PDF
+                </button>
+              )}
+            </div>
+
+            {dietPlans.length > 0 && dietPlans[0].days ? (
+              <div id="diet-plan-container">
+                {/* General Recommendations & Foods to Avoid */}
+                <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", marginBottom: "24px" }}>
+                  {(dietPlans[0].foodsToAvoid?.length > 0) && (
+                    <div style={{ flex: 1, minWidth: "280px", background: "#fef2f2", border: "1px solid #fecaca", padding: "16px", borderRadius: "12px" }}>
+                      <h4 style={{ color: "#dc2626", fontWeight: 800, marginBottom: "8px", fontSize: "0.95rem", display: "flex", alignItems: "center", gap: "6px" }}>🚫 Foods to Avoid</h4>
+                      <ul style={{ paddingLeft: "20px", margin: 0, fontSize: "0.85rem", color: "#7f1d1d", lineHeight: 1.5 }}>
+                        {dietPlans[0].foodsToAvoid.map((food: string, i: number) => <li key={i}>{food}</li>)}
+                      </ul>
+                    </div>
+                  )}
+                  {(dietPlans[0].generalRecommendations?.length > 0) && (
+                    <div style={{ flex: 1, minWidth: "280px", background: "#ecfdf5", border: "1px solid #a7f3d0", padding: "16px", borderRadius: "12px" }}>
+                      <h4 style={{ color: "#059669", fontWeight: 800, marginBottom: "8px", fontSize: "0.95rem", display: "flex", alignItems: "center", gap: "6px" }}>💡 General Recommendations</h4>
+                      <ul style={{ paddingLeft: "20px", margin: 0, fontSize: "0.85rem", color: "#065f46", lineHeight: 1.5 }}>
+                        {dietPlans[0].generalRecommendations.map((rec: string, i: number) => <li key={i}>{rec}</li>)}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "16px" }}>
+                  {dietPlans[0].days.map((day: any) => (
+                    <div key={day.dayNumber} style={{ background: "white", padding: "20px", borderRadius: "12px", border: "1px solid #e5e7eb", boxShadow: "0 2px 4px rgba(0,0,0,0.02)" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #f3f4f6", paddingBottom: "12px", marginBottom: "16px" }}>
+                        <h4 style={{ color: "#4f46e5", fontWeight: 800, fontSize: "1.1rem", margin: 0 }}>Day {day.dayNumber}</h4>
+                        <div style={{ fontSize: "0.75rem", display: "flex", gap: "8px", fontWeight: 700, color: "#6b7280", flexWrap: "wrap", background: "#f3f4f6", padding: "4px 8px", borderRadius: "6px" }}>
+                          <span title="Calories">🔥 {day.calories} kcal</span>
+                          <span title="Protein">🥩 {day.protein}g P</span>
+                          <span title="Carbs">🍞 {day.carbs}g C</span>
+                          <span title="Fats">🥑 {day.fats}g F</span>
+                        </div>
+                      </div>
+
+                      <div style={{ fontSize: "0.85rem", display: "flex", flexDirection: "column", gap: "12px" }}>
+                        {day.breakfast && <div><strong style={{ color: "#111827", display: "block", marginBottom: "2px" }}>Breakfast</strong> <span style={{ color: "#4b5563", lineHeight: 1.4 }}>{day.breakfast}</span></div>}
+                        {day.morningSnack && <div><strong style={{ color: "#111827", display: "block", marginBottom: "2px" }}>Morning Snack</strong> <span style={{ color: "#4b5563", lineHeight: 1.4 }}>{day.morningSnack}</span></div>}
+                        {day.lunch && <div><strong style={{ color: "#111827", display: "block", marginBottom: "2px" }}>Lunch</strong> <span style={{ color: "#4b5563", lineHeight: 1.4 }}>{day.lunch}</span></div>}
+                        {day.eveningSnack && <div><strong style={{ color: "#111827", display: "block", marginBottom: "2px" }}>Evening Snack</strong> <span style={{ color: "#4b5563", lineHeight: 1.4 }}>{day.eveningSnack}</span></div>}
+                        {day.dinner && <div><strong style={{ color: "#111827", display: "block", marginBottom: "2px" }}>Dinner</strong> <span style={{ color: "#4b5563", lineHeight: 1.4 }}>{day.dinner}</span></div>}
+                        {day.bedtimeSnack && <div><strong style={{ color: "#111827", display: "block", marginBottom: "2px" }}>Bedtime</strong> <span style={{ color: "#4b5563", lineHeight: 1.4 }}>{day.bedtimeSnack}</span></div>}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             ) : (
-              <p style={{ color: "var(--text-muted)", fontSize: "0.95rem" }}>You don't have a generated diet plan yet. Generate one from your latest photo!</p>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "40px 0" }}>
+                <img src="/empty_diet_plan_illustration.png" alt="No Diet Plan" style={{ width: "180px", marginBottom: "24px", opacity: 0.9, filter: "drop-shadow(0 10px 15px rgba(0,0,0,0.05))" }} />
+                <h4 style={{ fontSize: "1.3rem", fontWeight: 800, color: "#111827", marginBottom: "8px", margin: 0 }}>No 7-Day Plan Yet</h4>
+                <p style={{ color: "#6b7280", fontSize: "0.95rem", marginBottom: "24px", fontWeight: 500 }}>Generate your first AI diet plan to view it here.</p>
+                <button
+                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                  style={{ background: "white", border: "2px solid #6366f1", color: "#6366f1", padding: "10px 24px", borderRadius: "12px", fontWeight: 700, cursor: "pointer", fontSize: "0.9rem", transition: "all 0.2s", boxShadow: "0 4px 12px rgba(99,102,241,0.1)" }}
+                  onMouseOver={(e) => { e.currentTarget.style.background = "#e0e7ff"; e.currentTarget.style.transform = "translateY(-2px)" }}
+                  onMouseOut={(e) => { e.currentTarget.style.background = "white"; e.currentTarget.style.transform = "translateY(0)" }}
+                >
+                  Generate Your Plan
+                </button>
+              </div>
             )}
           </div>
 
-          {/* Latest Photo */}
-          <div className="gym-card">
-            <h3 style={{ fontSize: "1.2rem", fontWeight: 700, marginBottom: 16 }}>Latest Progress Photo</h3>
-            {latestBmiPhoto ? (
-              <div style={{ display: "flex", gap: 16, alignItems: "flex-start", flexWrap: "wrap" }}>
-                <img src={latestBmiPhoto.reportImageUrl.startsWith("http") ? latestBmiPhoto.reportImageUrl : `http://localhost:5000${latestBmiPhoto.reportImageUrl}`} alt="BMI Report" style={{ width: 250, height: "auto", borderRadius: 8, border: "1px solid var(--border-color)" }} />
-                <div>
-                  <p style={{ fontSize: "0.9rem", color: "var(--text-secondary)", marginBottom: 8 }}>Uploaded on: {new Date(latestBmiPhoto.createdAt).toLocaleDateString()}</p>
-                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-                    <a href={latestBmiPhoto.reportImageUrl.startsWith("http") ? latestBmiPhoto.reportImageUrl : `http://localhost:5000${latestBmiPhoto.reportImageUrl}`} download className="btn-blue-outline" style={{ display: "inline-flex", padding: "6px 12px", textDecoration: "none" }}>
-                      Download Photo
-                    </a>
-                    <select className="form-input" style={{ width: 150, padding: "8px" }} value={dietGoal} onChange={e => setDietGoal(e.target.value)}>
-                      <option>Weight Loss</option>
-                      <option>Weight Gain</option>
-                      <option>Maintain Weight</option>
-                    </select>
-                    <button className="btn-blue" disabled={isGeneratingDiet} onClick={() => handleGenerateDiet(latestBmiPhoto._id)} style={{ display: "inline-flex", padding: "6px 12px", background: "linear-gradient(135deg, var(--primary), #8b5cf6)", border: "none", color: "#fff", fontWeight: 600 }}>
-                      {isGeneratingDiet ? <Loader size={16} style={{ animation: "spin 1s linear infinite" }} /> : "✨ Generate Diet Plan (AI)"}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <p style={{ color: "var(--text-muted)", fontSize: "0.95rem" }}>No progress photos uploaded yet.</p>
-            )}
-          </div>
         </div>
       )}
     </div>
@@ -907,6 +1149,13 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
         <UserProfileModal
           user={{ fullName: userName, email: (user?.email as string) || profile?.email || "", role: "member" }}
           onClose={() => setShowChangePassword(false)}
+        />
+      )}
+      {showAiModal && (
+        <PurchaseAICreditsModal
+          userEmail={(user?.email as string) || profile?.email || ""}
+          onClose={() => setShowAiModal(false)}
+          onSuccess={(newTotalCredits) => setProfile((prev: any) => ({ ...prev, aiCredits: newTotalCredits }))}
         />
       )}
       {Sidebar}

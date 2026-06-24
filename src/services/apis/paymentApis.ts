@@ -17,6 +17,10 @@ export interface VerifySignaturePayload {
   razorpaySignature: string;
 }
 
+export interface CreateAiCreditOrderPayload {
+  quantity: number;
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Payment APIs
 // ─────────────────────────────────────────────────────────────────────────────
@@ -36,5 +40,15 @@ export const createOrderApi = async (payload: CreateOrderPayload) => {
  */
 export const verifySignatureApi = async (payload: VerifySignaturePayload) => {
   const response = await AxiosInstance.post(apiRoutes.verifySignature, payload);
+  return response;
+};
+
+export const createAiCreditOrderApi = async (payload: CreateAiCreditOrderPayload) => {
+  const response = await AxiosInstance.post(apiRoutes.createAiCreditOrder, payload);
+  return response;
+};
+
+export const verifyAiCreditSignatureApi = async (payload: VerifySignaturePayload) => {
+  const response = await AxiosInstance.post(apiRoutes.verifyAiCreditSignature, payload);
   return response;
 };

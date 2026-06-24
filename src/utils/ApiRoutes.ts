@@ -15,6 +15,8 @@ export const apiRoutes = {
   // ── Payment ───────────────────────────────────────────────────────────────
   createOrder: "/payment/create-order",
   verifySignature: "/payment/verify-signature",
+  createAiCreditOrder: "/payment/ai-credits/create-order",
+  verifyAiCreditSignature: "/payment/ai-credits/verify-signature",
 
   // ── Managers ──────────────────────────────────────────────────────────────
   managers: "/managers",
@@ -35,6 +37,7 @@ export const apiRoutes = {
 
   // ── Workouts ──────────────────────────────────────────────────────────────
   workouts: "/workouts",
+  deleteWorkout: "/workouts/:id",
   logWorkout: "/workouts/log",
   workoutReport: "/workouts/report",
 
