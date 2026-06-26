@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { LogOut, Activity, Dumbbell, BarChart3, Clock, Play, Square, Loader, Menu, X, Moon, Sun, LayoutDashboard, CreditCard, ChevronRight, CheckCircle2, User, KeyRound, Sparkles, ShoppingCart, FileText, Target, ClipboardList, TrendingUp, ShieldCheck, PenLine, Eye, Trash2 } from "lucide-react";
+import { LogOut, Activity, Dumbbell, BarChart3, Clock, Play, Square, Loader, Menu, X, Moon, Sun, LayoutDashboard, CreditCard, ChevronRight, CheckCircle2, User, KeyRound, Sparkles, ShoppingCart, FileText, Target, ClipboardList, TrendingUp, ShieldCheck, PenLine, Eye, Trash2, BookOpen } from "lucide-react";
 import UserProfileModal from "../components/UserProfileModal/UserProfileModal";
 import PurchaseAICreditsModal from "../components/PurchaseAICreditsModal/PurchaseAICreditsModal";
 import ConfirmationModal from "../components/ConfirmationModal/ConfirmationModal";
@@ -13,6 +13,7 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { getWeeklyStatsApi } from "../services/apis/memberApis";
 import { getLatestBmiReportApi } from "../services/apis/bmiApis";
 import { getMemberDietHistoryApi, generateDietPlanApi } from "../services/apis/dietApis";
+import WorkoutLibraryPage from "../components/WorkoutLibrary/WorkoutLibraryPage";
 
 const DEFAULT_WORKOUTS = [
   { _id: "def_chest_1", name: "Bench Press", bodyPart: "Chest" },
@@ -40,7 +41,7 @@ interface Props {
   gymName?: string;
 }
 
-type Tab = "overview" | "workouts" | "reports" | "plans" | "diet";
+type Tab = "overview" | "workouts" | "reports" | "plans" | "diet" | "library";
 
 export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName = "Trainix Gym" }) => {
   const dispatch = useAppDispatch();
@@ -807,11 +808,12 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
   );
 
   const navItems: { id: Tab; label: string; icon: React.FC<{ size?: number }> }[] = [
-    { id: "overview", label: "Overview", icon: LayoutDashboard as any },
-    { id: "workouts", label: "Workouts", icon: Dumbbell as any },
-    { id: "reports", label: "Reports", icon: BarChart3 as any },
-    { id: "diet", label: "My Diet", icon: Activity as any },
-    { id: "plans", label: "Gym Plans", icon: CreditCard as any },
+    { id: "overview",  label: "Overview",   icon: LayoutDashboard as any },
+    { id: "workouts",  label: "Workouts",   icon: Dumbbell as any },
+    { id: "library",   label: "Workout Video",    icon: BookOpen as any },
+    { id: "reports",   label: "Reports",    icon: BarChart3 as any },
+    { id: "diet",      label: "My Diet",    icon: Activity as any },
+    { id: "plans",     label: "Gym Plans",  icon: CreditCard as any },
   ];
 
   const Sidebar = (
@@ -1141,6 +1143,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
     reports: ReportsPanel,
     plans: PlansPanel,
     diet: DietPanel,
+    library: <WorkoutLibraryPage />,
   };
 
   return (

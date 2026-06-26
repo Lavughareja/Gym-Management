@@ -6,24 +6,25 @@ import {
   LogOut, 
   ChevronLeft, 
   ChevronRight,
-  Zap
+  BookOpen
 } from "lucide-react";
-import type { AppDispatch } from "../../../redux/store";
+import type { AppDispatch } from "../../redux/store";
 import { saLogout } from "../redux/slices/superAdminSlice";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SuperAdminLayout — Sidebar + topbar shell for all super admin pages
 // ─────────────────────────────────────────────────────────────────────────────
 
-type NavTab = "dashboard" | "gyms";
+type NavTab = "dashboard" | "gyms" | "workout-library";
 
 interface SuperAdminLayoutProps {
   children: (tab: NavTab) => React.ReactNode;
 }
 
 const NAV_ITEMS: { id: NavTab; label: string; icon: React.ReactNode }[] = [
-  { id: "dashboard", label: "Dashboard",    icon: <LayoutDashboard size={20} /> },
-  { id: "gyms",      label: "All Gyms",     icon: <Dumbbell size={20} /> },
+  { id: "dashboard",       label: "Dashboard",        icon: <LayoutDashboard size={20} /> },
+  { id: "gyms",            label: "All Gyms",          icon: <Dumbbell size={20} /> },
+  { id: "workout-library", label: "Workout Videos",   icon: <BookOpen size={20} /> },
 ];
 
 const SuperAdminLayout: React.FC<SuperAdminLayoutProps> = ({ children }) => {
@@ -45,7 +46,7 @@ const SuperAdminLayout: React.FC<SuperAdminLayoutProps> = ({ children }) => {
         {/* Logo */}
         <div style={styles.logo}>
           <div style={styles.logoIcon}>
-            <img src="/logo.png" alt="Logo" style={{ width: 24, height: 24, display: "block" }} />
+            <img src="/logo.png" alt="Logo" style={{ width: 32, height: 32, display: "block" }} />
           </div>
           {sidebarOpen && (
             <span style={styles.logoText}>
@@ -82,14 +83,6 @@ const SuperAdminLayout: React.FC<SuperAdminLayoutProps> = ({ children }) => {
 
         {/* Bottom actions */}
         <div style={styles.sidebarBottom}>
-          <button
-            id="sa-collapse-btn"
-            style={styles.collapseBtn}
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            title={sidebarOpen ? "Collapse" : "Expand"}
-          >
-            {sidebarOpen ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
-          </button>
           <button
             id="sa-logout-btn"
             style={{ ...styles.logoutBtn, justifyContent: sidebarOpen ? "flex-start" : "center" }}
@@ -130,7 +123,8 @@ const SuperAdminLayout: React.FC<SuperAdminLayoutProps> = ({ children }) => {
 const styles: Record<string, React.CSSProperties> = {
   root: {
     display: "flex",
-    minHeight: "100vh",
+    height: "100vh",
+    overflow: "hidden",
     background: "#f8fafc",
     fontFamily: "'Inter', 'Outfit', sans-serif",
     color: "#0f172a",
@@ -143,20 +137,21 @@ const styles: Record<string, React.CSSProperties> = {
     transition: "width 0.25s ease",
     overflow: "hidden",
     flexShrink: 0,
-    minHeight: "100vh",
-    position: "sticky",
-    top: 0,
+    height: "100vh",
   },
   logo: {
     display: "flex",
     alignItems: "center",
-    gap: 10,
-    padding: "24px 18px 20px",
+    gap: 12,
+    padding: "0 24px",
+    height: "72px",
     borderBottom: "1px solid #e2e8f0",
+    flexShrink: 0,
   },
   logoIcon: {
-    fontSize: 22,
     flexShrink: 0,
+    display: "flex",
+    alignItems: "center",
   },
   logoText: {
     fontSize: 18,
@@ -171,6 +166,7 @@ const styles: Record<string, React.CSSProperties> = {
     gap: 4,
     padding: "16px 10px",
     flex: 1,
+    overflowY: "auto",
   },
   navItem: {
     display: "flex",
@@ -229,17 +225,17 @@ const styles: Record<string, React.CSSProperties> = {
     display: "flex",
     flexDirection: "column",
     minWidth: 0,
+    height: "100vh",
   },
   topbar: {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    padding: "16px 28px",
+    padding: "0 28px",
+    height: "72px",
     background: "#ffffff",
     borderBottom: "1px solid #e2e8f0",
-    position: "sticky",
-    top: 0,
-    zIndex: 10,
+    flexShrink: 0,
   },
   topbarLeft: {
     display: "flex",
