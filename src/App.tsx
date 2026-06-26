@@ -18,6 +18,7 @@ const ManagerSetup  = lazy(() => import("./pages/ManagerSetup").then((m) => ({ d
 const MemberSetup   = lazy(() => import("./pages/MemberSetup").then((m) => ({ default: m.MemberSetup })));
 const MemberDashboard = lazy(() => import("./pages/MemberDashboard").then((m) => ({ default: m.MemberDashboard })));
 const ResetPassword = lazy(() => import("./pages/ResetPassword").then((m) => ({ default: m.ResetPassword })));
+const SuperAdminRoutes = lazy(() => import("./SuperAdmin/routes/SuperAdminRoutes"));
 
 // ── Shared page-level loading fallback ──────────────────────────────────────
 const PageLoader = () => (
@@ -30,7 +31,7 @@ const PageLoader = () => (
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared types
 // ─────────────────────────────────────────────────────────────────────────────
-export type AppMode = "public" | "register" | "dashboard" | "login" | "manager-setup" | "trainer-setup" | "member-setup" | "reset-password";
+export type AppMode = "public" | "register" | "dashboard" | "login" | "manager-setup" | "trainer-setup" | "member-setup" | "reset-password" | "super-admin";
 
 export interface DashboardUser {
   ownerName:    string;
@@ -50,6 +51,10 @@ export interface PaymentVerifiedPayload {
 // ─────────────────────────────────────────────────────────────────────────────
 function App() {
   const [mode, setMode] = useState<AppMode>(() => {
+    // Super admin portal is completely isolated
+    if (window.location.pathname === "/super-admin") {
+      return "super-admin";
+    }
     const hasDashUser = !!localStorage.getItem("dashUser");
     if (hasDashUser && window.location.pathname === "/") {
       return "dashboard";
@@ -65,7 +70,9 @@ function App() {
   // Intercept URLs on mount
   useEffect(() => {
     const path = window.location.pathname;
-    if (path === "/manager-setup") {
+    if (path === "/super-admin") {
+      setMode("super-admin");
+    } else if (path === "/manager-setup") {
       setMode("manager-setup");
     } else if (path === "/trainer-setup") {
       setMode("trainer-setup");
@@ -178,6 +185,10 @@ function App() {
           )
         )}
 
+        {mode === "super-admin" && (
+          <SuperAdminRoutes />
+        )}
+
         {mode === "public" && (
           <SidebarLayout onLoginClick={() => { setMode("login"); window.history.pushState({}, "", "/login"); }}>
             {(activeTab) => (
@@ -201,3 +212,4 @@ function App() {
 }
 
 export default App;
+
