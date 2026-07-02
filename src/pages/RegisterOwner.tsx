@@ -28,6 +28,7 @@ const RegisterOwner: React.FC<Props> = ({ plan, email, paymentToken, onSuccess, 
     password: "",
     confirmPassword: "",
     gymName: "",
+    dateOfBirth: "",
   });
 
   const [validationError, setValidationError] = useState<string | null>(null);
@@ -62,6 +63,7 @@ const RegisterOwner: React.FC<Props> = ({ plan, email, paymentToken, onSuccess, 
         gymName:      form.gymName,
         plan,
         paymentToken,
+        dateOfBirth:  form.dateOfBirth,
       })
     );
 
@@ -141,6 +143,18 @@ const RegisterOwner: React.FC<Props> = ({ plan, email, paymentToken, onSuccess, 
               onChange={handleChange}
               required
               placeholder="John's Fitness Hub"
+              style={inputStyle}
+            />
+          </div>
+
+          <div>
+            <label style={labelStyle}>Date of Birth</label>
+            <input
+              name="dateOfBirth"
+              type="date"
+              value={form.dateOfBirth}
+              onChange={handleChange}
+              required
               style={inputStyle}
             />
           </div>

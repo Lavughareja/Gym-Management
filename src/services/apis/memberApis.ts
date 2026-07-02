@@ -10,7 +10,7 @@ export const bulkImportMembersApi = async (formData: FormData) => {
   return response;
 };
 
-export const addMemberApi = async (data: { fullName: string; email: string; mobileNo: string; planId?: string; durationMonths?: string | number; extraDays?: string | number; startDate?: string; secondaryPhone?: string; emergencyNumber?: string; bloodGroup?: string; amountPaid?: number | string }) => {
+export const addMemberApi = async (data: { fullName: string; email: string; mobileNo: string; planId?: string; durationMonths?: string | number; extraDays?: string | number; startDate?: string; secondaryPhone?: string; emergencyNumber?: string; bloodGroup?: string; amountPaid?: number | string; dateOfBirth?: string }) => {
   const response = await AxiosInstance.post(apiRoutes.addMember, data);
   return response;
 };
@@ -19,7 +19,7 @@ export const getMembersApi = async () => {
   return await AxiosInstance.get(apiRoutes.getMembers);
 };
 
-export const memberSetupApi = async (data: { token: string; password: string }) => {
+export const memberSetupApi = async (data: { token: string; password: string; dateOfBirth?: string }) => {
   const response = await AxiosInstance.post(apiRoutes.memberSetup, data);
   return response;
 };

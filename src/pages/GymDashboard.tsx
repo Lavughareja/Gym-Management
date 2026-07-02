@@ -72,7 +72,7 @@ const GymDashboard: React.FC<Props> = ({
   // Manager State
   const [managers, setManagers] = useState<any[]>([]);
   const [showAddManager, setShowAddManager] = useState(false);
-  const [newManager, setNewManager] = useState({ fullName: "", email: "", mobileNo: "", canAddMember: false });
+  const [newManager, setNewManager] = useState({ fullName: "", email: "", mobileNo: "", canAddMember: false, dateOfBirth: "" });
   const [isManagersLoading, setIsManagersLoading] = useState(false);
   const [inviteLoading, setInviteLoading] = useState(false);
 
@@ -93,7 +93,7 @@ const GymDashboard: React.FC<Props> = ({
   const [isUploadingBmi, setIsUploadingBmi] = useState(false);
 
   // ── Members panel state ──────────────────────────────────────────────────
-  const [newMember, setNewMember] = useState({ name: "", planId: "", durationMonths: "1", extraDays: "0", email: "", mobileNo: "", secondaryPhone: "", emergencyNumber: "", bloodGroup: "", amountPaid: "", startDate: "" });
+  const [newMember, setNewMember] = useState({ name: "", planId: "", durationMonths: "1", extraDays: "0", email: "", mobileNo: "", secondaryPhone: "", emergencyNumber: "", bloodGroup: "", amountPaid: "", startDate: "", dateOfBirth: "" });
   const [addingMember, setAddingMember] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
   const [importFile, setImportFile] = useState<File | null>(null);
@@ -492,6 +492,7 @@ const GymDashboard: React.FC<Props> = ({
                 { label: "Secondary Phone (Optional)", field: "secondaryPhone", placeholder: "0987654321", type: "tel" },
                 { label: "Emergency Number (Optional)", field: "emergencyNumber", placeholder: "1122334455", type: "tel" },
                 { label: "Blood Group (Optional)", field: "bloodGroup", placeholder: "O+", type: "text" },
+                { label: "Date of Birth", field: "dateOfBirth", placeholder: "", type: "date" },
               ].map(({ label, field, placeholder, type }) => (
                 <div key={field}>
                   <label className="form-label">{label}</label>
@@ -580,10 +581,11 @@ const GymDashboard: React.FC<Props> = ({
                         bloodGroup: (newMember as any).bloodGroup,
                         amountPaid: (newMember as any).amountPaid,
                         startDate: (newMember as any).startDate,
+                        dateOfBirth: (newMember as any).dateOfBirth,
                       });
                       dispatch(showSnackbar({ message: "Member added successfully!", type: "success" }));
                       setShowAddMember(false);
-                      setNewMember({ name: "", planId: "", durationMonths: "1", extraDays: "0", email: "", mobileNo: "", secondaryPhone: "", emergencyNumber: "", bloodGroup: "", amountPaid: "", startDate: "" });
+                      setNewMember({ name: "", planId: "", durationMonths: "1", extraDays: "0", email: "", mobileNo: "", secondaryPhone: "", emergencyNumber: "", bloodGroup: "", amountPaid: "", startDate: "", dateOfBirth: "" });
                       fetchMembers();
                     } catch (error: any) {
                       dispatch(showSnackbar({ message: error?.response?.data?.message || "Failed to add member", type: "error" }));
@@ -909,7 +911,7 @@ const GymDashboard: React.FC<Props> = ({
   );
 
   // ── Trainers panel ───────────────────────────────────────────────────────
-  const [newTrainer, setNewTrainer] = useState({ fullName: "", email: "", mobileNo: "", canAddMember: false });
+  const [newTrainer, setNewTrainer] = useState({ fullName: "", email: "", mobileNo: "", canAddMember: false, dateOfBirth: "" });
 
   const TrainersPanel = (
     <div className="page-container">
@@ -944,6 +946,10 @@ const GymDashboard: React.FC<Props> = ({
               <div>
                 <label className="form-label">Mobile Number</label>
                 <input type="tel" value={newTrainer.mobileNo} onChange={e => setNewTrainer({ ...newTrainer, mobileNo: e.target.value })} placeholder="1234567890" className="form-input" />
+              <div>
+                <label className="form-label">Date of Birth</label>
+                <input type="date" value={newTrainer.dateOfBirth} onChange={e => setNewTrainer({ ...newTrainer, dateOfBirth: e.target.value })} className="form-input" />
+              </div>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 4, marginBottom: 8, padding: "8px 0" }}>
                   <div>
                     <h4 style={{ fontSize: "0.9rem", fontWeight: 600, color: "var(--text-primary)" }}>Can Add Members</h4>
@@ -974,7 +980,7 @@ const GymDashboard: React.FC<Props> = ({
                       const res = await inviteTrainerApi(newTrainer);
                       dispatch(showSnackbar({ message: res.data.message || "Invitation sent!", type: "success" }));
                       setShowAddTrainer(false);
-                      setNewTrainer({ fullName: "", email: "", mobileNo: "", canAddMember: false });
+                      setNewTrainer({ fullName: "", email: "", mobileNo: "", canAddMember: false, dateOfBirth: "" });
                       fetchTrainers();
                     } catch (error: any) {
                       dispatch(showSnackbar({ message: error?.response?.data?.message || "Failed to invite trainer", type: "error" }));
@@ -1134,6 +1140,10 @@ const GymDashboard: React.FC<Props> = ({
               <div>
                 <label className="form-label">Mobile Number</label>
                 <input type="tel" value={newManager.mobileNo} onChange={e => setNewManager({ ...newManager, mobileNo: e.target.value })} placeholder="1234567890" className="form-input" />
+              <div>
+                <label className="form-label">Date of Birth</label>
+                <input type="date" value={newManager.dateOfBirth} onChange={e => setNewManager({ ...newManager, dateOfBirth: e.target.value })} className="form-input" />
+              </div>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 4, marginBottom: 8, padding: "8px 0" }}>
                   <div>
                     <h4 style={{ fontSize: "0.9rem", fontWeight: 600, color: "var(--text-primary)" }}>Can Add Members</h4>
@@ -1164,7 +1174,7 @@ const GymDashboard: React.FC<Props> = ({
                       const res = await inviteManagerApi(newManager);
                       dispatch(showSnackbar({ message: res.data.message || "Invitation sent!", type: "success" }));
                       setShowAddManager(false);
-                      setNewManager({ fullName: "", email: "", mobileNo: "", canAddMember: false });
+                      setNewManager({ fullName: "", email: "", mobileNo: "", canAddMember: false, dateOfBirth: "" });
                       fetchManagers();
                     } catch (error: any) {
                       dispatch(showSnackbar({ message: error?.response?.data?.message || "Failed to invite manager", type: "error" }));

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Dumbbell, Loader, Lock } from "lucide-react";
+import { Dumbbell, Loader, Lock, Calendar } from "lucide-react";
 import { managerSetupApi } from "../services/apis/authApis";
 import { AUTH_TOKEN_KEY } from "../utils/constant";
 import { useAppDispatch } from "../utils/reduxHooks";
@@ -31,7 +31,10 @@ export const ManagerSetup: React.FC<Props> = ({ onSuccess, role = "Manager" }) =
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!password || !confirmPassword) return;
+    if (!password || !confirmPassword) {
+      dispatch(showSnackbar({ message: "Please fill all fields", type: "error" }));
+      return;
+    }
 
     if (password !== confirmPassword) {
       dispatch(showSnackbar({ message: "Passwords do not match", type: "error" }));
@@ -114,6 +117,7 @@ export const ManagerSetup: React.FC<Props> = ({ onSuccess, role = "Manager" }) =
               />
             </div>
           </div>
+
 
           <button
             type="submit"

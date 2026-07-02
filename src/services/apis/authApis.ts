@@ -19,6 +19,7 @@ export interface RegisterOwnerPayload {
   gymName: string;
   plan: PlanType;
   paymentToken: string;
+  dateOfBirth?: string;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -56,6 +57,7 @@ export interface ManagerSetupPayload {
   token: string;
   password?: string;
   confirmPassword?: string;
+  dateOfBirth?: string;
 }
 
 export const managerSetupApi = async (payload: ManagerSetupPayload) => {
