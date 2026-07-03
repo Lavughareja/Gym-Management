@@ -319,10 +319,6 @@ const MembersPanel: React.FC<Props> = ({ role, canAddMember, showAddMember, setS
                           style={{ background: "none", border: "none", cursor: "pointer", color: "var(--primary)", fontSize: "0.8rem", padding: "4px 8px", borderRadius: 6, transition: "background 0.1s", fontWeight: 600 }}>
                           View
                         </button>
-                        <button onClick={() => dispatch(updateMemberStatus({ id: m.id, status: m.status === "Active" ? "Inactive" : "Active" }))}
-                          style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", fontSize: "0.8rem", padding: "4px 8px", borderRadius: 6, transition: "background 0.1s" }}>
-                          Toggle
-                        </button>
                       </div>
                     </td>
                   </tr>

@@ -71,7 +71,7 @@ const TrainersPanel: React.FC<Props> = ({ role, showAddTrainer, setShowAddTraine
                 <label className="form-label">Date of Birth</label>
                 <input type="date" value={newTrainer.dateOfBirth} onChange={e => setNewTrainer({ ...newTrainer, dateOfBirth: e.target.value })} className="form-input" />
               </div>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 4, marginBottom: 8, padding: "8px 0" }}>
+              {/* <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 4, marginBottom: 8, padding: "8px 0" }}>
                 <div>
                   <h4 style={{ fontSize: "0.9rem", fontWeight: 600, color: "var(--text-primary)" }}>Can Add Members</h4>
                   <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: 2 }}>Allow this trainer to register new members</p>
@@ -89,7 +89,7 @@ const TrainersPanel: React.FC<Props> = ({ role, showAddTrainer, setShowAddTraine
                     transition: "all 0.3s ease", boxShadow: "0 2px 4px rgba(0,0,0,0.2)"
                   }} />
                 </div>
-              </div>
+              </div> */}
               <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
                 <button className="btn-blue" style={{ flex: 1, justifyContent: "center" }}
                   disabled={inviteTrainerLoading}
@@ -125,9 +125,9 @@ const TrainersPanel: React.FC<Props> = ({ role, showAddTrainer, setShowAddTraine
                   <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", whiteSpace: "nowrap" }}>Name</th>
                   <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", whiteSpace: "nowrap" }}>Email</th>
                   <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", whiteSpace: "nowrap" }}>Status</th>
-                  {(role === "admin" || role === "superadmin" || role === "gymmanager") && (
+                  {/* {(role === "admin" || role === "superadmin" || role === "gymmanager") && (
                     <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", whiteSpace: "nowrap" }}>Can Add Members</th>
-                  )}
+                  )} */}
                   <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", whiteSpace: "nowrap" }}>Actions</th>
                 </tr>
               </thead>
@@ -150,7 +150,7 @@ const TrainersPanel: React.FC<Props> = ({ role, showAddTrainer, setShowAddTraine
                         {t.isActive || t.status === 'Active' ? "Active" : "Pending Setup"}
                       </span>
                     </td>
-                    {(role === "admin" || role === "superadmin" || role === "gymmanager") && (
+                    {/* {(role === "admin" || role === "superadmin" || role === "gymmanager") && (
                       <td style={{ padding: "14px 16px" }}>
                         {(t.isActive || t.status === 'Active') && (
                           <label className="switch" style={{ transform: "scale(0.8)", margin: 0 }}>
@@ -163,7 +163,7 @@ const TrainersPanel: React.FC<Props> = ({ role, showAddTrainer, setShowAddTraine
                           </label>
                         )}
                       </td>
-                    )}
+                    )} */}
                     <td style={{ padding: "14px 16px" }}>
                       {(!t.isActive && t.status !== 'Active') && (
                         <button className="btn-blue-outline" style={{ fontSize: "0.75rem", padding: "4px 8px" }}
