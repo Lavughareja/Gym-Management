@@ -83,11 +83,6 @@ const BmiPanel: React.FC = () => {
                     <h4 style={{ fontSize: "1rem", fontWeight: 600, marginBottom: 12 }}>Upload New BMI Report</h4>
                     <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
                       <input type="file" accept="image/*" onChange={e => setSelectedPhotoFile(e.target.files?.[0] || null)} style={{ flex: 1, fontSize: "0.85rem" }} />
-                      <select className="form-input" style={{ width: 140, padding: "6px" }} value={selectedGoal} onChange={e => setSelectedGoal(e.target.value)}>
-                        <option>Weight Loss</option>
-                        <option>Weight Gain</option>
-                        <option>Maintain Weight</option>
-                      </select>
                       <button className="btn-blue" disabled={isUploadingBmi || !selectedPhotoFile} onClick={handleUploadBmi} style={{ padding: "6px 12px" }}>
                         {isUploadingBmi ? <Loader size={16} style={{ animation: "spin 1s linear infinite" }} /> : "Upload"}
                       </button>
@@ -159,9 +154,18 @@ const BmiPanel: React.FC = () => {
                   </td>
                   <td style={{ padding: "14px 16px", fontSize: "0.875rem", color: "var(--text-secondary)" }}>{member.plan}</td>
                   <td style={{ padding: "14px 16px" }}>
-                    <span className={`checkin-status ${member.status === "Active" ? "status-active" : "status-inactive"}`}>
-                      {member.status}
-                    </span>
+                    {(() => {
+                      let derivedStatus = member.status;
+                      if (member.planEndDate) {
+                        const today = new Date();
+                        today.setHours(0,0,0,0);
+                        const endDate = new Date(member.planEndDate);
+                        derivedStatus = endDate >= today ? "Active" : "Inactive";
+                      }
+                      return (
+                        <span className={`checkin-status ${derivedStatus === "Active" ? "status-active" : "status-inactive"}`}>{derivedStatus}</span>
+                      );
+                    })()}
                   </td>
                   <td style={{ padding: "14px 16px", fontSize: "0.875rem", color: "var(--text-secondary)" }}>{member.joined}</td>
                   <td style={{ padding: "14px 16px", textAlign: "right" }}>

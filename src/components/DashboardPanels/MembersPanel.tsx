@@ -309,7 +309,18 @@ const MembersPanel: React.FC<Props> = ({ role, canAddMember, showAddMember, setS
                     </td>
                     <td style={{ padding: "14px 16px", fontSize: "0.875rem", color: "var(--text-secondary)" }}>{m.plan}</td>
                     <td style={{ padding: "14px 16px" }}>
-                      <span className={`checkin-status ${m.status === "Active" ? "status-active" : "status-inactive"}`}>{m.status}</span>
+                      {(() => {
+                        let derivedStatus = m.status;
+                        if (m.planEndDate) {
+                          const today = new Date();
+                          today.setHours(0,0,0,0);
+                          const endDate = new Date(m.planEndDate);
+                          derivedStatus = endDate >= today ? "Active" : "Inactive";
+                        }
+                        return (
+                          <span className={`checkin-status ${derivedStatus === "Active" ? "status-active" : "status-inactive"}`}>{derivedStatus}</span>
+                        );
+                      })()}
                     </td>
                     <td style={{ padding: "14px 16px", fontSize: "0.875rem", color: "var(--text-muted)", whiteSpace: "nowrap" }}>{m.joined}</td>
                     <td style={{ padding: "14px 16px", fontSize: "0.875rem", color: "var(--text-muted)", whiteSpace: "nowrap" }}>{m.planEndDate ? new Date(m.planEndDate).toLocaleDateString() : "-"}</td>
