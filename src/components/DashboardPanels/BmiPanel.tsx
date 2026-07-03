@@ -95,7 +95,7 @@ const BmiPanel: React.FC = () => {
                       <div style={{ display: "flex", gap: 16, alignItems: "flex-start", flexWrap: "wrap" }}>
                         <img src={bmiPhotos[0].reportImageUrl.startsWith("http") ? bmiPhotos[0].reportImageUrl : `http://localhost:5000${bmiPhotos[0].reportImageUrl}`} alt="BMI Report" style={{ width: 200, height: "auto", borderRadius: 8, border: "1px solid var(--border-color)" }} />
                         <div style={{ flex: 1, minWidth: 200 }}>
-                          <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginBottom: 8 }}>Uploaded on: {new Date(bmiPhotos[0].createdAt).toLocaleDateString()}</p>
+                          <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginBottom: 8 }}>Uploaded on: {new Date(bmiPhotos[0].createdAt).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" })}</p>
                         </div>
                       </div>
                     </div>

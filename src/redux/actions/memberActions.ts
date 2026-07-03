@@ -17,7 +17,7 @@ export const fetchMembersAction = () => async (dispatch: AppDispatch) => {
         avatar: m.fullName.substring(0, 2).toUpperCase(),
         plan: m.planId?.name || "No Plan",
         status: m.isActive ? "Active" : "Inactive",
-        joined: new Date(m.createdAt).toLocaleDateString(),
+        joined: new Date(m.createdAt).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" }),
       }));
       dispatch(fetchMembersSuccess(formattedMembers));
     } else {

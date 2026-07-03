@@ -166,7 +166,7 @@ const MembersPanel: React.FC<Props> = ({ role, canAddMember, showAddMember, setS
                       const end = new Date((newMember as any).startDate);
                       end.setMonth(end.getMonth() + Number(newMember.durationMonths));
                       if ((newMember as any).extraDays) end.setDate(end.getDate() + Number((newMember as any).extraDays));
-                      return end.toLocaleDateString();
+                      return end.toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" });
                     })()}
                   </div>
                 </div>
@@ -323,7 +323,7 @@ const MembersPanel: React.FC<Props> = ({ role, canAddMember, showAddMember, setS
                       })()}
                     </td>
                     <td style={{ padding: "14px 16px", fontSize: "0.875rem", color: "var(--text-muted)", whiteSpace: "nowrap" }}>{m.joined}</td>
-                    <td style={{ padding: "14px 16px", fontSize: "0.875rem", color: "var(--text-muted)", whiteSpace: "nowrap" }}>{m.planEndDate ? new Date(m.planEndDate).toLocaleDateString() : "-"}</td>
+                    <td style={{ padding: "14px 16px", fontSize: "0.875rem", color: "var(--text-muted)", whiteSpace: "nowrap" }}>{m.planEndDate ? new Date(m.planEndDate).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" }) : "-"}</td>
                     <td style={{ padding: "14px 16px" }}>
                       <div style={{ display: "flex", gap: 8 }}>
                         <button onClick={() => setSelectedMember(m)}

@@ -408,7 +408,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div>
                 <div style={{ fontSize: "1.1rem", fontWeight: 600 }}>{profile.planId ? profile.planId.name : "Gym Membership"}</div>
-                <div style={{ fontSize: "0.875rem", color: "var(--text-secondary)" }}>Expires on: {new Date(profile.planEndDate).toLocaleDateString()}</div>
+                <div style={{ fontSize: "0.875rem", color: "var(--text-secondary)" }}>Expires on: {new Date(profile.planEndDate).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" })}</div>
               </div>
               <div style={{ background: "var(--primary)", color: "#fff", padding: "6px 12px", borderRadius: 16, fontSize: "0.8rem", fontWeight: 600 }}>Active</div>
             </div>
@@ -734,7 +734,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
                   .map(([date, logs]: [string, any]) => (
                     <div key={date} className="gym-card" style={{ padding: "16px 20px" }}>
                       <h4 style={{ fontSize: "1rem", fontWeight: 700, color: "var(--primary)", borderBottom: "1px solid var(--border-color)", paddingBottom: 8, marginBottom: 12 }}>
-                        {new Date(date).toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}
+                        {new Date(date).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" })}
                       </h4>
                       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                         {logs.map((log: any, idx: number) => (
@@ -988,7 +988,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
                       <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
                         <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#374151", marginBottom: "2px" }}>Latest BMI Report</span>
                         {latestBmiPhoto ? (
-                          <span style={{ fontSize: "0.7rem", color: "#6b7280", fontWeight: 500 }}>Uploaded on <strong style={{ color: "#4b5563" }}>{new Date(latestBmiPhoto.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</strong></span>
+                          <span style={{ fontSize: "0.7rem", color: "#6b7280", fontWeight: 500 }}>Uploaded on <strong style={{ color: "#4b5563" }}>{new Date(latestBmiPhoto.createdAt).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" })}</strong></span>
                         ) : (
                           <span style={{ fontSize: "0.7rem", color: "#ef4444", fontWeight: 500 }}>No report uploaded</span>
                         )}

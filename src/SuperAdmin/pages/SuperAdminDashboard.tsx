@@ -199,11 +199,7 @@ const SuperAdminDashboard: React.FC = () => {
                         <div style={styles.recentName}>{g.name}</div>
                         <div style={styles.recentEmail}>{g.email}</div>
                         <div style={styles.recentDate}>
-                          {new Date(g.createdAt).toLocaleDateString("en-IN", {
-                            day: "2-digit",
-                            month: "short",
-                            year: "numeric",
-                          })}
+                          {new Date(g.createdAt).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" })}
                         </div>
                         <span
                           style={{

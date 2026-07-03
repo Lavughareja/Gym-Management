@@ -151,7 +151,7 @@ const GymTable: React.FC<GymTableProps> = ({
                     </td>
                     <td style={styles.td}>
                       <span style={styles.date}>
-                        {new Date(gym.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
+                        {new Date(gym.createdAt).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" })}
                       </span>
                     </td>
                     <td style={styles.td}>
