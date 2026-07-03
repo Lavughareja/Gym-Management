@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { LogOut, Settings, Sun, Moon, Dumbbell, Users, ClipboardList, Activity, LayoutDashboard, UserCog } from "lucide-react";
+import { LogOut, Settings, Sun, Moon, Dumbbell, Users, ClipboardList, Activity, LayoutDashboard, UserCog, UserCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../utils/reduxHooks";
 import { logoutAction } from "../redux/actions/authActions";
@@ -13,6 +13,7 @@ import ManagersPanel from "../components/DashboardPanels/ManagersPanel";
 import PlansPanel from "../components/DashboardPanels/PlansPanel";
 import AttendancePanel from "../components/DashboardPanels/AttendancePanel";
 import SettingsPanel from "../components/DashboardPanels/SettingsPanel";
+import PtManagementPanel from "../components/DashboardPanels/PtManagementPanel";
 
 // Actions
 import { fetchMembersAction } from "../redux/actions/memberActions";
@@ -63,6 +64,7 @@ const GymDashboard: React.FC = () => {
     { id: "bmi", label: "BMI & Diet", icon: Activity },
     { id: "trainers", label: "Trainers", icon: Dumbbell, hide: userObj?.role === "trainer" },
     { id: "managers", label: "Managers", icon: UserCog, hide: userObj?.role === "gymmanager" || userObj?.role === "trainer" },
+    { id: "pt", label: "PT Management", icon: UserCheck },
     { id: "plans", label: "Plans", icon: ClipboardList },
     { id: "attendance", label: "Attendance", icon: Users },
     { id: "settings", label: "Settings", icon: Settings, hide: userObj?.role === "trainer" },
@@ -82,7 +84,7 @@ const GymDashboard: React.FC = () => {
           </div>
         </div>
 
-        <nav style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+        <nav style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
           <ul className="sidebar-menu">
             {navItems.filter(item => !item.hide).map((item) => (
               <li key={item.id}>
@@ -162,6 +164,7 @@ const GymDashboard: React.FC = () => {
           />
         )}
         {activeTab === "managers" && <ManagersPanel role={userObj?.role || "admin"} />}
+        {activeTab === "pt" && <PtManagementPanel role={userObj?.role || "admin"} userId={userObj?._id} />}
         {activeTab === "plans" && <PlansPanel gymName={userObj?.gymId?.name || "Your Gym"} />}
         {activeTab === "attendance" && <AttendancePanel />}
         {activeTab === "settings" && <SettingsPanel gymName={userObj?.gymId?.name || "Your Gym"} />}

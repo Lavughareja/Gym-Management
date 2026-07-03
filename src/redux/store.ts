@@ -10,6 +10,7 @@ import planReducer from "./slices/planSlice";
 import healthReducer from "./slices/healthSlice";
 import attendanceReducer from "./slices/attendanceSlice";
 import deviceReducer from "./slices/deviceSlice";
+import ptReducer from "./slices/ptSlice";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Redux Store
@@ -28,6 +29,7 @@ export const store = configureStore({
     health:     healthReducer,
     attendance: attendanceReducer,
     device:     deviceReducer,
+    pt:         ptReducer,
   },
 });
 
