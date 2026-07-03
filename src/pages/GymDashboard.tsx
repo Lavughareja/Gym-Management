@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { LogOut, Settings, Sun, Moon, Dumbbell, Users, ClipboardList, Activity, LayoutDashboard, UserCog, UserCheck } from "lucide-react";
+import { LogOut, Settings, Sun, Moon, Dumbbell, Users, ClipboardList, Activity, LayoutDashboard, UserCog, UserCheck, Menu } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../utils/reduxHooks";
 import { logoutAction } from "../redux/actions/authActions";
@@ -21,7 +21,11 @@ import { fetchTrainersAction } from "../redux/actions/trainerActions";
 import { fetchManagersAction } from "../redux/actions/managerActions";
 import { fetchPlansAction } from "../redux/actions/planActions";
 
-const GymDashboard: React.FC = () => {
+interface GymDashboardProps {
+  onLogout?: () => void;
+}
+
+const GymDashboard: React.FC<GymDashboardProps> = ({ onLogout }) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
@@ -30,6 +34,7 @@ const GymDashboard: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState("overview");
   const [isDarkMode, setIsDarkMode] = useState(() => localStorage.getItem("theme") === "dark");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const [showAddMember, setShowAddMember] = useState(false);
   const [showAddTrainer, setShowAddTrainer] = useState(false);
@@ -53,9 +58,13 @@ const GymDashboard: React.FC = () => {
     }
   }, [isDarkMode]);
 
-  const handleLogout = () => {
-    dispatch(logoutAction());
-    navigate("/login");
+  const handleLogout = async () => {
+    await dispatch(logoutAction());
+    if (onLogout) {
+      onLogout();
+    } else {
+      navigate("/login");
+    }
   };
 
   const navItems = [
@@ -72,8 +81,9 @@ const GymDashboard: React.FC = () => {
 
   return (
     <div className="app-container">
+      <div className={`sidebar-overlay ${sidebarOpen ? "show" : ""}`} onClick={() => setSidebarOpen(false)} />
       {/* Sidebar */}
-      <aside className="sidebar">
+      <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
         <div className="sidebar-brand">
           <div className="brand-icon-wrapper" style={{ background: 'none', boxShadow: 'none', padding: 0 }}>
             <img src="/logo.png" alt="Trainix" style={{ width: 44, height: 44, objectFit: 'contain', borderRadius: 10 }} />
@@ -90,7 +100,7 @@ const GymDashboard: React.FC = () => {
               <li key={item.id}>
                 <a
                   className={`sidebar-menu-item ${activeTab === item.id ? "active" : ""}`}
-                  onClick={() => setActiveTab(item.id)}
+                  onClick={() => { setActiveTab(item.id); setSidebarOpen(false); }}
                   style={{ cursor: "pointer" }}
                 >
                   <item.icon size={20} />
@@ -136,6 +146,18 @@ const GymDashboard: React.FC = () => {
 
       {/* Main Content */}
       <main className="main-content">
+        {/* Mobile header */}
+        <header className="mobile-header">
+          <button className="menu-toggle-btn" onClick={() => setSidebarOpen(true)} aria-label="Open menu">
+            <Menu size={24} />
+          </button>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <img src="/logo.png" alt="Logo" style={{ width: 32, height: 32, objectFit: "contain", borderRadius: 8 }} />
+            <span className="brand-name" style={{ fontSize: "1rem" }}>TRAINIX</span>
+          </div>
+          <div style={{ width: 40 }} />
+        </header>
+
         {activeTab === "overview" && (
           <OverviewPanel 
             ownerName={userObj?.name || "Admin"} 

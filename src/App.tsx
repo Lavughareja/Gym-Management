@@ -174,7 +174,7 @@ function App() {
               onLogout={handleLogout}
             />
           ) : (
-            <GymDashboard />
+            <GymDashboard onLogout={handleLogout} />
           )
         )}
 
