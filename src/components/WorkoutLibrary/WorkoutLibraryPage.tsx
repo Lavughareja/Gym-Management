@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BookOpen, Video, Play, X, Dumbbell, Clock, ChevronLeft, Loader, Zap } from "lucide-react";
+import { BookOpen, Video, Play, X, Dumbbell, Clock, ChevronLeft, Loader, Zap, CheckSquare, BarChart3 } from "lucide-react";
 import { getWorkoutCategoriesApi, getWorkoutCategoryApi } from "../../services/apis/workoutLibraryApis";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -31,9 +31,9 @@ interface VideoItem {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const DIFF_STYLE: Record<string, { bg: string; text: string }> = {
-  beginner:     { bg: "#dcfce7", text: "#16a34a" },
-  intermediate: { bg: "#fef3c7", text: "#d97706" },
-  advanced:     { bg: "#fee2e2", text: "#dc2626" },
+  beginner:     { bg: "rgba(34, 197, 94, 0.15)", text: "#22c55e" },
+  intermediate: { bg: "rgba(245, 158, 11, 0.15)", text: "#f59e0b" },
+  advanced:     { bg: "rgba(239, 68, 68, 0.15)", text: "#ef4444" },
 };
 
 const fmtDuration = (secs: number) => {
@@ -54,6 +54,9 @@ const toEmbedUrl = (url: string) => {
   // youtu.be/ID
   const shortMatch = url.match(/youtu\.be\/([^?]+)/);
   if (shortMatch) return `https://www.youtube.com/embed/${shortMatch[1]}`;
+  // youtube.com/shorts/ID
+  const shortsMatch = url.match(/youtube\.com\/shorts\/([^?&]+)/);
+  if (shortsMatch) return `https://www.youtube.com/embed/${shortsMatch[1]}`;
   return url;
 };
 
@@ -207,64 +210,103 @@ const WorkoutLibraryPage: React.FC = () => {
                 <div
                   key={v._id}
                   className="gym-card"
-                  style={{ display: "flex", alignItems: "flex-start", gap: 16, padding: "16px 20px", cursor: "pointer" }}
-                  onClick={() => setPlayingVideo(v)}
+                  style={{ display: "flex", alignItems: "flex-start", gap: 24, padding: "24px", transition: "all 0.2s" }}
                 >
                   {/* Thumbnail / index */}
                   {v.thumbnailUrl ? (
-                    <div style={{ position: "relative", flexShrink: 0 }}>
+                    <div 
+                      onClick={() => setPlayingVideo(v)}
+                      style={{ position: "relative", flexShrink: 0, width: 180, height: 180, borderRadius: 16, overflow: "hidden", background: "#000", cursor: "pointer" }}
+                    >
                       <img
                         src={v.thumbnailUrl}
                         alt={v.title}
-                        style={{ width: 96, height: 66, objectFit: "cover", borderRadius: 10, border: "1px solid var(--border-color)" }}
+                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
                         onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                       />
                       <div style={{
-                        position: "absolute", inset: 0, background: "rgba(0,0,0,0.2)", borderRadius: 10,
-                        display: "flex", alignItems: "center", justifyContent: "center",
+                        position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center"
                       }}>
-                        <Play size={18} fill="#fff" color="#fff" />
+                        <div style={{ width: 48, height: 48, background: "#fff", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 12px rgba(0,0,0,0.15)" }}>
+                          <Play size={24} fill="#3b82f6" color="#3b82f6" style={{ marginLeft: 3 }} />
+                        </div>
                       </div>
                     </div>
                   ) : (
                     <div style={{
-                      width: 96, height: 66, borderRadius: 10, background: "var(--bg-secondary)",
+                      width: 180, height: 180, borderRadius: 16, background: "var(--bg-secondary)",
                       border: "1px solid var(--border-color)", display: "flex", alignItems: "center", justifyContent: "center",
                       flexShrink: 0, gap: 4,
                     }}>
-                      <span style={{ fontSize: "0.9rem", fontWeight: 700, color: "var(--text-muted)" }}>{idx + 1}</span>
-                      <Play size={16} color="var(--primary)" />
+                      <span style={{ fontSize: "1.2rem", fontWeight: 700, color: "var(--text-muted)" }}>{idx + 1}</span>
+                      <Play size={24} color="var(--primary)" />
                     </div>
                   )}
 
                   {/* Info */}
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: "1rem", fontWeight: 700, color: "var(--text-primary)", marginBottom: 6 }}>
+                  <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+                    <div style={{ fontSize: 24, fontWeight: 800, color: "var(--text-primary)", marginBottom: 20, textTransform: "capitalize" }}>
                       {v.title}
                     </div>
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 6 }}>
-                      <span style={{ fontSize: 11, fontWeight: 600, padding: "3px 8px", borderRadius: 20, background: "var(--bg-secondary)", color: "var(--text-secondary)", border: "1px solid var(--border-color)", display: "flex", alignItems: "center", gap: 4 }}>
-                        <Dumbbell size={11} /> {v.bodyPart}
-                      </span>
-                      {dur && (
-                        <span style={{ fontSize: 11, fontWeight: 600, padding: "3px 8px", borderRadius: 20, background: "var(--bg-secondary)", color: "var(--text-secondary)", border: "1px solid var(--border-color)", display: "flex", alignItems: "center", gap: 4 }}>
-                          <Clock size={11} /> {dur}
-                        </span>
-                      )}
-                      <span style={{ fontSize: 11, fontWeight: 600, padding: "3px 8px", borderRadius: 20, background: diff.bg, color: diff.text }}>
-                        {v.difficulty}
-                      </span>
-                    </div>
-                    {v.musclesTargeted?.length > 0 && (
-                      <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginBottom: 4 }}>
-                        <span style={{ fontSize: 11, color: "var(--text-muted)", marginRight: 2 }}>Muscles:</span>
-                        {v.musclesTargeted.map((m) => (
-                          <span key={m} style={{ fontSize: 11, padding: "2px 8px", borderRadius: 20, background: "var(--primary-light)", color: "var(--primary)", fontWeight: 600 }}>{m}</span>
-                        ))}
+
+                    {/* Stats row */}
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 20, alignItems: "center" }}>
+                      {/* Muscle Group */}
+                      <div style={{ display: "flex", gap: 10, padding: "8px 12px", background: "rgba(59, 130, 246, 0.12)", borderRadius: 12, alignItems: "center" }}>
+                        <div style={{ color: "#3b82f6" }}><Dumbbell size={16} /></div>
+                        <div>
+                          <div style={{ fontSize: 11, fontWeight: 700, color: "#3b82f6", marginBottom: 2 }}>Muscle Group</div>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)", textTransform: "capitalize" }}>{v.bodyPart}</div>
+                        </div>
                       </div>
-                    )}
+
+                      {/* Primary Muscle */}
+                      {v.musclesTargeted?.length > 0 && (
+                        <div style={{ display: "flex", gap: 10, padding: "8px 12px", background: "rgba(34, 197, 94, 0.12)", borderRadius: 12, alignItems: "center" }}>
+                          <div style={{ color: "#22c55e" }}><CheckSquare size={16} /></div>
+                          <div>
+                            <div style={{ fontSize: 11, fontWeight: 700, color: "#22c55e", marginBottom: 2 }}>Primary Muscle</div>
+                            <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)", textTransform: "capitalize" }}>{v.musclesTargeted.join(", ")}</div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Duration */}
+                      {dur && (
+                        <div style={{ display: "flex", gap: 10, padding: "8px 12px", background: "var(--bg-secondary)", borderRadius: 12, alignItems: "center" }}>
+                          <div style={{ color: "var(--text-muted)" }}><Clock size={16} /></div>
+                          <div>
+                            <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-muted)", marginBottom: 2 }}>Duration</div>
+                            <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)" }}>{dur}</div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Level */}
+                      <div style={{ display: "flex", gap: 10, padding: "8px 12px", background: diff.bg, borderRadius: 12, alignItems: "center" }}>
+                        <div style={{ color: diff.text }}><BarChart3 size={16} /></div>
+                        <div>
+                          <div style={{ fontSize: 11, fontWeight: 700, color: diff.text, marginBottom: 2 }}>Level</div>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: diff.text, textTransform: "capitalize" }}>{v.difficulty}</div>
+                        </div>
+                      </div>
+
+                      <div style={{ flex: 1 }}></div>
+
+                      {/* Watch button */}
+                      <button 
+                        onClick={() => setPlayingVideo(v)}
+                        style={{ padding: "10px 20px", borderRadius: 10, background: "#3b82f6", color: "#fff", border: "none", fontSize: 14, fontWeight: 600, display: "flex", alignItems: "center", gap: 8, cursor: "pointer", boxShadow: "0 4px 12px rgba(59, 130, 246, 0.25)" }}
+                      >
+                        <Play size={16} fill="#fff" /> Watch Exercise
+                      </button>
+                    </div>
+
+                    {/* Description */}
                     {v.description && (
-                      <div style={{ fontSize: 12, color: "var(--text-muted)", lineHeight: 1.5, marginTop: 4 }}>{v.description}</div>
+                      <div style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.6 }}>
+                        {v.description}
+                      </div>
                     )}
                   </div>
                 </div>

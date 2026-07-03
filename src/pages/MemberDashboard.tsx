@@ -948,7 +948,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
       {/* Header */}
       <header className="page-header" style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: "16px", alignItems: "center", marginBottom: "24px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <div style={{ background: "white", padding: "10px", borderRadius: "12px", boxShadow: "0 2px 8px rgba(0,0,0,0.05)", border: "1px solid #f3f4f6" }}>
+          <div style={{ background: "var(--bg-card)", padding: "10px", borderRadius: "12px", boxShadow: "0 2px 8px rgba(0,0,0,0.05)", border: "1px solid var(--border-color)" }}>
             <Activity size={24} style={{ color: "#10b981" }} />
           </div>
           <div>
@@ -957,11 +957,11 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
           </div>
         </div>
         <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-          <div style={{ background: "white", border: "1px solid #e5e7eb", padding: "8px 16px", borderRadius: "10px", display: "flex", alignItems: "center", gap: "10px", boxShadow: "0 2px 4px rgba(0,0,0,0.02)" }}>
+          <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", padding: "8px 16px", borderRadius: "10px", display: "flex", alignItems: "center", gap: "10px", boxShadow: "0 2px 4px rgba(0,0,0,0.02)" }}>
             <Sparkles size={18} style={{ color: "#f59e0b" }} />
             <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.2 }}>
               <span style={{ fontSize: "0.7rem", color: "var(--primary)", fontWeight: 700 }}>AI Credits</span>
-              <span style={{ fontSize: "0.85rem", fontWeight: 600, color: "#1f2937" }}>{profile?.aiCredits || 0} credit{profile?.aiCredits !== 1 ? 's' : ''}</span>
+              <span style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--text-primary)" }}>{profile?.aiCredits || 0} credit{profile?.aiCredits !== 1 ? 's' : ''}</span>
             </div>
           </div>
           <button className="btn-blue" onClick={() => setShowAiModal(true)} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 20px", borderRadius: "10px", background: "linear-gradient(135deg, #6366f1, #4f46e5)", color: "white", fontWeight: 600, border: "none", cursor: "pointer", boxShadow: "0 4px 10px rgba(99, 102, 241, 0.3)", fontSize: "0.9rem" }}>
@@ -976,7 +976,8 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
         <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
 
           {/* Hero Banner */}
-          <div style={{ background: "linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%)", borderRadius: "20px", padding: "32px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", position: "relative", overflow: "hidden", border: "1px solid #e2e8f0", boxShadow: "0 2px 10px rgba(139, 92, 246, 0.05)" }}>
+          <div style={{ background: "var(--bg-card)", borderRadius: "20px", padding: "32px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", position: "relative", overflow: "hidden", border: "1px solid var(--border-color)", boxShadow: "0 2px 10px rgba(139, 92, 246, 0.05)" }}>
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)" }} />
             <div style={{ position: "absolute", top: "20px", left: "60%", color: "#fcd34d", opacity: 0.8, fontSize: "1.2rem" }}>✨</div>
             <div style={{ position: "absolute", bottom: "30px", left: "55%", color: "#fcd34d", opacity: 0.8, fontSize: "1.5rem" }}>✨</div>
             <div style={{ position: "absolute", top: "10%", left: "75%", color: "#fcd34d", opacity: 0.8, fontSize: "1rem" }}>✨</div>
@@ -986,28 +987,28 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
                 <div style={{ background: "linear-gradient(135deg, #6366f1, #4f46e5)", padding: "10px", borderRadius: "50%", color: "white", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 12px rgba(99,102,241,0.3)" }}>
                   <Sparkles size={20} />
                 </div>
-                <h3 style={{ fontSize: "1.6rem", fontWeight: 800, color: "#1e1b4b", margin: 0, letterSpacing: "-0.5px" }}>Generate Your Diet Plan</h3>
+                <h3 style={{ fontSize: "1.6rem", fontWeight: 800, color: "var(--text-primary)", margin: 0, letterSpacing: "-0.5px" }}>Generate Your Diet Plan</h3>
               </div>
-              <p style={{ color: "#4b5563", fontSize: "0.9rem", marginBottom: "24px", fontWeight: 500, lineHeight: 1.5 }}>Get a personalized 7-day diet plan tailored to your goals using your latest BMI report.</p>
+              <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", marginBottom: "24px", fontWeight: 500, lineHeight: 1.5 }}>Get a personalized 7-day diet plan tailored to your goals using your latest BMI report.</p>
 
               <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", alignItems: "flex-start" }}>
                 <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                   <div style={{ display: "flex", gap: "16px" }}>
                     {/* Latest BMI Report Card */}
-                    <div style={{ background: "white", padding: "12px 16px", borderRadius: "12px", display: "flex", alignItems: "center", gap: "12px", border: "1px solid #e5e7eb", boxShadow: "0 2px 4px rgba(0,0,0,0.02)", width: "260px", position: "relative" }}>
+                    <div style={{ background: "var(--bg-secondary)", padding: "12px 16px", borderRadius: "12px", display: "flex", alignItems: "center", gap: "12px", border: "1px solid var(--border-color)", boxShadow: "0 2px 4px rgba(0,0,0,0.02)", width: "260px", position: "relative" }}>
                       {latestBmiPhoto ? (
-                        <div style={{ width: "36px", height: "36px", borderRadius: "8px", overflow: "hidden", border: "1px solid #e5e7eb", flexShrink: 0 }}>
+                        <div style={{ width: "36px", height: "36px", borderRadius: "8px", overflow: "hidden", border: "1px solid var(--border-color)", flexShrink: 0 }}>
                           <img src={latestBmiPhoto.reportImageUrl.startsWith("http") ? latestBmiPhoto.reportImageUrl : `http://localhost:5000${latestBmiPhoto.reportImageUrl}`} alt="BMI Report" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                         </div>
                       ) : (
-                        <div style={{ background: "#d1fae5", padding: "8px", borderRadius: "8px", color: "#10b981", flexShrink: 0 }}>
+                        <div style={{ background: "rgba(16, 185, 129, 0.15)", padding: "8px", borderRadius: "8px", color: "#10b981", flexShrink: 0 }}>
                           <FileText size={20} />
                         </div>
                       )}
                       <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
-                        <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#374151", marginBottom: "2px" }}>Latest BMI Report</span>
+                        <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--text-primary)", marginBottom: "2px" }}>Latest BMI Report</span>
                         {latestBmiPhoto ? (
-                          <span style={{ fontSize: "0.7rem", color: "#6b7280", fontWeight: 500 }}>Uploaded on <strong style={{ color: "#4b5563" }}>{new Date(latestBmiPhoto.createdAt).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" })}</strong></span>
+                          <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", fontWeight: 500 }}>Uploaded on <strong style={{ color: "var(--text-secondary)" }}>{new Date(latestBmiPhoto.createdAt).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" })}</strong></span>
                         ) : (
                           <span style={{ fontSize: "0.7rem", color: "#ef4444", fontWeight: 500 }}>No report uploaded</span>
                         )}
@@ -1015,9 +1016,9 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
                       {latestBmiPhoto && (
                         <button
                           onClick={() => window.open(latestBmiPhoto.reportImageUrl.startsWith("http") ? latestBmiPhoto.reportImageUrl : `http://localhost:5000${latestBmiPhoto.reportImageUrl}`, "_blank")}
-                          style={{ background: "#f3f4f6", border: "none", padding: "6px", borderRadius: "6px", color: "#4b5563", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.2s" }}
-                          onMouseOver={(e) => e.currentTarget.style.background = "#e5e7eb"}
-                          onMouseOut={(e) => e.currentTarget.style.background = "#f3f4f6"}
+                          style={{ background: "var(--bg-hover)", border: "none", padding: "6px", borderRadius: "6px", color: "var(--text-muted)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.2s" }}
+                          onMouseOver={(e) => e.currentTarget.style.background = "var(--border-color)"}
+                          onMouseOut={(e) => e.currentTarget.style.background = "var(--bg-hover)"}
                           title="View Report"
                         >
                           <Eye size={16} />
@@ -1026,9 +1027,9 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
                     </div>
 
                     {/* Goal Dropdown */}
-                    <div style={{ background: "white", padding: "8px 16px", borderRadius: "12px", border: "1px solid #e5e7eb", display: "flex", flexDirection: "column", justifyContent: "center", width: "160px", boxShadow: "0 2px 4px rgba(0,0,0,0.02)" }}>
-                      <span style={{ fontSize: "0.65rem", color: "#6b7280", marginBottom: "2px", fontWeight: 600 }}>Your Goal</span>
-                      <select value={dietGoal} onChange={e => setDietGoal(e.target.value)} style={{ border: "none", background: "transparent", fontSize: "0.85rem", fontWeight: 700, color: "#1f2937", outline: "none", cursor: "pointer", padding: 0 }}>
+                    <div style={{ background: "var(--bg-secondary)", padding: "8px 16px", borderRadius: "12px", border: "1px solid var(--border-color)", display: "flex", flexDirection: "column", justifyContent: "center", width: "160px", boxShadow: "0 2px 4px rgba(0,0,0,0.02)" }}>
+                      <span style={{ fontSize: "0.65rem", color: "var(--text-muted)", marginBottom: "2px", fontWeight: 600 }}>Your Goal</span>
+                      <select value={dietGoal} onChange={e => setDietGoal(e.target.value)} style={{ border: "none", background: "transparent", fontSize: "0.85rem", fontWeight: 700, color: "var(--text-primary)", outline: "none", cursor: "pointer", padding: 0 }}>
                         <option>Weight Loss</option>
                         <option>Weight Gain</option>
                         <option>Maintain Weight</option>
@@ -1074,14 +1075,14 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
 
 
           {/* Current 7-Day Diet Plan Card */}
-          <div style={{ background: "white", border: "1px solid #e5e7eb", borderRadius: "20px", padding: "32px", boxShadow: "0 4px 12px rgba(0,0,0,0.03)" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px", borderBottom: "1px solid #f3f4f6", paddingBottom: "16px" }}>
+          <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: "20px", padding: "32px", boxShadow: "0 4px 12px rgba(0,0,0,0.03)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px", borderBottom: "1px solid var(--border-color)", paddingBottom: "16px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                <div style={{ background: "#eef2ff", color: "#4f46e5", padding: "10px", borderRadius: "10px" }}><PenLine size={20} /></div>
-                <h3 style={{ fontSize: "1.2rem", fontWeight: 800, color: "#111827", margin: 0 }}>Current 7-Day Diet Plan</h3>
+                <div style={{ background: "rgba(79, 70, 229, 0.1)", color: "#4f46e5", padding: "10px", borderRadius: "10px" }}><PenLine size={20} /></div>
+                <h3 style={{ fontSize: "1.2rem", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>Current 7-Day Diet Plan</h3>
               </div>
               {dietPlans.length > 0 && dietPlans[0].days && (
-                <button onClick={downloadDietPDF} style={{ background: "white", border: "1px solid #d1d5db", padding: "8px 16px", borderRadius: "10px", color: "#374151", fontWeight: 600, cursor: "pointer", fontSize: "0.85rem", boxShadow: "0 1px 2px rgba(0,0,0,0.05)", transition: "all 0.2s" }} onMouseOver={(e) => e.currentTarget.style.background = "#f9fafb"} onMouseOut={(e) => e.currentTarget.style.background = "white"}>
+                <button onClick={downloadDietPDF} style={{ background: "var(--bg-secondary)", border: "1px solid var(--border-color)", padding: "8px 16px", borderRadius: "10px", color: "var(--text-primary)", fontWeight: 600, cursor: "pointer", fontSize: "0.85rem", boxShadow: "0 1px 2px rgba(0,0,0,0.05)", transition: "all 0.2s" }} onMouseOver={(e) => e.currentTarget.style.background = "var(--bg-hover)"} onMouseOut={(e) => e.currentTarget.style.background = "var(--bg-secondary)"}>
                   Download PDF
                 </button>
               )}
@@ -1111,10 +1112,10 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
 
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "16px" }}>
                   {dietPlans[0].days.map((day: any) => (
-                    <div key={day.dayNumber} style={{ background: "white", padding: "20px", borderRadius: "12px", border: "1px solid #e5e7eb", boxShadow: "0 2px 4px rgba(0,0,0,0.02)" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #f3f4f6", paddingBottom: "12px", marginBottom: "16px" }}>
+                    <div key={day.dayNumber} style={{ background: "var(--bg-secondary)", padding: "20px", borderRadius: "12px", border: "1px solid var(--border-color)", boxShadow: "0 2px 4px rgba(0,0,0,0.02)" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--border-color)", paddingBottom: "12px", marginBottom: "16px" }}>
                         <h4 style={{ color: "#4f46e5", fontWeight: 800, fontSize: "1.1rem", margin: 0 }}>Day {day.dayNumber}</h4>
-                        <div style={{ fontSize: "0.75rem", display: "flex", gap: "8px", fontWeight: 700, color: "#6b7280", flexWrap: "wrap", background: "#f3f4f6", padding: "4px 8px", borderRadius: "6px" }}>
+                        <div style={{ fontSize: "0.75rem", display: "flex", gap: "8px", fontWeight: 700, color: "var(--text-muted)", flexWrap: "wrap", background: "var(--bg-hover)", padding: "4px 8px", borderRadius: "6px" }}>
                           <span title="Calories">🔥 {day.calories} kcal</span>
                           <span title="Protein">🥩 {day.protein}g P</span>
                           <span title="Carbs">🍞 {day.carbs}g C</span>
@@ -1123,12 +1124,12 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
                       </div>
 
                       <div style={{ fontSize: "0.85rem", display: "flex", flexDirection: "column", gap: "12px" }}>
-                        {day.breakfast && <div><strong style={{ color: "#111827", display: "block", marginBottom: "2px" }}>Breakfast</strong> <span style={{ color: "#4b5563", lineHeight: 1.4 }}>{day.breakfast}</span></div>}
-                        {day.morningSnack && <div><strong style={{ color: "#111827", display: "block", marginBottom: "2px" }}>Morning Snack</strong> <span style={{ color: "#4b5563", lineHeight: 1.4 }}>{day.morningSnack}</span></div>}
-                        {day.lunch && <div><strong style={{ color: "#111827", display: "block", marginBottom: "2px" }}>Lunch</strong> <span style={{ color: "#4b5563", lineHeight: 1.4 }}>{day.lunch}</span></div>}
-                        {day.eveningSnack && <div><strong style={{ color: "#111827", display: "block", marginBottom: "2px" }}>Evening Snack</strong> <span style={{ color: "#4b5563", lineHeight: 1.4 }}>{day.eveningSnack}</span></div>}
-                        {day.dinner && <div><strong style={{ color: "#111827", display: "block", marginBottom: "2px" }}>Dinner</strong> <span style={{ color: "#4b5563", lineHeight: 1.4 }}>{day.dinner}</span></div>}
-                        {day.bedtimeSnack && <div><strong style={{ color: "#111827", display: "block", marginBottom: "2px" }}>Bedtime</strong> <span style={{ color: "#4b5563", lineHeight: 1.4 }}>{day.bedtimeSnack}</span></div>}
+                        {day.breakfast && <div><strong style={{ color: "var(--text-primary)", display: "block", marginBottom: "2px" }}>Breakfast</strong> <span style={{ color: "var(--text-secondary)", lineHeight: 1.4 }}>{day.breakfast}</span></div>}
+                        {day.morningSnack && <div><strong style={{ color: "var(--text-primary)", display: "block", marginBottom: "2px" }}>Morning Snack</strong> <span style={{ color: "var(--text-secondary)", lineHeight: 1.4 }}>{day.morningSnack}</span></div>}
+                        {day.lunch && <div><strong style={{ color: "var(--text-primary)", display: "block", marginBottom: "2px" }}>Lunch</strong> <span style={{ color: "var(--text-secondary)", lineHeight: 1.4 }}>{day.lunch}</span></div>}
+                        {day.eveningSnack && <div><strong style={{ color: "var(--text-primary)", display: "block", marginBottom: "2px" }}>Evening Snack</strong> <span style={{ color: "var(--text-secondary)", lineHeight: 1.4 }}>{day.eveningSnack}</span></div>}
+                        {day.dinner && <div><strong style={{ color: "var(--text-primary)", display: "block", marginBottom: "2px" }}>Dinner</strong> <span style={{ color: "var(--text-secondary)", lineHeight: 1.4 }}>{day.dinner}</span></div>}
+                        {day.bedtimeSnack && <div><strong style={{ color: "var(--text-primary)", display: "block", marginBottom: "2px" }}>Bedtime</strong> <span style={{ color: "var(--text-secondary)", lineHeight: 1.4 }}>{day.bedtimeSnack}</span></div>}
                       </div>
                     </div>
                   ))}
@@ -1137,13 +1138,13 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
             ) : (
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "40px 0" }}>
                 <img src="/empty_diet_plan_illustration.png" alt="No Diet Plan" style={{ width: "180px", marginBottom: "24px", opacity: 0.9, filter: "drop-shadow(0 10px 15px rgba(0,0,0,0.05))" }} />
-                <h4 style={{ fontSize: "1.3rem", fontWeight: 800, color: "#111827", marginBottom: "8px", margin: 0 }}>No 7-Day Plan Yet</h4>
-                <p style={{ color: "#6b7280", fontSize: "0.95rem", marginBottom: "24px", fontWeight: 500 }}>Generate your first AI diet plan to view it here.</p>
+                <h4 style={{ fontSize: "1.3rem", fontWeight: 800, color: "var(--text-primary)", marginBottom: "8px", margin: 0 }}>No 7-Day Plan Yet</h4>
+                <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem", marginBottom: "24px", fontWeight: 500 }}>Generate your first AI diet plan to view it here.</p>
                 <button
                   onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                  style={{ background: "white", border: "2px solid #6366f1", color: "#6366f1", padding: "10px 24px", borderRadius: "12px", fontWeight: 700, cursor: "pointer", fontSize: "0.9rem", transition: "all 0.2s", boxShadow: "0 4px 12px rgba(99,102,241,0.1)" }}
-                  onMouseOver={(e) => { e.currentTarget.style.background = "#e0e7ff"; e.currentTarget.style.transform = "translateY(-2px)" }}
-                  onMouseOut={(e) => { e.currentTarget.style.background = "white"; e.currentTarget.style.transform = "translateY(0)" }}
+                  style={{ background: "var(--bg-secondary)", border: "2px solid #6366f1", color: "#6366f1", padding: "10px 24px", borderRadius: "12px", fontWeight: 700, cursor: "pointer", fontSize: "0.9rem", transition: "all 0.2s", boxShadow: "0 4px 12px rgba(99,102,241,0.1)" }}
+                  onMouseOver={(e) => { e.currentTarget.style.background = "var(--bg-hover)"; e.currentTarget.style.transform = "translateY(-2px)" }}
+                  onMouseOut={(e) => { e.currentTarget.style.background = "var(--bg-secondary)"; e.currentTarget.style.transform = "translateY(0)" }}
                 >
                   Generate Your Plan
                 </button>

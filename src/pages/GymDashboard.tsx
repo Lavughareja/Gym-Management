@@ -159,18 +159,18 @@ const GymDashboard: React.FC<GymDashboardProps> = ({ onLogout }) => {
         </header>
 
         {activeTab === "overview" && (
-          <OverviewPanel 
-            ownerName={userObj?.name || "Admin"} 
-            gymName={userObj?.gymId?.name || userObj?.name + "'s Gym" || "Your Gym"} 
-            role={userObj?.role || "admin"} 
-            canAddMember={!!userObj?.canAddMember} 
+          <OverviewPanel
+            ownerName={userObj?.name || "Admin"}
+            gymName={userObj?.gymId?.name || userObj?.name + "'s Gym" || "Your Gym"}
+            role={userObj?.role || "admin"}
+            canAddMember={!!userObj?.canAddMember}
             setActiveTab={setActiveTab}
             setShowAddMember={setShowAddMember}
             setShowAddTrainer={setShowAddTrainer}
           />
         )}
         {activeTab === "members" && (
-          <MembersPanel 
+          <MembersPanel
             role={userObj?.role || "admin"}
             canAddMember={!!userObj?.canAddMember}
             showAddMember={showAddMember}
@@ -179,7 +179,7 @@ const GymDashboard: React.FC<GymDashboardProps> = ({ onLogout }) => {
         )}
         {activeTab === "bmi" && <BmiPanel />}
         {activeTab === "trainers" && (
-          <TrainersPanel 
+          <TrainersPanel
             role={userObj?.role || "admin"}
             showAddTrainer={showAddTrainer}
             setShowAddTrainer={setShowAddTrainer}
