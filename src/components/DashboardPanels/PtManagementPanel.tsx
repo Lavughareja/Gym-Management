@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {
   UserCheck, Users, Plus, ChevronLeft, Trash2, Calendar,
-  Dumbbell, Salad, Ruler, X, Loader, ChevronDown, ChevronUp, UserMinus
+  Dumbbell, Salad, Ruler, X, Loader, ChevronDown, ChevronUp, UserMinus, Mail, Eye
 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../utils/reduxHooks";
 import {
@@ -541,6 +541,7 @@ const PtManagementPanel: React.FC<Props> = ({ role, userId }) => {
 
   const [selectedAssignment, setSelectedAssignment] = useState<any>(null);
   const [selectedMemberForAssign, setSelectedMemberForAssign] = useState<any>(null);
+  const [memberWarningPtName, setMemberWarningPtName] = useState<{member: any, ptName: string} | null>(null);
   const [memberSearch, setMemberSearch] = useState("");
   const [viewTab, setViewTab] = useState<"all" | "assigned">("assigned");
 
@@ -589,16 +590,22 @@ const PtManagementPanel: React.FC<Props> = ({ role, userId }) => {
       </div>
 
       {/* Tabs */}
-      <div style={{ display: "flex", gap: 8, marginBottom: 24, background: "var(--bg-hover)", padding: 4, borderRadius: 12, width: "fit-content" }}>
-        {[["assigned", isTrainer ? "My Members" : "Active Assignments"], ["all", "All Members"]].map(([key, label]) => (
-          <button key={key} onClick={() => setViewTab(key as any)}
+      <div style={{ display: "flex", gap: 12, marginBottom: 24 }}>
+        {[
+          ["assigned", isTrainer ? "My Members" : "Active Assignments", <Users size={16} />],
+          ["all", "All Members", <Users size={16} />]
+        ].map(([key, label, icon]) => (
+          <button key={key as string} onClick={() => setViewTab(key as any)}
             style={{
-              padding: "8px 18px", borderRadius: 10, border: "none", cursor: "pointer", fontWeight: 600, fontSize: 14,
-              background: viewTab === key ? "var(--bg-card)" : "none",
-              color: viewTab === key ? "var(--text-primary)" : "var(--text-muted)",
-              boxShadow: viewTab === key ? "0 2px 8px rgba(0,0,0,0.1)" : "none",
+              display: "flex", alignItems: "center", gap: 8,
+              padding: "8px 16px", borderRadius: 8, cursor: "pointer", fontWeight: 600, fontSize: 14,
+              background: "transparent",
+              border: viewTab === key ? "1px solid #c7d2fe" : "1px solid var(--border-color)",
+              color: viewTab === key ? "#6366f1" : "var(--text-muted)",
+              transition: "all 0.2s"
             }}>
-            {label}
+            {icon}
+            {label as string}
           </button>
         ))}
       </div>
@@ -622,34 +629,42 @@ const PtManagementPanel: React.FC<Props> = ({ role, userId }) => {
                 key={assignment._id}
                 onClick={() => setSelectedAssignment(assignment)}
                 style={{
-                  background: "var(--bg-card)", borderRadius: 14, padding: "16px 20px",
-                  border: "1.5px solid var(--border-color)", display: "flex", alignItems: "center",
-                  gap: 14, cursor: "pointer", transition: "all 0.15s", flexWrap: "wrap",
+                  background: "var(--bg-card)", borderRadius: 12, padding: "16px 20px",
+                  border: "1px solid var(--border-color)", display: "flex", alignItems: "center",
+                  gap: 16, cursor: "pointer", transition: "all 0.15s", flexWrap: "wrap",
                 }}
                 onMouseEnter={e => (e.currentTarget.style.borderColor = "#6366f1")}
                 onMouseLeave={e => (e.currentTarget.style.borderColor = "var(--border-color)")}
               >
-                <div style={{ width: 44, height: 44, borderRadius: "50%", background: "linear-gradient(135deg,#6366f1,#8b5cf6)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 16, flexShrink: 0 }}>
+                <div style={{ width: 48, height: 48, borderRadius: "50%", background: "#6366f1", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 16, flexShrink: 0 }}>
                   {(member?.fullName || "?").slice(0, 2).toUpperCase()}
                 </div>
-                <div style={{ flex: 1, minWidth: 120 }}>
-                  <p style={{ margin: 0, fontWeight: 700, fontSize: 15 }}>{member?.fullName || "—"}</p>
-                  <p style={{ margin: 0, fontSize: 12, color: "var(--text-muted)" }}>{member?.email || "—"}</p>
+                
+                <div style={{ flex: 1, minWidth: 200 }}>
+                  <p style={{ margin: 0, fontWeight: 700, fontSize: 16 }}>{member?.fullName || "—"}</p>
+                  <p style={{ margin: "4px 0 0", fontSize: 13, color: "var(--text-muted)", display: "flex", alignItems: "center", gap: 6 }}>
+                     <Mail size={14} /> {member?.email || "—"}
+                  </p>
                 </div>
+
                 {!isTrainer && (
-                  <div style={{ flexShrink: 0 }}>
-                    <p style={{ margin: 0, fontSize: 12, color: "var(--text-muted)" }}>Trainer</p>
-                    <p style={{ margin: 0, fontSize: 14, fontWeight: 600 }}>{trainer?.fullName || "—"}</p>
-                  </div>
+                  <>
+                    <div style={{ width: 1, height: 40, background: "var(--border-color)", margin: "0 16px" }}></div>
+                    <div style={{ flex: 1, minWidth: 150 }}>
+                      <p style={{ margin: 0, fontSize: 12, color: "var(--text-muted)", marginBottom: 4 }}>Trainer</p>
+                      <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "var(--text-primary)" }}>{trainer?.fullName || "—"}</p>
+                    </div>
+                  </>
                 )}
-                <div style={{ flexShrink: 0, display: "flex", gap: 8 }}>
-                  <div style={{ padding: "6px 14px", borderRadius: 8, background: "rgba(99,102,241,0.1)", color: "#6366f1", fontSize: 13, fontWeight: 600, display: "flex", alignItems: "center", gap: 5 }}>
-                    <Dumbbell size={13} /> View Details
-                  </div>
+
+                <div style={{ flexShrink: 0, display: "flex", gap: 12, alignItems: "center" }}>
+                  <button style={{ padding: "8px 16px", borderRadius: 8, background: "#eff6ff", color: "#6366f1", border: "1px solid #dbeafe", fontSize: 13, fontWeight: 600, display: "flex", alignItems: "center", gap: 6, cursor: "pointer" }}>
+                    <Eye size={16} /> View Details
+                  </button>
                   <button
                     onClick={e => { e.stopPropagation(); dispatch(removePtAssignmentAction(assignment._id)); }}
-                    style={{ padding: "6px 10px", borderRadius: 8, border: "1.5px solid #f87171", background: "none", color: "#f87171", cursor: "pointer", display: "flex", alignItems: "center" }}>
-                    <UserMinus size={14} />
+                    style={{ padding: "8px", borderRadius: 8, border: "1px solid #fecaca", background: "none", color: "#f87171", cursor: "pointer", display: "flex", alignItems: "center" }}>
+                    <UserMinus size={16} />
                   </button>
                 </div>
               </div>
@@ -697,9 +712,15 @@ const PtManagementPanel: React.FC<Props> = ({ role, userId }) => {
                   <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
                     {!isMine && (
                       <button
-                        onClick={() => setSelectedMemberForAssign(member)}
+                        onClick={() => {
+                          if (currentPt) {
+                            setMemberWarningPtName({ member, ptName: currentPt });
+                          } else {
+                            setSelectedMemberForAssign(member);
+                          }
+                        }}
                         style={{ padding: "7px 14px", borderRadius: 8, border: "none", background: "linear-gradient(135deg,#6366f1,#8b5cf6)", color: "#fff", fontWeight: 600, fontSize: 13, cursor: "pointer", display: "flex", alignItems: "center", gap: 6 }}>
-                        <UserCheck size={14} /> {currentPt ? "Assign to Me (Override)" : "Assign to Me"}
+                        <UserCheck size={14} /> Assign to Me
                       </button>
                     )}
                   </div>
@@ -720,6 +741,30 @@ const PtManagementPanel: React.FC<Props> = ({ role, userId }) => {
             await dispatch(assignPtAction(selectedMemberForAssign._id || selectedMemberForAssign.id, ""));
           }}
         />
+      )}
+
+      {/* Warning Modal — shown when trying to assign an already assigned member */}
+      {memberWarningPtName && (
+        <Overlay onClose={() => setMemberWarningPtName(null)}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+            <h3 style={{ margin: 0, fontSize: 17, fontWeight: 700, color: "#ef4444", display: "flex", alignItems: "center", gap: 8 }}>
+              Already Assigned
+            </h3>
+            <button onClick={() => setMemberWarningPtName(null)} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)" }}><X size={20} /></button>
+          </div>
+          <div style={{ padding: "16px", background: "rgba(239,68,68,0.08)", borderRadius: 12, border: "1.5px solid rgba(239,68,68,0.2)", marginBottom: 24 }}>
+            <p style={{ margin: 0, fontSize: 15, color: "var(--text-primary)", lineHeight: 1.5 }}>
+              <strong>{memberWarningPtName.member.name || memberWarningPtName.member.fullName}</strong> is already assigned to trainer <strong>{memberWarningPtName.ptName}</strong>. 
+              <br/><br/>
+              Please remove the existing assignment from the "Active Assignments" tab first before assigning them to yourself.
+            </p>
+          </div>
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <button onClick={() => setMemberWarningPtName(null)} style={{ padding: "10px 24px", borderRadius: 10, border: "none", background: "#ef4444", color: "#fff", fontWeight: 600, fontSize: 14, cursor: "pointer" }}>
+              Understood
+            </button>
+          </div>
+        </Overlay>
       )}
     </div>
   );
