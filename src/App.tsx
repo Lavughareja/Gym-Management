@@ -174,14 +174,7 @@ function App() {
               onLogout={handleLogout}
             />
           ) : (
-            <GymDashboard
-              ownerName={dashUser.ownerName}
-              gymName="Trainix Gym"
-              ownerEmail={dashUser.email}
-              role={dashUser.role}
-              canAddMember={dashUser.canAddMember}
-              onLogout={handleLogout}
-            />
+            <GymDashboard />
           )
         )}
 

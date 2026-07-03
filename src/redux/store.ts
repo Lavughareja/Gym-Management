@@ -3,6 +3,13 @@ import authReducer from "./slices/authSlice";
 import paymentReducer from "./slices/paymentSlice";
 import snackbarReducer from "./slices/snackbarSlice";
 import superAdminReducer from "../SuperAdmin/redux/slices/superAdminSlice";
+import memberReducer from "./slices/memberSlice";
+import trainerReducer from "./slices/trainerSlice";
+import managerReducer from "./slices/managerSlice";
+import planReducer from "./slices/planSlice";
+import healthReducer from "./slices/healthSlice";
+import attendanceReducer from "./slices/attendanceSlice";
+import deviceReducer from "./slices/deviceSlice";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Redux Store
@@ -14,6 +21,13 @@ export const store = configureStore({
     payment:    paymentReducer,
     snackbar:   snackbarReducer,
     superAdmin: superAdminReducer,
+    member:     memberReducer,
+    trainer:    trainerReducer,
+    manager:    managerReducer,
+    plan:       planReducer,
+    health:     healthReducer,
+    attendance: attendanceReducer,
+    device:     deviceReducer,
   },
 });
 

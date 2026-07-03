@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Search } from "lucide-react";
-import type { AppDispatch, RootState } from "../../../redux/store";
+import type { RootState, AppDispatch } from "../../redux/store";
 import { toggleGymStatus } from "../redux/actions/superAdminActions";
 import type { GymItem } from "../redux/slices/superAdminSlice";
 

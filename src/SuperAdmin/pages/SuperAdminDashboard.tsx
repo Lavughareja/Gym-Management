@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import type { AppDispatch, RootState } from "../../../redux/store";
+import type { AppDispatch, RootState } from "../../redux/store";
 import {
   fetchSuperAdminDashboard,
   fetchAllGyms,
