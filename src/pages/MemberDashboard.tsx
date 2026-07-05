@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { LogOut, Activity, Dumbbell, BarChart3, Clock, Play, Square, Loader, Menu, X, Moon, Sun, LayoutDashboard, CreditCard, ChevronRight, CheckCircle2, User, KeyRound, Sparkles, ShoppingCart, FileText, Target, ClipboardList, TrendingUp, ShieldCheck, PenLine, Eye, Trash2, BookOpen, UserCheck, Calendar, Salad, Ruler, ChevronDown, ChevronUp } from "lucide-react";
+import { LogOut, Activity, Dumbbell, BarChart3, Clock, Play, Square, Loader, Menu, X, Moon, Sun, LayoutDashboard, CreditCard, ChevronRight, CheckCircle2, User, KeyRound, Sparkles, ShoppingCart, FileText, Target, ClipboardList, TrendingUp, ShieldCheck, PenLine, Eye, Trash2, BookOpen, UserCheck, Calendar, Salad, Ruler, ChevronDown, ChevronUp, Flame } from "lucide-react";
 import UserProfileModal from "../components/UserProfileModal/UserProfileModal";
 import PurchaseAICreditsModal from "../components/PurchaseAICreditsModal/PurchaseAICreditsModal";
 import ConfirmationModal from "../components/ConfirmationModal/ConfirmationModal";
@@ -10,7 +10,7 @@ import { getPlansApi } from "../services/apis/planApis";
 import { useAppDispatch, useAppSelector } from "../utils/reduxHooks";
 import { showSnackbar } from "../redux/slices/snackbarSlice";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { getWeeklyStatsApi } from "../services/apis/memberApis";
+import { getWeeklyStatsApi, getStreakStatsApi } from "../services/apis/memberApis";
 import { getLatestBmiReportApi } from "../services/apis/bmiApis";
 import { getMemberDietHistoryApi, generateDietPlanApi, generateDietPlanFromWorkoutApi } from "../services/apis/dietApis";
 import WorkoutLibraryPage from "../components/WorkoutLibrary/WorkoutLibraryPage";
@@ -62,6 +62,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
   const [attendance, setAttendance] = useState<any[]>([]);
   const [loadingAttendance, setLoadingAttendance] = useState(false);
   const [weeklyStats, setWeeklyStats] = useState<{ dailyData: any[]; trends: any[] } | null>(null);
+  const [streakStats, setStreakStats] = useState<{ currentStreak: number; milestones: any[] } | null>(null);
 
   // Workouts state
   const [workouts, setWorkouts] = useState<any[]>([]);
@@ -195,6 +196,15 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
       }
     } catch (err) {
       console.error("Weekly stats fetch error", err);
+    }
+
+    try {
+      const resStreak = await getStreakStatsApi();
+      if (resStreak.data) {
+        setStreakStats(resStreak.data);
+      }
+    } catch (err) {
+      console.error("Streak stats fetch error", err);
     }
 
     setLoadingAttendance(false);
@@ -528,6 +538,56 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
           </div>
         )}
 
+        {streakStats && (
+          <div className="gym-card" style={{ marginBottom: 24, border: "2px solid rgba(245, 158, 11, 0.3)", position: "relative", overflow: "hidden" }}>
+            <div style={{ position: "absolute", right: -20, top: -20, opacity: 0.05, transform: "scale(3)" }}><Flame size={100} color="#f59e0b" /></div>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, zIndex: 1, position: "relative" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <div style={{ background: "rgba(245, 158, 11, 0.1)", padding: 12, borderRadius: 12, color: "#f59e0b" }}>
+                  <Flame size={24} />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: "1.2rem", fontWeight: 800, margin: 0, color: "var(--text-primary)" }}>Daily Streak</h3>
+                  <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", margin: 0 }}>Keep showing up to unlock rewards!</p>
+                </div>
+              </div>
+              <div style={{ textAlign: "right" }}>
+                <span style={{ fontSize: "2rem", fontWeight: 900, color: "#f59e0b", lineHeight: 1 }}>{streakStats.currentStreak || 0}</span>
+                <span style={{ fontSize: "0.9rem", color: "var(--text-muted)", marginLeft: 6, fontWeight: 700 }}>Days</span>
+              </div>
+            </div>
+
+            <div style={{ display: "flex", gap: 12, overflowX: "auto", overflowY: "hidden", zIndex: 1, position: "relative", padding: "8px 8px 16px 8px" }}>
+              {streakStats.milestones?.map((m: any, i: number) => (
+                <div key={i} style={{ 
+                  flex: "0 0 auto", 
+                  width: 110, 
+                  padding: "16px 12px", 
+                  borderRadius: 16, 
+                  background: m.achieved ? "var(--bg-card)" : "var(--bg-secondary)", 
+                  border: `2px solid ${m.achieved ? "#f59e0b" : "var(--border-color)"}`,
+                  display: "flex", 
+                  flexDirection: "column", 
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                  boxShadow: m.achieved ? "0 4px 12px rgba(245, 158, 11, 0.15)" : "none",
+                  opacity: m.achieved ? 1 : 0.5,
+                  transition: "all 0.3s"
+                }}>
+                  <div style={{ background: m.achieved ? "linear-gradient(135deg, #fcd34d, #f59e0b)" : "var(--border-color)", padding: 10, borderRadius: "50%", color: m.achieved ? "white" : "var(--text-muted)" }}>
+                    <Target size={20} />
+                  </div>
+                  <div style={{ textAlign: "center" }}>
+                    <div style={{ fontSize: "0.8rem", fontWeight: 800, color: m.achieved ? "var(--text-primary)" : "var(--text-muted)" }}>{m.name}</div>
+                    <div style={{ fontSize: "0.7rem", fontWeight: 600, color: "var(--text-secondary)" }}>{m.target} Days</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="gym-card">
           <h3 style={{ fontSize: "1.2rem", fontWeight: 700, marginBottom: 16 }}>Today's Check-ins</h3>
           {loadingAttendance ? (
@@ -716,7 +776,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
           <h2 className="page-title">Workout Reports</h2>
           <p className="page-subtitle">Analyze your training volume</p>
         </div>
-        <div style={{ display: "flex", gap: 12 }}>
+        <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
           <select className="form-input" style={{ width: 140, cursor: "pointer" }} value={reportType} onChange={e => setReportType(e.target.value as any)}>
             <option value="daily">Daily Report</option>
             <option value="monthly">Monthly Report</option>

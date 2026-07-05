@@ -34,6 +34,7 @@ export const apiRoutes = {
   addMember: "/members",
   getMembers: "/members",
   memberSetup: "/members/setup",
+  memberStreak: "/members/streak",
 
   // ── Workouts ──────────────────────────────────────────────────────────────
   workouts: "/workouts",

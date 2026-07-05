@@ -31,3 +31,7 @@ export const getMeApi = async () => {
 export const getWeeklyStatsApi = async () => {
   return await AxiosInstance.get(`${apiRoutes.getMembers}/weekly-stats`);
 };
+
+export const getStreakStatsApi = async () => {
+  return await AxiosInstance.get(apiRoutes.memberStreak);
+};

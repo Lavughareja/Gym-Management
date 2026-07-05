@@ -5,6 +5,7 @@
   width: 100%;
   margin: 0 auto;
   animation: pageFadeIn 0.3s ease-out;
+  overflow-x: auto;
 }
 
 @keyframes pageFadeIn {
