@@ -35,3 +35,7 @@ export const getWeeklyStatsApi = async () => {
 export const getStreakStatsApi = async () => {
   return await AxiosInstance.get(apiRoutes.memberStreak);
 };
+
+export const completeChallengeApi = async (data: { xp: number }) => {
+  return await AxiosInstance.post(`${apiRoutes.getMembers}/complete-challenge`, data);
+};

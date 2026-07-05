@@ -10,7 +10,7 @@ import { getPlansApi } from "../services/apis/planApis";
 import { useAppDispatch, useAppSelector } from "../utils/reduxHooks";
 import { showSnackbar } from "../redux/slices/snackbarSlice";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { getWeeklyStatsApi, getStreakStatsApi } from "../services/apis/memberApis";
+import { getWeeklyStatsApi, getStreakStatsApi, completeChallengeApi } from "../services/apis/memberApis";
 import { getLatestBmiReportApi } from "../services/apis/bmiApis";
 import { getMemberDietHistoryApi, generateDietPlanApi, generateDietPlanFromWorkoutApi } from "../services/apis/dietApis";
 import WorkoutLibraryPage from "../components/WorkoutLibrary/WorkoutLibraryPage";
@@ -47,7 +47,7 @@ interface Props {
   gymName?: string;
 }
 
-type Tab = "overview" | "workouts" | "reports" | "plans" | "diet" | "library" | "pt";
+type Tab = "overview" | "workouts" | "reports" | "plans" | "diet" | "library" | "pt" | "challenges";
 
 export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName = "Trainix Gym" }) => {
   const dispatch = useAppDispatch();
@@ -121,6 +121,14 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
   const [profile, setProfile] = useState<any>(null);
   // PT date selector
   const [ptDate, setPtDate] = useState<string>(new Date().toISOString().split("T")[0]);
+
+  // Challenges state
+  const [dailyChallenges, setDailyChallenges] = useState([
+    { id: 1, text: "Complete a workout session today", xp: 10, completed: false },
+    { id: 2, text: "Generate a Diet Plan", xp: 20, completed: false },
+    { id: 3, text: "Maintain a 30-day streak", xp: 80, completed: false }
+  ]);
+  const [generatedDietPlanToday, setGeneratedDietPlanToday] = useState(false);
 
   useEffect(() => {
     fetchProfile();
@@ -277,6 +285,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
       if (res.data.remainingCredits !== undefined) {
         setProfile((prev: any) => ({ ...prev, aiCredits: res.data.remainingCredits }));
       }
+      setGeneratedDietPlanToday(true);
       fetchDietData();
     } catch (err: any) {
       dispatch(showSnackbar({ message: err?.response?.data?.message || "Failed to generate diet plan", type: "error" }));
@@ -308,6 +317,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
       if (res.data.remainingCredits !== undefined) {
         setProfile((prev: any) => ({ ...prev, aiCredits: res.data.remainingCredits }));
       }
+      setGeneratedDietPlanToday(true);
       fetchDietData();
     } catch (err: any) {
       dispatch(showSnackbar({ message: err?.response?.data?.message || "Failed to generate diet plan", type: "error" }));
@@ -538,62 +548,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
           </div>
         )}
 
-        {streakStats && (
-          <div className="gym-card" style={{ marginBottom: 24, border: "2px solid rgba(245, 158, 11, 0.3)", position: "relative", overflow: "hidden" }}>
-            <div style={{ position: "absolute", right: -20, top: -20, opacity: 0.05, transform: "scale(3)" }}><Flame size={100} color="#f59e0b" /></div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, zIndex: 1, position: "relative" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div style={{ background: "rgba(245, 158, 11, 0.1)", padding: 12, borderRadius: 12, color: "#f59e0b" }}>
-                  <Flame size={24} />
-                </div>
-                <div>
-                  <h3 style={{ fontSize: "1.2rem", fontWeight: 800, margin: 0, color: "var(--text-primary)" }}>Daily Streak</h3>
-                  <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", margin: 0 }}>Keep showing up to unlock rewards!</p>
-                </div>
-              </div>
-              <div style={{ textAlign: "right" }}>
-                <span style={{ fontSize: "2rem", fontWeight: 900, color: "#f59e0b", lineHeight: 1 }}>{streakStats.currentStreak || 0}</span>
-                <span style={{ fontSize: "0.9rem", color: "var(--text-muted)", marginLeft: 6, fontWeight: 700 }}>Days</span>
-              </div>
-            </div>
 
-            <div style={{ display: "flex", gap: 12, overflowX: "auto", overflowY: "hidden", zIndex: 1, position: "relative", padding: "8px 8px 16px 8px" }}>
-              {streakStats.milestones?.map((m: any, i: number) => (
-                <div key={i} style={{ 
-                  flex: "0 0 auto", 
-                  width: 110, 
-                  padding: "16px 12px", 
-                  borderRadius: 16, 
-                  background: m.achieved ? "var(--bg-card)" : "var(--bg-secondary)", 
-                  border: `2px solid ${m.achieved ? "#f59e0b" : "var(--border-color)"}`,
-                  display: "flex", 
-                  flexDirection: "column", 
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 8,
-                  boxShadow: m.achieved ? "0 4px 12px rgba(245, 158, 11, 0.15)" : "none",
-                  opacity: m.achieved ? 1 : 0.5,
-                  transition: "all 0.3s"
-                }}>
-                  <div style={{ background: m.achieved ? "linear-gradient(135deg, #fcd34d, #f59e0b)" : "var(--border-color)", padding: 10, borderRadius: "50%", color: m.achieved ? "white" : "var(--text-muted)", display: "flex", alignItems: "center", justifyContent: "center", width: 44, height: 44 }}>
-                    <span style={{ fontSize: "1.5rem", lineHeight: 1 }}>
-                      {m.name === "Bronze" ? "🥉" : 
-                       m.name === "Silver" ? "🥈" : 
-                       m.name === "Gold" ? "🥇" : 
-                       m.name === "Platinum" ? "🏆" : 
-                       m.name === "Diamond" ? "💎" : 
-                       m.name === "Champion" ? "👑" : "🏅"}
-                    </span>
-                  </div>
-                  <div style={{ textAlign: "center" }}>
-                    <div style={{ fontSize: "0.8rem", fontWeight: 800, color: m.achieved ? "var(--text-primary)" : "var(--text-muted)" }}>{m.name}</div>
-                    <div style={{ fontSize: "0.7rem", fontWeight: 600, color: "var(--text-secondary)" }}>{m.target} Days</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
 
         <div className="gym-card">
           <h3 style={{ fontSize: "1.2rem", fontWeight: 700, marginBottom: 16 }}>Today's Check-ins</h3>
@@ -929,6 +884,152 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
     </div>
   );
 
+  const handleCompleteChallenge = async (challengeId: number, xp: number) => {
+    try {
+      const res = await completeChallengeApi({ xp });
+      dispatch(showSnackbar({ message: `+${xp} XP Earned!`, type: "success" }));
+      setProfile((prev: any) => ({ ...prev, xp: res.data.xp, level: res.data.level }));
+      setDailyChallenges(prev => prev.map(c => c.id === challengeId ? { ...c, completed: true } : c));
+    } catch (err: any) {
+      dispatch(showSnackbar({ message: "Failed to claim XP", type: "error" }));
+    }
+  };
+
+  const currentLevel = profile?.level || 1;
+  const currentXp = profile?.xp || 0;
+  const nextLevelXp = currentLevel * 500;
+  const progressPercent = Math.min(100, (currentXp / nextLevelXp) * 100);
+
+  const ChallengesPanel = (
+    <div className="page-container">
+      <header className="page-header" style={{ marginBottom: 24 }}>
+        <div>
+          <h2 className="page-title" style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <ShieldCheck size={24} color="#6366f1" /> Challenges & Rewards
+          </h2>
+          <p className="page-subtitle">Complete tasks to earn XP and level up!</p>
+        </div>
+      </header>
+
+      {/* Level Progress */}
+      <div className="gym-card" style={{ marginBottom: 24, padding: "24px 32px", background: "linear-gradient(135deg, #4f46e5, #3730a3)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "space-between", position: "relative", overflow: "hidden" }}>
+        <div style={{ position: "absolute", right: -30, top: -30, opacity: 0.1, transform: "scale(2)" }}>
+          <ShieldCheck size={120} />
+        </div>
+        <div style={{ width: "100%", zIndex: 1 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 12 }}>
+            <div>
+              <span style={{ fontSize: "0.9rem", opacity: 0.8, fontWeight: 600 }}>Current Level</span>
+              <h3 style={{ fontSize: "2.5rem", fontWeight: 800, margin: 0, lineHeight: 1 }}>{currentLevel}</h3>
+            </div>
+            <div style={{ textAlign: "right" }}>
+              <span style={{ fontSize: "1.2rem", fontWeight: 700 }}>{currentXp}</span>
+              <span style={{ opacity: 0.7, fontSize: "0.9rem" }}> / {nextLevelXp} XP</span>
+            </div>
+          </div>
+          <div style={{ width: "100%", height: 12, background: "rgba(0,0,0,0.2)", borderRadius: 6, overflow: "hidden" }}>
+            <div style={{ width: `${progressPercent}%`, height: "100%", background: "#f59e0b", transition: "width 0.5s ease-out" }} />
+          </div>
+          <p style={{ margin: "12px 0 0", fontSize: "0.85rem", opacity: 0.8, fontWeight: 500 }}>
+            {nextLevelXp - currentXp} XP needed for Level {currentLevel + 1}
+          </p>
+        </div>
+      </div>
+
+      {streakStats && (
+        <div className="gym-card" style={{ marginBottom: 24, border: "2px solid rgba(245, 158, 11, 0.3)", position: "relative", overflow: "hidden" }}>
+          <div style={{ position: "absolute", right: -20, top: -20, opacity: 0.05, transform: "scale(3)" }}><Flame size={100} color="#f59e0b" /></div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, zIndex: 1, position: "relative" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{ background: "rgba(245, 158, 11, 0.1)", padding: 12, borderRadius: 12, color: "#f59e0b" }}>
+                <Flame size={24} />
+              </div>
+              <div>
+                <h3 style={{ fontSize: "1.2rem", fontWeight: 800, margin: 0, color: "var(--text-primary)" }}>Daily Streak</h3>
+                <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", margin: 0 }}>Keep showing up to unlock rewards!</p>
+              </div>
+            </div>
+            <div style={{ textAlign: "right" }}>
+              <span style={{ fontSize: "2rem", fontWeight: 900, color: "#f59e0b", lineHeight: 1 }}>{streakStats.currentStreak || 0}</span>
+              <span style={{ fontSize: "0.9rem", color: "var(--text-muted)", marginLeft: 6, fontWeight: 700 }}>Days</span>
+            </div>
+          </div>
+
+          <div style={{ display: "flex", gap: 12, overflowX: "auto", overflowY: "hidden", zIndex: 1, position: "relative", padding: "8px 8px 16px 8px" }}>
+            {streakStats.milestones?.map((m: any, i: number) => (
+              <div key={i} style={{ 
+                flex: "0 0 auto", 
+                width: 110, 
+                padding: "16px 12px", 
+                borderRadius: 16, 
+                background: m.achieved ? "var(--bg-card)" : "var(--bg-secondary)", 
+                border: `2px solid ${m.achieved ? "#f59e0b" : "var(--border-color)"}`,
+                display: "flex", 
+                flexDirection: "column", 
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 8,
+                boxShadow: m.achieved ? "0 4px 12px rgba(245, 158, 11, 0.15)" : "none",
+                opacity: m.achieved ? 1 : 0.5,
+                transition: "all 0.3s"
+              }}>
+                <div style={{ background: m.achieved ? "linear-gradient(135deg, #fcd34d, #f59e0b)" : "var(--border-color)", padding: 10, borderRadius: "50%", color: m.achieved ? "white" : "var(--text-muted)", display: "flex", alignItems: "center", justifyContent: "center", width: 44, height: 44 }}>
+                  <span style={{ fontSize: "1.5rem", lineHeight: 1 }}>
+                    {m.name === "Bronze" ? "🥉" : 
+                     m.name === "Silver" ? "🥈" : 
+                     m.name === "Gold" ? "🥇" : 
+                     m.name === "Platinum" ? "🏆" : 
+                     m.name === "Diamond" ? "💎" : 
+                     m.name === "Champion" ? "👑" : "🏅"}
+                  </span>
+                </div>
+                <div style={{ textAlign: "center" }}>
+                  <div style={{ fontSize: "0.8rem", fontWeight: 800, color: m.achieved ? "var(--text-primary)" : "var(--text-muted)" }}>{m.name}</div>
+                  <div style={{ fontSize: "0.7rem", fontWeight: 600, color: "var(--text-secondary)" }}>{m.target} Days</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Daily Challenges */}
+      <div className="gym-card" style={{ marginBottom: 24 }}>
+        <h3 style={{ fontSize: "1.2rem", fontWeight: 700, marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
+          <Target size={20} color="var(--primary)" /> Daily Challenges
+        </h3>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {dailyChallenges.map((c) => {
+            const isEligible = 
+              c.id === 1 ? attendance.length > 0 :
+              c.id === 2 ? generatedDietPlanToday :
+              c.id === 3 ? (streakStats?.currentStreak || 0) >= 30 : false;
+            
+            const btnDisabled = c.completed || !isEligible;
+            
+            return (
+              <div key={c.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--bg-secondary)", padding: "16px 20px", borderRadius: 12, border: "1px solid var(--border-color)", opacity: c.completed ? 0.6 : 1 }}>
+                <div>
+                  <h4 style={{ margin: "0 0 4px", fontSize: "1rem", fontWeight: 700, color: c.completed ? "var(--text-muted)" : "var(--text-primary)" }}>{c.text}</h4>
+                  <span style={{ color: "#f59e0b", fontWeight: 700, fontSize: "0.85rem" }}>+{c.xp} XP</span>
+                  {!c.completed && !isEligible && <span style={{ color: "var(--text-muted)", fontSize: "0.75rem", marginLeft: 12 }}>Not completed yet</span>}
+                </div>
+                <button
+                  className={c.completed ? "btn-blue-outline" : "btn-blue"}
+                  disabled={btnDisabled}
+                  onClick={() => handleCompleteChallenge(c.id, c.xp)}
+                  style={{ padding: "8px 16px", borderRadius: 8, opacity: btnDisabled ? 0.5 : 1, cursor: btnDisabled ? "not-allowed" : "pointer", border: c.completed ? "1px solid var(--border-color)" : "" }}
+                >
+                  {c.completed ? "Claimed" : "Claim"}
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+
   const navItems: { id: Tab; label: string; icon: React.FC<{ size?: number }> }[] = [
     { id: "overview",  label: "Overview",   icon: LayoutDashboard as any },
     { id: "workouts",  label: "Workouts",   icon: Dumbbell as any },
@@ -936,6 +1037,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
     { id: "reports",   label: "Reports",    icon: BarChart3 as any },
     { id: "diet",      label: "My Diet",    icon: Activity as any },
     { id: "plans",     label: "Gym Plans",  icon: CreditCard as any },
+    { id: "challenges",label: "Challenges", icon: ShieldCheck as any },
     // Only shown if member has an active PT
     ...(ptState.memberPtInfo ? [{ id: "pt" as Tab, label: "Personal Trainer", icon: UserCheck as any }] : []),
   ];
@@ -1506,6 +1608,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
     diet: DietPanel,
     library: <WorkoutLibraryPage />,
     pt: PersonalTrainerPanel,
+    challenges: ChallengesPanel,
   };
 
   return (
