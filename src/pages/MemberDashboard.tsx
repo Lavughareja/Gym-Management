@@ -575,8 +575,15 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
                   opacity: m.achieved ? 1 : 0.5,
                   transition: "all 0.3s"
                 }}>
-                  <div style={{ background: m.achieved ? "linear-gradient(135deg, #fcd34d, #f59e0b)" : "var(--border-color)", padding: 10, borderRadius: "50%", color: m.achieved ? "white" : "var(--text-muted)" }}>
-                    <Target size={20} />
+                  <div style={{ background: m.achieved ? "linear-gradient(135deg, #fcd34d, #f59e0b)" : "var(--border-color)", padding: 10, borderRadius: "50%", color: m.achieved ? "white" : "var(--text-muted)", display: "flex", alignItems: "center", justifyContent: "center", width: 44, height: 44 }}>
+                    <span style={{ fontSize: "1.5rem", lineHeight: 1 }}>
+                      {m.name === "Bronze" ? "🥉" : 
+                       m.name === "Silver" ? "🥈" : 
+                       m.name === "Gold" ? "🥇" : 
+                       m.name === "Platinum" ? "🏆" : 
+                       m.name === "Diamond" ? "💎" : 
+                       m.name === "Champion" ? "👑" : "🏅"}
+                    </span>
                   </div>
                   <div style={{ textAlign: "center" }}>
                     <div style={{ fontSize: "0.8rem", fontWeight: 800, color: m.achieved ? "var(--text-primary)" : "var(--text-muted)" }}>{m.name}</div>
