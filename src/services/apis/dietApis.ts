@@ -5,6 +5,10 @@ export const generateDietPlanApi = async (data: { bmiReportId: string; goal?: st
   return await AxiosInstance.post(apiRoutes.dietGenerate, data);
 };
 
+export const generateDietPlanFromWorkoutApi = async (data: { age: number; height: number; weight: number; goal: string }) => {
+  return await AxiosInstance.post(apiRoutes.dietGenerateFromWorkout, data);
+};
+
 export const getMemberDietHistoryApi = async (memberId: string) => {
   return await AxiosInstance.get(`${apiRoutes.dietMember}/${memberId}`);
 };

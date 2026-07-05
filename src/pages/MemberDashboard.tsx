@@ -12,7 +12,7 @@ import { showSnackbar } from "../redux/slices/snackbarSlice";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { getWeeklyStatsApi } from "../services/apis/memberApis";
 import { getLatestBmiReportApi } from "../services/apis/bmiApis";
-import { getMemberDietHistoryApi, generateDietPlanApi } from "../services/apis/dietApis";
+import { getMemberDietHistoryApi, generateDietPlanApi, generateDietPlanFromWorkoutApi } from "../services/apis/dietApis";
 import WorkoutLibraryPage from "../components/WorkoutLibrary/WorkoutLibraryPage";
 import {
   fetchMemberPtInfoAction,
@@ -108,6 +108,13 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
   const [isGeneratingDiet, setIsGeneratingDiet] = useState(false);
   const [dietGoal, setDietGoal] = useState("Weight Loss");
   const [showAiModal, setShowAiModal] = useState(false);
+
+  // New Workout Diet state
+  const [isGeneratingWorkoutDiet, setIsGeneratingWorkoutDiet] = useState(false);
+  const [workoutDietGoal, setWorkoutDietGoal] = useState("Weight Loss");
+  const [memberAge, setMemberAge] = useState<number | "">("");
+  const [memberHeight, setMemberHeight] = useState<number | "">("");
+  const [memberWeight, setMemberWeight] = useState<number | "">("");
 
   // Profile
   const [profile, setProfile] = useState<any>(null);
@@ -265,6 +272,37 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
       dispatch(showSnackbar({ message: err?.response?.data?.message || "Failed to generate diet plan", type: "error" }));
     } finally {
       setIsGeneratingDiet(false);
+    }
+  };
+
+  const handleGenerateWorkoutDiet = async () => {
+    if (!memberAge || !memberHeight || !memberWeight) {
+      dispatch(showSnackbar({ message: "Please fill in age, height, and weight.", type: "error" }));
+      return;
+    }
+    if ((profile?.aiCredits || 0) < 1) {
+      dispatch(showSnackbar({ message: "Not enough AI credits! Please purchase credits first.", type: "error" }));
+      setShowAiModal(true);
+      return;
+    }
+
+    setIsGeneratingWorkoutDiet(true);
+    try {
+      const res = await generateDietPlanFromWorkoutApi({ 
+        age: Number(memberAge), 
+        height: Number(memberHeight), 
+        weight: Number(memberWeight), 
+        goal: workoutDietGoal 
+      });
+      dispatch(showSnackbar({ message: "Workout Diet Plan Generated!", type: "success" }));
+      if (res.data.remainingCredits !== undefined) {
+        setProfile((prev: any) => ({ ...prev, aiCredits: res.data.remainingCredits }));
+      }
+      fetchDietData();
+    } catch (err: any) {
+      dispatch(showSnackbar({ message: err?.response?.data?.message || "Failed to generate diet plan", type: "error" }));
+    } finally {
+      setIsGeneratingWorkoutDiet(false);
     }
   };
 
@@ -1074,12 +1112,82 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
 
 
 
-          {/* Current 7-Day Diet Plan Card */}
+          {/* Hero Banner 2 (Workout Diet) */}
+          <div style={{ background: "var(--bg-card)", borderRadius: "20px", padding: "32px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", position: "relative", overflow: "hidden", border: "1px solid var(--border-color)", boxShadow: "0 2px 10px rgba(16, 185, 129, 0.05)" }}>
+            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(5, 150, 105, 0.05) 100%)" }} />
+            <div style={{ position: "absolute", top: "20px", left: "60%", color: "#34d399", opacity: 0.8, fontSize: "1.2rem" }}>✨</div>
+            <div style={{ position: "absolute", bottom: "30px", left: "55%", color: "#34d399", opacity: 0.8, fontSize: "1.5rem" }}>✨</div>
+
+            <div style={{ zIndex: 1, flex: 1, maxWidth: "60%" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
+                <div style={{ background: "linear-gradient(135deg, #10b981, #059669)", padding: "10px", borderRadius: "50%", color: "white", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 12px rgba(16,185,129,0.3)" }}>
+                  <Dumbbell size={20} />
+                </div>
+                <h3 style={{ fontSize: "1.6rem", fontWeight: 800, color: "var(--text-primary)", margin: 0, letterSpacing: "-0.5px" }}>Post-Workout Diet Plan</h3>
+              </div>
+              <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", marginBottom: "24px", fontWeight: 500, lineHeight: 1.5 }}>Get a personalized 1-day diet plan tailored to today's logged workouts.</p>
+
+              <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", alignItems: "flex-end" }}>
+                <div style={{ display: "flex", gap: "12px", flexDirection: "column" }}>
+                  <div style={{ display: "flex", gap: "12px" }}>
+                    <div style={{ background: "var(--bg-secondary)", padding: "8px 12px", borderRadius: "10px", border: "1px solid var(--border-color)", width: "100px" }}>
+                      <span style={{ fontSize: "0.65rem", color: "var(--text-muted)", fontWeight: 600, display: "block", marginBottom: "2px" }}>Age</span>
+                      <input type="number" placeholder="yrs" value={memberAge} onChange={e => setMemberAge(e.target.value ? Number(e.target.value) : "")} style={{ width: "100%", background: "transparent", border: "none", outline: "none", color: "var(--text-primary)", fontWeight: 700, fontSize: "0.85rem" }} />
+                    </div>
+                    <div style={{ background: "var(--bg-secondary)", padding: "8px 12px", borderRadius: "10px", border: "1px solid var(--border-color)", width: "100px" }}>
+                      <span style={{ fontSize: "0.65rem", color: "var(--text-muted)", fontWeight: 600, display: "block", marginBottom: "2px" }}>Height</span>
+                      <input type="number" placeholder="cm" value={memberHeight} onChange={e => setMemberHeight(e.target.value ? Number(e.target.value) : "")} style={{ width: "100%", background: "transparent", border: "none", outline: "none", color: "var(--text-primary)", fontWeight: 700, fontSize: "0.85rem" }} />
+                    </div>
+                    <div style={{ background: "var(--bg-secondary)", padding: "8px 12px", borderRadius: "10px", border: "1px solid var(--border-color)", width: "100px" }}>
+                      <span style={{ fontSize: "0.65rem", color: "var(--text-muted)", fontWeight: 600, display: "block", marginBottom: "2px" }}>Weight</span>
+                      <input type="number" placeholder="kg" value={memberWeight} onChange={e => setMemberWeight(e.target.value ? Number(e.target.value) : "")} style={{ width: "100%", background: "transparent", border: "none", outline: "none", color: "var(--text-primary)", fontWeight: 700, fontSize: "0.85rem" }} />
+                    </div>
+                    <div style={{ background: "var(--bg-secondary)", padding: "8px 12px", borderRadius: "10px", border: "1px solid var(--border-color)", width: "140px" }}>
+                      <span style={{ fontSize: "0.65rem", color: "var(--text-muted)", fontWeight: 600, display: "block", marginBottom: "2px" }}>Goal</span>
+                      <select value={workoutDietGoal} onChange={e => setWorkoutDietGoal(e.target.value)} style={{ border: "none", background: "transparent", fontSize: "0.85rem", fontWeight: 700, color: "var(--text-primary)", outline: "none", cursor: "pointer", padding: 0, width: "100%" }}>
+                        <option>Weight Loss</option>
+                        <option>Weight Gain</option>
+                        <option>Maintain Weight</option>
+                      </select>
+                    </div>
+                  </div>
+                  <button
+                    disabled={isGeneratingWorkoutDiet}
+                    onClick={handleGenerateWorkoutDiet}
+                    style={{
+                      background: "linear-gradient(135deg, #10b981, #059669)",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "20px",
+                      padding: "8px 16px",
+                      fontWeight: 600,
+                      fontSize: "0.8rem",
+                      cursor: isGeneratingWorkoutDiet ? "not-allowed" : "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      width: "fit-content",
+                      boxShadow: "0 4px 12px rgba(16, 185, 129, 0.3)",
+                      transition: "all 0.2s"
+                    }}
+                  >
+                    {isGeneratingWorkoutDiet ? <Loader size={14} style={{ animation: "spin 1s linear infinite" }} /> : <><Sparkles size={14} /> Generate 1-Day Plan (1 Credit)</>}
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <div style={{ zIndex: 1, width: "35%", display: "flex", justifyContent: "flex-end", paddingRight: "20px" }}>
+              <img src="/hero_diet_illustration.png" alt="Workout Diet Illustration" style={{ width: "100%", maxWidth: "220px", objectFit: "contain", filter: "drop-shadow(0 10px 20px rgba(0,0,0,0.1))" }} />
+            </div>
+          </div>
+
+          {/* Current Diet Plan Card */}
           <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: "20px", padding: "32px", boxShadow: "0 4px 12px rgba(0,0,0,0.03)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px", borderBottom: "1px solid var(--border-color)", paddingBottom: "16px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                 <div style={{ background: "rgba(79, 70, 229, 0.1)", color: "#4f46e5", padding: "10px", borderRadius: "10px" }}><PenLine size={20} /></div>
-                <h3 style={{ fontSize: "1.2rem", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>Current 7-Day Diet Plan</h3>
+                <h3 style={{ fontSize: "1.2rem", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>Current Diet Plan</h3>
               </div>
               {dietPlans.length > 0 && dietPlans[0].days && (
                 <button onClick={downloadDietPDF} style={{ background: "var(--bg-secondary)", border: "1px solid var(--border-color)", padding: "8px 16px", borderRadius: "10px", color: "var(--text-primary)", fontWeight: 600, cursor: "pointer", fontSize: "0.85rem", boxShadow: "0 1px 2px rgba(0,0,0,0.05)", transition: "all 0.2s" }} onMouseOver={(e) => e.currentTarget.style.background = "var(--bg-hover)"} onMouseOut={(e) => e.currentTarget.style.background = "var(--bg-secondary)"}>
@@ -1138,7 +1246,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
             ) : (
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "40px 0" }}>
                 <img src="/empty_diet_plan_illustration.png" alt="No Diet Plan" style={{ width: "180px", marginBottom: "24px", opacity: 0.9, filter: "drop-shadow(0 10px 15px rgba(0,0,0,0.05))" }} />
-                <h4 style={{ fontSize: "1.3rem", fontWeight: 800, color: "var(--text-primary)", marginBottom: "8px", margin: 0 }}>No 7-Day Plan Yet</h4>
+                <h4 style={{ fontSize: "1.3rem", fontWeight: 800, color: "var(--text-primary)", marginBottom: "8px", margin: 0 }}>No Diet Plan Yet</h4>
                 <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem", marginBottom: "24px", fontWeight: 500 }}>Generate your first AI diet plan to view it here.</p>
                 <button
                   onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
