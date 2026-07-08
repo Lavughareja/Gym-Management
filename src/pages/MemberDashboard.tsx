@@ -42,13 +42,13 @@ const DEFAULT_WORKOUTS = [
 ];
 
 export const genericDietPlan = [
-  { dayNumber: 1, calories: 2000, protein: 120, carbs: 220, fats: 60, breakfast: "Oatmeal with fruits", morningSnack: "1 Apple", lunch: "Chicken breast with rice", eveningSnack: "Greek yogurt", dinner: "Salmon with veggies", bedtimeSnack: "Milk" },
-  { dayNumber: 2, calories: 2050, protein: 125, carbs: 230, fats: 55, breakfast: "Scrambled eggs", morningSnack: "Almonds", lunch: "Tuna salad", eveningSnack: "Protein shake", dinner: "Steak and sweet potato", bedtimeSnack: "Cottage cheese" },
-  { dayNumber: 3, calories: 1950, protein: 115, carbs: 210, fats: 58, breakfast: "Smoothie bowl", morningSnack: "Banana", lunch: "Turkey wrap", eveningSnack: "Mixed nuts", dinner: "Grilled chicken salad", bedtimeSnack: "Herbal tea" },
-  { dayNumber: 4, calories: 2100, protein: 130, carbs: 240, fats: 62, breakfast: "Pancakes", morningSnack: "Berries", lunch: "Beef bowl", eveningSnack: "Cheese stick", dinner: "Shrimp pasta", bedtimeSnack: "Yogurt" },
-  { dayNumber: 5, calories: 2000, protein: 120, carbs: 220, fats: 60, breakfast: "Toast with avocado", morningSnack: "Orange", lunch: "Chicken quinoa", eveningSnack: "Hummus and carrots", dinner: "Pork chops", bedtimeSnack: "Milk" },
-  { dayNumber: 6, calories: 2150, protein: 135, carbs: 250, fats: 65, breakfast: "Waffles", morningSnack: "Protein bar", lunch: "Burger (no bun)", eveningSnack: "Trail mix", dinner: "Fish tacos", bedtimeSnack: "Cheese" },
-  { dayNumber: 7, calories: 1900, protein: 110, carbs: 200, fats: 55, breakfast: "Fruit salad", morningSnack: "Yogurt", lunch: "Vegetable soup", eveningSnack: "Almonds", dinner: "Grilled tofu", bedtimeSnack: "Tea" },
+  { dayNumber: 1, calories: 2850, protein: 165, carbs: 355, fats: 72, morningSnack: "150g Oats + 1 Scoop Whey", breakfast: "2 Brown Bread + Peanut Butter + 1 Banana", lunch: "200g Rice + 100g Veggies + 100g Paneer", eveningSnack: "1 Apple + 20 Almonds", preWorkout: "2 Bananas", postWorkout: "1 Scoop Whey + 200g Rice", dinner: "Dal + 2 Roti + 100g Veggies + 100g Paneer", bedtimeSnack: "250ml Milk" },
+  { dayNumber: 2, calories: 2780, protein: 160, carbs: 345, fats: 70, morningSnack: "150g Poha + 1 Scoop Whey", breakfast: "2 Multigrain Toast + Peanut Butter + Apple", lunch: "3 Roti + 100g Paneer + Veggies", eveningSnack: "Mixed Fruits + 20 Peanuts", preWorkout: "2 Bananas", postWorkout: "1 Scoop Whey + 200g Rice", dinner: "Dal + Rice + Salad", bedtimeSnack: "250ml Milk" },
+  { dayNumber: 3, calories: 2900, protein: 168, carbs: 360, fats: 73, morningSnack: "150g Upma + 1 Scoop Whey", breakfast: "Vegetable Sandwich + 1 Banana", lunch: "200g Rice + Dal + Veggies", eveningSnack: "Apple + 15 Cashews", preWorkout: "Banana + Black Coffee", postWorkout: "1 Scoop Whey + 200g Sweet Potato", dinner: "2 Roti + Paneer + Veggies", bedtimeSnack: "250ml Milk" },
+  { dayNumber: 4, calories: 2820, protein: 162, carbs: 350, fats: 71, morningSnack: "150g Oats + 1 Scoop Whey", breakfast: "Oats Chilla + Peanut Butter", lunch: "3 Roti + Soya Chunks + Veggies", eveningSnack: "Orange + Roasted Chana", preWorkout: "2 Bananas", postWorkout: "1 Scoop Whey + 200g Rice", dinner: "Dal + 2 Roti + Mixed Veg", bedtimeSnack: "250ml Milk" },
+  { dayNumber: 5, calories: 2870, protein: 166, carbs: 355, fats: 72, morningSnack: "150g Poha + 1 Scoop Whey", breakfast: "2 Brown Bread + Almond Butter + Banana", lunch: "200g Rice + Rajma + Veggies", eveningSnack: "Banana + Almonds", preWorkout: "Banana + Dates", postWorkout: "1 Scoop Whey + 200g Rice", dinner: "Paneer Bhurji + 2 Roti", bedtimeSnack: "250ml Milk" },
+  { dayNumber: 6, calories: 2750, protein: 158, carbs: 340, fats: 69, morningSnack: "150g Dalia + 1 Scoop Whey", breakfast: "Vegetable Poha + Apple", lunch: "3 Roti + Paneer Bhurji + Veggies", eveningSnack: "Fruit Bowl", preWorkout: "2 Bananas", postWorkout: "1 Scoop Whey + 200g Sweet Potato", dinner: "Khichdi + Curd", bedtimeSnack: "250ml Milk" },
+  { dayNumber: 7, calories: 2800, protein: 160, carbs: 345, fats: 70, morningSnack: "150g Oats + 1 Scoop Whey", breakfast: "Paneer Sandwich + Banana", lunch: "Rice + Chole + Salad", eveningSnack: "Apple + Walnuts", preWorkout: "Banana + Peanut Butter", postWorkout: "1 Scoop Whey + 200g Rice", dinner: "Dal + 2 Roti + Paneer", bedtimeSnack: "250ml Milk" },
 ];
 
 interface Props {
@@ -125,6 +125,15 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
     normalDiet: true,
     aiDiet: false
   });
+
+  const [expandedDietMeals, setExpandedDietMeals] = useState<Record<string, boolean>>({});
+
+  const toggleDietMeal = (key: string) => {
+    setExpandedDietMeals(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
 
   const [dietGoal, setDietGoal] = useState("Weight Loss");
   const [showAiModal, setShowAiModal] = useState(false);
@@ -1448,24 +1457,38 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
                       {/* Meals Accordion */}
                       <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                         {[
-                          { key: "morningSnack", label: "Morning Snacks", icon: "🥣" },
-                          { key: "breakfast", label: "Breakfast", icon: "🥛" },
-                          { key: "lunch", label: "Lunch", icon: "🍛" },
-                          { key: "eveningSnack", label: "Evening Snack", icon: "🥗" },
-                          { key: "dinner", label: "Dinner", icon: "🍗" },
-                          { key: "bedtimeSnack", label: "Bedtime", icon: "🥙" }
+                          { key: "morningSnack", label: "9:00 AM - Morning Snack", icon: "🥣" },
+                          { key: "breakfast", label: "10:15 AM - Breakfast", icon: "🥛" },
+                          { key: "lunch", label: "2:00 PM - Lunch", icon: "🍛" },
+                          { key: "eveningSnack", label: "5:30 PM - Evening Snack", icon: "🥗" },
+                          { key: "preWorkout", label: "6:00 PM - Pre-Workout", icon: "🍌" },
+                          { key: "postWorkout", label: "8:00 PM - Post-Workout", icon: "💪" },
+                          { key: "dinner", label: "9:00 PM - Dinner", icon: "🍲" },
+                          { key: "bedtimeSnack", label: "10:30 PM - Before Bed", icon: "🥙" }
                         ].filter(meal => day[meal.key]).map(meal => {
+                          const mealKey = `${day.dayNumber}-${meal.key}`;
+                          const isExpanded = expandedDietMeals[mealKey];
                           return (
-                            <div key={meal.key} style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: "16px", padding: "16px 20px", display: "flex", flexDirection: "column", gap: "8px", boxShadow: "0 2px 4px rgba(0,0,0,0.02)" }}>
-                              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                                <div style={{ background: "var(--bg-secondary)", padding: "10px", borderRadius: "12px", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
-                                  <span style={{ fontSize: "1.5rem", display: "flex" }}>{meal.icon}</span>
+                            <div key={meal.key} style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: "12px", padding: "10px 14px", display: "flex", flexDirection: "column", gap: "6px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)", transition: "all 0.2s ease-in-out" }}>
+                              <div 
+                                style={{ display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer" }}
+                                onClick={() => toggleDietMeal(mealKey)}
+                              >
+                                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                                  <div style={{ background: "var(--bg-secondary)", padding: "6px", borderRadius: "8px", boxShadow: "0 1px 4px rgba(0,0,0,0.05)" }}>
+                                    <span style={{ fontSize: "1.2rem", display: "flex" }}>{meal.icon}</span>
+                                  </div>
+                                  <span style={{ fontWeight: 600, color: "var(--text-primary)", fontSize: "0.95rem" }}>{meal.label}</span>
                                 </div>
-                                <span style={{ fontWeight: 700, color: "var(--text-primary)", fontSize: "1.1rem" }}>{meal.label}</span>
+                                <div style={{ display: "flex", alignItems: "center", color: "var(--text-muted)", transition: "transform 0.2s" }}>
+                                  {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                                </div>
                               </div>
-                              <div style={{ paddingLeft: "58px", color: "var(--text-secondary)", fontSize: "0.95rem", lineHeight: 1.5 }}>
-                                {day[meal.key]}
-                              </div>
+                              {isExpanded && (
+                                <div style={{ paddingLeft: "42px", color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.4, marginTop: "4px", animation: "fadeIn 0.3s" }}>
+                                  {day[meal.key]}
+                                </div>
+                              )}
                             </div>
                           );
                         })}
