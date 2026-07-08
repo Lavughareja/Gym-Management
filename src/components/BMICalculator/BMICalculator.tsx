@@ -27,7 +27,7 @@ const BMICalculator: React.FC = () => {
   // Result states
   const [report, setReport] = useState<any>(null);
   const [useAsianCutoff, setUseAsianCutoff] = useState(false);
-  const [validationError, setValidationError] = useState("");
+  const [errors, setErrors] = useState<{age?: string; weight?: string; height?: string; bodyFat?: string}>({});
 
   const handleEstimateBF = () => {
     setEstimatorError("");
@@ -80,27 +80,21 @@ const BMICalculator: React.FC = () => {
   };
 
   const handleCalculate = () => {
-    setValidationError("");
-    if (!bodyFat) {
-      setValidationError("Please enter your Body Fat % or use the estimator.");
-      return;
-    }
-    if (!age || Number(age) < 18 || Number(age) > 100) {
-      setValidationError("Age must be between 18 and 100. Standard BMI categories do not apply to children or teens.");
-      return;
-    }
+    const newErrors: {age?: string; weight?: string; height?: string; bodyFat?: string} = {};
+    if (!bodyFat) newErrors.bodyFat = "Enter your Body Fat % or use the estimator.";
+    if (!age || Number(age) < 18 || Number(age) > 100) newErrors.age = "Age must be between 18 and 100.";
     
     let wKg = weightUnit === "kg" ? Number(weight) : Number(weight) * 0.453592;
     let hCm = heightUnit === "cm" ? Number(height) : (Number(heightFt) * 30.48) + (Number(heightIn) * 2.54);
 
-    if (!wKg || wKg < 20 || wKg > 300) {
-      setValidationError("Please enter a valid weight (20-300 kg).");
+    if (!wKg || wKg < 20 || wKg > 300) newErrors.weight = "Enter a valid weight (20-300 kg).";
+    if (!hCm || hCm < 100 || hCm > 250) newErrors.height = "Enter a valid height (100-250 cm).";
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       return;
     }
-    if (!hCm || hCm < 100 || hCm > 250) {
-      setValidationError("Please enter a valid height (100-250 cm).");
-      return;
-    }
+    setErrors({});
 
     const hM = hCm / 100;
     const bmiVal = wKg / (hM * hM);
@@ -192,11 +186,7 @@ const BMICalculator: React.FC = () => {
           <Calculator size={20} color="var(--primary)" /> Calculator Inputs
         </h3>
 
-        {validationError && (
-          <div style={{ background: '#fef2f2', border: '1px solid #fecaca', padding: '12px', borderRadius: '8px', color: '#dc2626', marginBottom: '20px', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <AlertCircle size={16} /> {validationError}
-          </div>
-        )}
+        {/* Validation Errors are now inline below fields */}
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
           
@@ -212,7 +202,8 @@ const BMICalculator: React.FC = () => {
           {/* Age */}
           <div>
             <label className="form-label" style={{ fontWeight: 600 }}>Age (years)</label>
-            <input type="number" min="18" max="100" className="form-input" placeholder="e.g. 25" value={age} onChange={(e) => setAge(e.target.value ? Number(e.target.value) : "")} style={{ background: 'var(--bg-secondary)' }} />
+            <input type="number" min="18" max="100" className="form-input" placeholder="e.g. 25" value={age} onChange={(e) => { setAge(e.target.value ? Number(e.target.value) : ""); setErrors({ ...errors, age: undefined }); }} style={{ background: 'var(--bg-secondary)', border: errors.age ? "1px solid #ef4444" : "1px solid var(--border-color)" }} />
+            {errors.age && <span style={{ color: "#ef4444", fontSize: "0.75rem", fontWeight: 600, display: "block", marginTop: "6px" }}>{errors.age}</span>}
           </div>
 
           {/* Weight */}
@@ -225,7 +216,8 @@ const BMICalculator: React.FC = () => {
                 <span onClick={() => setWeightUnit("lb")} style={{ fontWeight: weightUnit === "lb" ? 800 : 500, color: weightUnit === "lb" ? "var(--primary)" : "var(--text-muted)" }}>lb</span>
               </div>
             </div>
-            <input type="number" min="0" className="form-input" placeholder={weightUnit === "kg" ? "e.g. 70" : "e.g. 154"} value={weight} onChange={(e) => setWeight(e.target.value ? Number(e.target.value) : "")} style={{ background: 'var(--bg-secondary)' }} />
+            <input type="number" min="0" className="form-input" placeholder={weightUnit === "kg" ? "e.g. 70" : "e.g. 154"} value={weight} onChange={(e) => { setWeight(e.target.value ? Number(e.target.value) : ""); setErrors({ ...errors, weight: undefined }); }} style={{ background: 'var(--bg-secondary)', border: errors.weight ? "1px solid #ef4444" : "1px solid var(--border-color)" }} />
+            {errors.weight && <span style={{ color: "#ef4444", fontSize: "0.75rem", fontWeight: 600, display: "block", marginTop: "6px" }}>{errors.weight}</span>}
           </div>
 
           {/* Height */}
@@ -239,19 +231,20 @@ const BMICalculator: React.FC = () => {
               </div>
             </div>
             {heightUnit === "cm" ? (
-              <input type="number" min="0" className="form-input" placeholder="e.g. 175" value={height} onChange={(e) => setHeight(e.target.value ? Number(e.target.value) : "")} style={{ background: 'var(--bg-secondary)' }} />
+              <input type="number" min="0" className="form-input" placeholder="e.g. 175" value={height} onChange={(e) => { setHeight(e.target.value ? Number(e.target.value) : ""); setErrors({ ...errors, height: undefined }); }} style={{ background: 'var(--bg-secondary)', border: errors.height ? "1px solid #ef4444" : "1px solid var(--border-color)" }} />
             ) : (
               <div style={{ display: 'flex', gap: '8px' }}>
-                <div style={{ flex: 1, display: 'flex', alignItems: 'center', background: 'var(--bg-secondary)', borderRadius: '8px', border: '1px solid var(--border-color)', paddingRight: '12px' }}>
-                  <input type="number" min="0" placeholder="ft" style={{ width: '100%', background: 'transparent', border: 'none', padding: '10px 12px', outline: 'none', color: 'var(--text-primary)' }} value={heightFt} onChange={e => setHeightFt(e.target.value ? Number(e.target.value) : "")} />
+                <div style={{ flex: 1, display: 'flex', alignItems: 'center', background: 'var(--bg-secondary)', borderRadius: '8px', border: errors.height ? '1px solid #ef4444' : '1px solid var(--border-color)', paddingRight: '12px' }}>
+                  <input type="number" min="0" placeholder="ft" style={{ width: '100%', background: 'transparent', border: 'none', padding: '10px 12px', outline: 'none', color: 'var(--text-primary)' }} value={heightFt} onChange={e => { setHeightFt(e.target.value ? Number(e.target.value) : ""); setErrors({ ...errors, height: undefined }); }} />
                   <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 600 }}>ft</span>
                 </div>
-                <div style={{ flex: 1, display: 'flex', alignItems: 'center', background: 'var(--bg-secondary)', borderRadius: '8px', border: '1px solid var(--border-color)', paddingRight: '12px' }}>
-                  <input type="number" min="0" max="11" placeholder="in" style={{ width: '100%', background: 'transparent', border: 'none', padding: '10px 12px', outline: 'none', color: 'var(--text-primary)' }} value={heightIn} onChange={e => setHeightIn(e.target.value ? Number(e.target.value) : "")} />
+                <div style={{ flex: 1, display: 'flex', alignItems: 'center', background: 'var(--bg-secondary)', borderRadius: '8px', border: errors.height ? '1px solid #ef4444' : '1px solid var(--border-color)', paddingRight: '12px' }}>
+                  <input type="number" min="0" max="11" placeholder="in" style={{ width: '100%', background: 'transparent', border: 'none', padding: '10px 12px', outline: 'none', color: 'var(--text-primary)' }} value={heightIn} onChange={e => { setHeightIn(e.target.value ? Number(e.target.value) : ""); setErrors({ ...errors, height: undefined }); }} />
                   <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 600 }}>in</span>
                 </div>
               </div>
             )}
+            {errors.height && <span style={{ color: "#ef4444", fontSize: "0.75rem", fontWeight: 600, display: "block", marginTop: "6px" }}>{errors.height}</span>}
           </div>
 
           {/* Body Fat % */}
@@ -262,7 +255,8 @@ const BMICalculator: React.FC = () => {
                 I don't know my body fat %
               </span>
             </label>
-            <input type="number" min="0" max="100" className="form-input" placeholder="e.g. 15" value={bodyFat} onChange={(e) => setBodyFat(e.target.value ? Number(e.target.value) : "")} style={{ background: 'var(--bg-secondary)', maxWidth: '240px' }} />
+            <input type="number" min="0" max="100" className="form-input" placeholder="e.g. 15" value={bodyFat} onChange={(e) => { setBodyFat(e.target.value ? Number(e.target.value) : ""); setErrors({ ...errors, bodyFat: undefined }); }} style={{ background: 'var(--bg-secondary)', maxWidth: '240px', border: errors.bodyFat ? "1px solid #ef4444" : "1px solid var(--border-color)" }} />
+            {errors.bodyFat && <span style={{ color: "#ef4444", fontSize: "0.75rem", fontWeight: 600, display: "block", marginTop: "6px" }}>{errors.bodyFat}</span>}
           </div>
 
           {/* Options */}

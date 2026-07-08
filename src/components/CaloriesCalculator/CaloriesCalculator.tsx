@@ -24,7 +24,11 @@ const CaloriesCalculator: React.FC = () => {
   const [age, setAge] = useState<string>("");
   const [weight, setWeight] = useState<string>("");
   const [height, setHeight] = useState<string>("");
+  const [heightFt, setHeightFt] = useState<string>("");
+  const [heightIn, setHeightIn] = useState<string>("");
   const [activity, setActivity] = useState<string>("Sedentary");
+  const [isActivityDropdownOpen, setIsActivityDropdownOpen] = useState(false);
+  const [errors, setErrors] = useState<{age?: string; weight?: string; height?: string}>({});
   
   // Unit toggles
   const [weightUnit, setWeightUnit] = useState<"kg" | "lb">("kg");
@@ -46,17 +50,21 @@ const CaloriesCalculator: React.FC = () => {
 
     if (weightUnit === "lb") weightKg = weightKg * 0.453592;
     if (heightUnit === "ft") {
-      // height could be in format "5.9" for 5 ft 9 inches
-      const parts = height.split(".");
-      const ft = Number(parts[0]) || 0;
-      const inch = Number(parts[1]) || 0;
+      const ft = Number(heightFt) || 0;
+      const inch = Number(heightIn) || 0;
       heightCm = (ft * 30.48) + (inch * 2.54);
     }
 
-    if (!ageNum || ageNum < 15 || ageNum > 100 || !weightKg || weightKg < 20 || weightKg > 300 || !heightCm || heightCm < 50 || heightCm > 300) {
-      alert("Please enter valid values. Age (15-100), Weight (20-300kg), Height (50-300cm).");
+    const newErrors: {age?: string; weight?: string; height?: string} = {};
+    if (!ageNum || ageNum < 15 || ageNum > 100) newErrors.age = "Enter a valid age (15-100).";
+    if (!weightKg || weightKg < 20 || weightKg > 300) newErrors.weight = "Enter a valid weight (20-300kg).";
+    if (!heightCm || heightCm < 50 || heightCm > 300) newErrors.height = "Enter a valid height (50-300cm).";
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       return;
     }
+    setErrors({});
 
     // Mifflin-St Jeor BMR
     let bmr = (10 * weightKg) + (6.25 * heightCm) - (5 * ageNum);
@@ -328,20 +336,43 @@ const CaloriesCalculator: React.FC = () => {
         <div>
           <label style={{ display: "block", fontSize: "0.9rem", fontWeight: 700, color: "var(--text-primary)", marginBottom: "8px" }}>Activity Level</label>
           <div style={{ position: "relative" }}>
-            <select 
-              value={activity}
-              onChange={(e) => setActivity(e.target.value)}
-              style={{ width: "100%", padding: "14px 16px", borderRadius: "12px", border: "1px solid var(--border-color)", background: "var(--bg-secondary)", color: "var(--text-primary)", fontSize: "0.95rem", outline: "none", appearance: "none", cursor: "pointer", fontWeight: 500 }}
+            <div 
+              onClick={() => setIsActivityDropdownOpen(!isActivityDropdownOpen)}
+              style={{ width: "100%", padding: "14px 16px", borderRadius: "12px", border: "1px solid var(--border-color)", background: "var(--bg-secondary)", color: "var(--text-primary)", fontSize: "0.95rem", cursor: "pointer", fontWeight: 500, display: "flex", justifyContent: "space-between", alignItems: "center" }}
             >
-              <option value="BMR">Basal Metabolic Rate (BMR)</option>
-              <option value="Sedentary">Sedentary: little or no exercise</option>
-              <option value="Light">Light: exercise 1-3 times/week</option>
-              <option value="Moderate">Moderate: exercise 4-5 times/week</option>
-              <option value="Active">Active: daily exercise or intense exercise 3-4 times/week</option>
-              <option value="Very Active">Very Active: intense exercise 6-7 times/week</option>
-              <option value="Extra Active">Extra Active: very intense exercise daily, or physical job</option>
-            </select>
-            <ChevronDown size={18} color="var(--text-muted)" style={{ position: "absolute", right: "16px", top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }} />
+              {activity === "BMR" ? "Basal Metabolic Rate (BMR)" : 
+               activity === "Sedentary" ? "Sedentary: little or no exercise" :
+               activity === "Light" ? "Light: exercise 1-3 times/week" :
+               activity === "Moderate" ? "Moderate: exercise 4-5 times/week" :
+               activity === "Active" ? "Active: daily exercise or intense exercise 3-4 times/week" :
+               activity === "Very Active" ? "Very Active: intense exercise 6-7 times/week" :
+               "Extra Active: very intense exercise daily, or physical job"}
+              <ChevronDown size={18} color="var(--text-muted)" style={{ transform: isActivityDropdownOpen ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }} />
+            </div>
+            
+            {isActivityDropdownOpen && (
+              <div style={{ position: "absolute", top: "100%", left: 0, right: 0, marginTop: "8px", background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: "12px", boxShadow: "0 10px 25px rgba(0,0,0,0.1)", zIndex: 50, overflow: "hidden" }}>
+                {[
+                  { id: "BMR", label: "Basal Metabolic Rate (BMR)" },
+                  { id: "Sedentary", label: "Sedentary: little or no exercise" },
+                  { id: "Light", label: "Light: exercise 1-3 times/week" },
+                  { id: "Moderate", label: "Moderate: exercise 4-5 times/week" },
+                  { id: "Active", label: "Active: daily exercise or intense exercise 3-4 times/week" },
+                  { id: "Very Active", label: "Very Active: intense exercise 6-7 times/week" },
+                  { id: "Extra Active", label: "Extra Active: very intense exercise daily, or physical job" }
+                ].map((item) => (
+                  <div 
+                    key={item.id}
+                    onClick={() => { setActivity(item.id); setIsActivityDropdownOpen(false); }}
+                    style={{ padding: "12px 16px", fontSize: "0.95rem", cursor: "pointer", background: activity === item.id ? "rgba(99, 102, 241, 0.1)" : "transparent", color: activity === item.id ? "var(--primary)" : "var(--text-primary)", fontWeight: activity === item.id ? 700 : 500 }}
+                    onMouseOver={(e) => { if(activity !== item.id) e.currentTarget.style.background = "var(--bg-hover)"; }}
+                    onMouseOut={(e) => { if(activity !== item.id) e.currentTarget.style.background = "transparent"; }}
+                  >
+                    {item.label}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -368,10 +399,11 @@ const CaloriesCalculator: React.FC = () => {
             <input 
               type="number" 
               value={age}
-              onChange={(e) => setAge(e.target.value)}
+              onChange={(e) => { setAge(e.target.value); setErrors({ ...errors, age: undefined }); }}
               placeholder="e.g. 25"
-              style={{ width: "100%", padding: "14px 16px", borderRadius: "12px", border: "1px solid var(--border-color)", background: "var(--bg-secondary)", color: "var(--text-primary)", fontSize: "0.95rem", outline: "none", boxSizing: "border-box" }}
+              style={{ width: "100%", padding: "14px 16px", borderRadius: "12px", border: errors.age ? "1px solid #ef4444" : "1px solid var(--border-color)", background: "var(--bg-secondary)", color: "var(--text-primary)", fontSize: "0.95rem", outline: "none", boxSizing: "border-box" }}
             />
+            {errors.age && <span style={{ color: "#ef4444", fontSize: "0.75rem", fontWeight: 600, display: "block", marginTop: "6px" }}>{errors.age}</span>}
             {Number(age) > 0 && Number(age) < 18 && (
               <span style={{ fontSize: "0.75rem", color: "#f97316", display: "block", marginTop: "6px", fontWeight: 500 }}>* Results may be less accurate for growing teens.</span>
             )}
@@ -389,10 +421,11 @@ const CaloriesCalculator: React.FC = () => {
             <input 
               type="number" 
               value={weight}
-              onChange={(e) => setWeight(e.target.value)}
+              onChange={(e) => { setWeight(e.target.value); setErrors({ ...errors, weight: undefined }); }}
               placeholder={`e.g. ${weightUnit === "kg" ? "70" : "154"}`}
-              style={{ width: "100%", padding: "14px 16px", borderRadius: "12px", border: "1px solid var(--border-color)", background: "var(--bg-secondary)", color: "var(--text-primary)", fontSize: "0.95rem", outline: "none", boxSizing: "border-box" }}
+              style={{ width: "100%", padding: "14px 16px", borderRadius: "12px", border: errors.weight ? "1px solid #ef4444" : "1px solid var(--border-color)", background: "var(--bg-secondary)", color: "var(--text-primary)", fontSize: "0.95rem", outline: "none", boxSizing: "border-box" }}
             />
+            {errors.weight && <span style={{ color: "#ef4444", fontSize: "0.75rem", fontWeight: 600, display: "block", marginTop: "6px" }}>{errors.weight}</span>}
           </div>
         </div>
 
@@ -405,13 +438,42 @@ const CaloriesCalculator: React.FC = () => {
               <button onClick={() => setHeightUnit("ft")} style={{ border: "none", padding: "4px 8px", fontSize: "0.75rem", fontWeight: 600, background: heightUnit === "ft" ? "var(--border-color)" : "transparent", color: heightUnit === "ft" ? "var(--text-primary)" : "var(--text-muted)", cursor: "pointer" }}>ft/in</button>
             </div>
           </div>
-          <input 
-            type={heightUnit === "cm" ? "number" : "text"}
-            value={height}
-            onChange={(e) => setHeight(e.target.value)}
-            placeholder={heightUnit === "cm" ? "e.g. 175" : "e.g. 5.9 (5 ft 9 in)"}
-            style={{ width: "100%", padding: "14px 16px", borderRadius: "12px", border: "1px solid var(--border-color)", background: "var(--bg-secondary)", color: "var(--text-primary)", fontSize: "0.95rem", outline: "none", boxSizing: "border-box" }}
-          />
+          {heightUnit === "cm" ? (
+            <input 
+              type="number" 
+              value={height}
+              onChange={(e) => { setHeight(e.target.value); setErrors({ ...errors, height: undefined }); }}
+              placeholder="e.g. 175"
+              style={{ width: "100%", padding: "14px 16px", borderRadius: "12px", border: errors.height ? "1px solid #ef4444" : "1px solid var(--border-color)", background: "var(--bg-secondary)", color: "var(--text-primary)", fontSize: "0.95rem", outline: "none", boxSizing: "border-box" }}
+            />
+          ) : (
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <div style={{ flex: 1, display: 'flex', alignItems: 'center', background: 'var(--bg-secondary)', borderRadius: '12px', border: errors.height ? "1px solid #ef4444" : "1px solid var(--border-color)", paddingRight: '16px' }}>
+                <input 
+                  type="number" 
+                  min="0" 
+                  placeholder="ft" 
+                  style={{ width: '100%', background: 'transparent', border: 'none', padding: '14px 16px', outline: 'none', color: 'var(--text-primary)', fontSize: '0.95rem' }} 
+                  value={heightFt} 
+                  onChange={e => { setHeightFt(e.target.value); setErrors({ ...errors, height: undefined }); }} 
+                />
+                <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: 600 }}>ft</span>
+              </div>
+              <div style={{ flex: 1, display: 'flex', alignItems: 'center', background: 'var(--bg-secondary)', borderRadius: '12px', border: errors.height ? "1px solid #ef4444" : "1px solid var(--border-color)", paddingRight: '16px' }}>
+                <input 
+                  type="number" 
+                  min="0" 
+                  max="11" 
+                  placeholder="in" 
+                  style={{ width: '100%', background: 'transparent', border: 'none', padding: '14px 16px', outline: 'none', color: 'var(--text-primary)', fontSize: '0.95rem' }} 
+                  value={heightIn} 
+                  onChange={e => { setHeightIn(e.target.value); setErrors({ ...errors, height: undefined }); }} 
+                />
+                <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem', fontWeight: 600 }}>in</span>
+              </div>
+            </div>
+          )}
+          {errors.height && <span style={{ color: "#ef4444", fontSize: "0.75rem", fontWeight: 600, display: "block", marginTop: "6px" }}>{errors.height}</span>}
         </div>
 
         {/* Action Button */}
