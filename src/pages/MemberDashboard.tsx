@@ -1617,7 +1617,14 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
                         </label>
                         {latestBmiPhoto && (
                           <button
-                            onClick={() => window.open(latestBmiPhoto.reportImageUrl.startsWith("http") ? latestBmiPhoto.reportImageUrl : `http://localhost:5000${latestBmiPhoto.reportImageUrl}`, "_blank")}
+                            onClick={() => {
+                              const url = latestBmiPhoto.reportImageUrl.startsWith("http") ? latestBmiPhoto.reportImageUrl : `http://localhost:5000${latestBmiPhoto.reportImageUrl}`;
+                              // Cloudinary free tier blocks inline PDF viewing. By changing the extension to .jpg, Cloudinary automatically renders it as an image.
+                              const finalUrl = (url.toLowerCase().endsWith(".pdf") && url.includes("cloudinary.com")) 
+                                ? url.replace(/\.pdf$/i, ".jpg") 
+                                : url;
+                              window.open(finalUrl, "_blank");
+                            }}
                             style={{ background: "var(--bg-hover)", border: "none", padding: "6px", borderRadius: "6px", color: "var(--text-muted)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.2s" }}
                             onMouseOver={(e) => e.currentTarget.style.background = "var(--border-color)"}
                             onMouseOut={(e) => e.currentTarget.style.background = "var(--bg-hover)"}
