@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { LogOut, Activity, Dumbbell, BarChart3, Clock, Play, Square, Loader, Menu, X, Moon, Sun, LayoutDashboard, CreditCard, ChevronRight, CheckCircle2, User, KeyRound, Sparkles, ShoppingCart, FileText, Target, ClipboardList, TrendingUp, ShieldCheck, PenLine, Eye, Trash2, BookOpen, UserCheck, Calendar, Salad, Ruler, ChevronDown, ChevronUp, Flame, Upload, Download } from "lucide-react";
+import { LogOut, Activity, Dumbbell, BarChart3, Clock, Play, Square, Loader, Menu, X, Moon, Sun, LayoutDashboard, CreditCard, ChevronRight, CheckCircle2, User, KeyRound, Sparkles, ShoppingCart, FileText, Target, ClipboardList, TrendingUp, ShieldCheck, PenLine, Eye, Trash2, BookOpen, UserCheck, Calendar, Salad, Ruler, ChevronDown, ChevronUp, Flame, Upload, Download, CheckCircle } from "lucide-react";
 import UserProfileModal from "../components/UserProfileModal/UserProfileModal";
 import PurchaseAICreditsModal from "../components/PurchaseAICreditsModal/PurchaseAICreditsModal";
 import ConfirmationModal from "../components/ConfirmationModal/ConfirmationModal";
@@ -12,7 +12,7 @@ import { showSnackbar } from "../redux/slices/snackbarSlice";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { getWeeklyStatsApi, getStreakStatsApi, completeChallengeApi } from "../services/apis/memberApis";
 import { getLatestBmiReportApi, uploadBmiReportApi } from "../services/apis/bmiApis";
-import { getMemberDietHistoryApi, generateDietPlanApi, generateDietPlanFromWorkoutApi } from "../services/apis/dietApis";
+import { getMemberDietHistoryApi, generateDietPlanApi, generateDietPlanFromWorkoutApi, createManualDietPlanApi } from "../services/apis/dietApis";
 import WorkoutLibraryPage from "../components/WorkoutLibrary/WorkoutLibraryPage";
 import {
   fetchMemberPtInfoAction,
@@ -41,6 +41,16 @@ const DEFAULT_WORKOUTS = [
   { _id: "def_forearm_1", name: "Wrist Curls", bodyPart: "Forearm" }
 ];
 
+export const genericDietPlan = [
+  { dayNumber: 1, calories: 2000, protein: 120, carbs: 220, fats: 60, breakfast: "Oatmeal with fruits", morningSnack: "1 Apple", lunch: "Chicken breast with rice", eveningSnack: "Greek yogurt", dinner: "Salmon with veggies", bedtimeSnack: "Milk" },
+  { dayNumber: 2, calories: 2050, protein: 125, carbs: 230, fats: 55, breakfast: "Scrambled eggs", morningSnack: "Almonds", lunch: "Tuna salad", eveningSnack: "Protein shake", dinner: "Steak and sweet potato", bedtimeSnack: "Cottage cheese" },
+  { dayNumber: 3, calories: 1950, protein: 115, carbs: 210, fats: 58, breakfast: "Smoothie bowl", morningSnack: "Banana", lunch: "Turkey wrap", eveningSnack: "Mixed nuts", dinner: "Grilled chicken salad", bedtimeSnack: "Herbal tea" },
+  { dayNumber: 4, calories: 2100, protein: 130, carbs: 240, fats: 62, breakfast: "Pancakes", morningSnack: "Berries", lunch: "Beef bowl", eveningSnack: "Cheese stick", dinner: "Shrimp pasta", bedtimeSnack: "Yogurt" },
+  { dayNumber: 5, calories: 2000, protein: 120, carbs: 220, fats: 60, breakfast: "Toast with avocado", morningSnack: "Orange", lunch: "Chicken quinoa", eveningSnack: "Hummus and carrots", dinner: "Pork chops", bedtimeSnack: "Milk" },
+  { dayNumber: 6, calories: 2150, protein: 135, carbs: 250, fats: 65, breakfast: "Waffles", morningSnack: "Protein bar", lunch: "Burger (no bun)", eveningSnack: "Trail mix", dinner: "Fish tacos", bedtimeSnack: "Cheese" },
+  { dayNumber: 7, calories: 1900, protein: 110, carbs: 200, fats: 55, breakfast: "Fruit salad", morningSnack: "Yogurt", lunch: "Vegetable soup", eveningSnack: "Almonds", dinner: "Grilled tofu", bedtimeSnack: "Tea" },
+];
+
 interface Props {
   userName: string;
   onLogout: () => void;
@@ -55,6 +65,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
   const ptState = useAppSelector((s) => s.pt);
   const [activeTab, setActiveTab] = useState<Tab>("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarDietExpanded, setSidebarDietExpanded] = useState(false);
   const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains("dark-theme"));
   const [showChangePassword, setShowChangePassword] = useState(false);
 
@@ -108,6 +119,13 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
   const [loadingDiet, setLoadingDiet] = useState(false);
   const [uploadingBmi, setUploadingBmi] = useState(false);
   const [isGeneratingDiet, setIsGeneratingDiet] = useState(false);
+  const [selectedDietDay, setSelectedDietDay] = useState(1);
+  const [selectedGenericDay, setSelectedGenericDay] = useState(1);
+  const [expandedMainSections, setExpandedMainSections] = useState({
+    normalDiet: true,
+    aiDiet: false
+  });
+
   const [dietGoal, setDietGoal] = useState("Weight Loss");
   const [showAiModal, setShowAiModal] = useState(false);
 
@@ -270,6 +288,38 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
   };
 
 
+
+  const handleLoadSamplePlan = async () => {
+    try {
+      setLoadingDiet(true);
+      const dummyDays = Array.from({ length: 7 }).map((_, i) => ({
+        dayNumber: i + 1,
+        calories: 2200 + i * 10,
+        protein: 150,
+        carbs: 200,
+        fats: 60,
+        water: 3,
+        morningSnack: "1 apple, handful of almonds",
+        breakfast: "3 scrambled eggs, 2 slices of whole wheat toast",
+        lunch: "Grilled chicken breast, quinoa, steamed broccoli",
+        eveningSnack: "Protein shake, 1 banana",
+        dinner: "Salmon, sweet potato, asparagus",
+        bedtimeSnack: "Cottage cheese, berries"
+      }));
+
+      await createManualDietPlanApi({
+        days: dummyDays,
+        planType: "MANUAL"
+      });
+      
+      dispatch(showSnackbar({ message: "Sample diet plan loaded!", type: "success" }));
+      fetchDietData();
+    } catch (error) {
+      dispatch(showSnackbar({ message: "Failed to load sample plan", type: "error" }));
+    } finally {
+      setLoadingDiet(false);
+    }
+  };
 
   const handleDownloadReport = async (url: string) => {
     try {
@@ -1123,17 +1173,84 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
         {/* Nav */}
         <nav style={{ flex: 1, display: "flex", flexDirection: "column" }}>
           <ul className="sidebar-menu">
-            {navItems.map(({ id, label, icon: Icon }) => (
-              <li key={id}>
-                <a
-                  className={`sidebar-menu-item ${activeTab === id ? "active" : ""}`}
-                  onClick={() => { setActiveTab(id); setSidebarOpen(false); }}
-                >
-                  <Icon size={20} />
-                  <span>{label}</span>
-                </a>
-              </li>
-            ))}
+            {navItems.map(({ id, label, icon: Icon }) => {
+              if (id === "diet") {
+                return (
+                  <li key={id} style={{ display: "flex", flexDirection: "column" }}>
+                    <a
+                      className={`sidebar-menu-item ${activeTab === id ? "active" : ""}`}
+                      onClick={() => setSidebarDietExpanded(!sidebarDietExpanded)}
+                      style={{ justifyContent: "space-between", cursor: "pointer" }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                        <Icon size={20} />
+                        <span>{label}</span>
+                      </div>
+                      {sidebarDietExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                    </a>
+                    {sidebarDietExpanded && (
+                      <div style={{ display: "flex", flexDirection: "column", paddingLeft: "42px", gap: "4px", marginTop: "4px", marginBottom: "8px" }}>
+                        <a
+                          style={{
+                            padding: "8px 12px",
+                            borderRadius: "8px",
+                            cursor: "pointer",
+                            fontSize: "0.9rem",
+                            fontWeight: 600,
+                            color: activeTab === "diet" && expandedMainSections.normalDiet ? "var(--primary)" : "var(--text-secondary)",
+                            background: activeTab === "diet" && expandedMainSections.normalDiet ? "rgba(99, 102, 241, 0.1)" : "transparent",
+                            transition: "all 0.2s"
+                          }}
+                          onClick={() => {
+                            setActiveTab("diet");
+                            setExpandedMainSections({ normalDiet: true, aiDiet: false });
+                            setSidebarOpen(false);
+                          }}
+                          onMouseOver={(e) => e.currentTarget.style.color = "var(--primary)"}
+                          onMouseOut={(e) => e.currentTarget.style.color = activeTab === "diet" && expandedMainSections.normalDiet ? "var(--primary)" : "var(--text-secondary)"}
+                        >
+                          Normal Diet Plan
+                        </a>
+                        <a
+                          style={{
+                            padding: "8px 12px",
+                            borderRadius: "8px",
+                            cursor: "pointer",
+                            fontSize: "0.9rem",
+                            fontWeight: 600,
+                            color: activeTab === "diet" && expandedMainSections.aiDiet ? "var(--primary)" : "var(--text-secondary)",
+                            background: activeTab === "diet" && expandedMainSections.aiDiet ? "rgba(99, 102, 241, 0.1)" : "transparent",
+                            transition: "all 0.2s"
+                          }}
+                          onClick={() => {
+                            setActiveTab("diet");
+                            setExpandedMainSections({ normalDiet: false, aiDiet: true });
+                            setSidebarOpen(false);
+                          }}
+                          onMouseOver={(e) => e.currentTarget.style.color = "var(--primary)"}
+                          onMouseOut={(e) => e.currentTarget.style.color = activeTab === "diet" && expandedMainSections.aiDiet ? "var(--primary)" : "var(--text-secondary)"}
+                        >
+                          Premium Diet Plan
+                        </a>
+                      </div>
+                    )}
+                  </li>
+                );
+              }
+
+              return (
+                <li key={id}>
+                  <a
+                    className={`sidebar-menu-item ${activeTab === id ? "active" : ""}`}
+                    onClick={() => { setActiveTab(id); setSidebarOpen(false); }}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <Icon size={20} />
+                    <span>{label}</span>
+                  </a>
+                </li>
+              );
+            })}
           </ul>
         </nav>
 
@@ -1236,6 +1353,126 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
         <div style={{ display: "flex", justifyContent: "center", padding: "40px" }}><Loader size={32} style={{ animation: "spin 1s linear infinite", color: "var(--primary)" }} /></div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+
+          {/* 1. Normal Diet Plan (Free) Accordion */}
+          <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: "20px", overflow: "hidden", boxShadow: "0 4px 12px rgba(0,0,0,0.03)" }}>
+            <div 
+              onClick={() => setExpandedMainSections(p => ({ ...p, normalDiet: !p.normalDiet }))}
+              style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "24px 32px", cursor: "pointer", background: "var(--bg-secondary)", transition: "background 0.2s" }}
+              onMouseOver={(e) => e.currentTarget.style.background = "var(--bg-hover)"}
+              onMouseOut={(e) => e.currentTarget.style.background = "var(--bg-secondary)"}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+                <div style={{ background: "rgba(16, 185, 129, 0.1)", color: "#10b981", padding: "12px", borderRadius: "12px" }}>
+                  <CheckCircle size={24} />
+                </div>
+                <h3 style={{ fontSize: "1.3rem", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>Normal Diet Plan (Free)</h3>
+              </div>
+              {expandedMainSections.normalDiet ? <ChevronUp size={24} color="var(--text-muted)" /> : <ChevronDown size={24} color="var(--text-muted)" />}
+            </div>
+            {expandedMainSections.normalDiet && (
+              <div style={{ padding: "32px", borderTop: "1px solid var(--border-color)" }}>
+                <div style={{ marginBottom: "24px" }}>
+                  <div style={{ display: "flex", gap: "8px", overflowX: "auto", marginBottom: "24px", paddingBottom: "8px", msOverflowStyle: "none", scrollbarWidth: "none" }}>
+                    {genericDietPlan.map((day: any, i: number) => {
+                      const dayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+                      const label = dayLabels[i];
+                      const isSelected = selectedGenericDay === day.dayNumber;
+                      return (
+                        <button
+                          key={day.dayNumber}
+                          onClick={() => setSelectedGenericDay(day.dayNumber)}
+                          style={{
+                            padding: "12px 24px",
+                            borderRadius: "16px",
+                            border: "none",
+                            background: isSelected ? "#2d3748" : "var(--bg-secondary)",
+                            color: isSelected ? "#fff" : "var(--text-primary)",
+                            fontWeight: 700,
+                            cursor: "pointer",
+                            minWidth: "80px",
+                            transition: "all 0.2s",
+                            boxShadow: isSelected ? "0 4px 12px rgba(0,0,0,0.1)" : "none"
+                          }}
+                        >
+                          {label}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {genericDietPlan.filter((d: any) => d.dayNumber === selectedGenericDay).map((day: any) => (
+                    <div key={day.dayNumber}>
+                      {/* Macros */}
+                      <div style={{ display: "flex", gap: "12px", marginBottom: "24px", flexWrap: "wrap" }}>
+                        <div style={{ background: "var(--bg-secondary)", padding: "12px 16px", borderRadius: "12px", border: "1px solid var(--border-color)", display: "flex", flexDirection: "column", flex: 1, minWidth: "120px" }}>
+                          <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 700, marginBottom: "4px" }}>Calories</span>
+                          <span style={{ fontSize: "1.1rem", fontWeight: 800, color: "#f59e0b" }}>🔥 {day.calories}</span>
+                        </div>
+                        <div style={{ background: "var(--bg-secondary)", padding: "12px 16px", borderRadius: "12px", border: "1px solid var(--border-color)", display: "flex", flexDirection: "column", flex: 1, minWidth: "120px" }}>
+                          <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 700, marginBottom: "4px" }}>Protein</span>
+                          <span style={{ fontSize: "1.1rem", fontWeight: 800, color: "#3b82f6" }}>🥩 {day.protein}g</span>
+                        </div>
+                        <div style={{ background: "var(--bg-secondary)", padding: "12px 16px", borderRadius: "12px", border: "1px solid var(--border-color)", display: "flex", flexDirection: "column", flex: 1, minWidth: "120px" }}>
+                          <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 700, marginBottom: "4px" }}>Carbs</span>
+                          <span style={{ fontSize: "1.1rem", fontWeight: 800, color: "#10b981" }}>🍞 {day.carbs}g</span>
+                        </div>
+                        <div style={{ background: "var(--bg-secondary)", padding: "12px 16px", borderRadius: "12px", border: "1px solid var(--border-color)", display: "flex", flexDirection: "column", flex: 1, minWidth: "120px" }}>
+                          <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 700, marginBottom: "4px" }}>Fats</span>
+                          <span style={{ fontSize: "1.1rem", fontWeight: 800, color: "#8b5cf6" }}>🥑 {day.fats}g</span>
+                        </div>
+                      </div>
+
+                      {/* Meals Accordion */}
+                      <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                        {[
+                          { key: "morningSnack", label: "Morning Snacks", icon: "🥣" },
+                          { key: "breakfast", label: "Breakfast", icon: "🥛" },
+                          { key: "lunch", label: "Lunch", icon: "🍛" },
+                          { key: "eveningSnack", label: "Evening Snack", icon: "🥗" },
+                          { key: "dinner", label: "Dinner", icon: "🍗" },
+                          { key: "bedtimeSnack", label: "Bedtime", icon: "🥙" }
+                        ].filter(meal => day[meal.key]).map(meal => {
+                          return (
+                            <div key={meal.key} style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: "16px", padding: "16px 20px", display: "flex", flexDirection: "column", gap: "8px", boxShadow: "0 2px 4px rgba(0,0,0,0.02)" }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                                <div style={{ background: "var(--bg-secondary)", padding: "10px", borderRadius: "12px", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
+                                  <span style={{ fontSize: "1.5rem", display: "flex" }}>{meal.icon}</span>
+                                </div>
+                                <span style={{ fontWeight: 700, color: "var(--text-primary)", fontSize: "1.1rem" }}>{meal.label}</span>
+                              </div>
+                              <div style={{ paddingLeft: "58px", color: "var(--text-secondary)", fontSize: "0.95rem", lineHeight: 1.5 }}>
+                                {day[meal.key]}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* 2. AI Based Diet Plan (Premium) Accordion */}
+          <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: "20px", overflow: "hidden", boxShadow: "0 4px 12px rgba(0,0,0,0.03)" }}>
+            <div 
+              onClick={() => setExpandedMainSections(p => ({ ...p, aiDiet: !p.aiDiet }))}
+              style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "24px 32px", cursor: "pointer", background: "var(--bg-secondary)", transition: "background 0.2s" }}
+              onMouseOver={(e) => e.currentTarget.style.background = "var(--bg-hover)"}
+              onMouseOut={(e) => e.currentTarget.style.background = "var(--bg-secondary)"}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+                <div style={{ background: "rgba(99, 102, 241, 0.1)", color: "#6366f1", padding: "12px", borderRadius: "12px" }}>
+                  <Sparkles size={24} />
+                </div>
+                <h3 style={{ fontSize: "1.3rem", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>AI Based Diet Plan (Premium)</h3>
+              </div>
+              {expandedMainSections.aiDiet ? <ChevronUp size={24} color="var(--text-muted)" /> : <ChevronDown size={24} color="var(--text-muted)" />}
+            </div>
+            {expandedMainSections.aiDiet && (
+              <div style={{ padding: "32px", borderTop: "1px solid var(--border-color)", display: "flex", flexDirection: "column", gap: "24px" }}>
 
           {/* Hero Banner */}
           <div style={{ background: "var(--bg-card)", borderRadius: "20px", padding: "32px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", position: "relative", overflow: "hidden", border: "1px solid var(--border-color)", boxShadow: "0 2px 10px rgba(139, 92, 246, 0.05)" }}>
@@ -1464,26 +1701,83 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
                   )}
                 </div>
 
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "16px" }}>
-                  {dietPlans[0].days.map((day: any) => (
-                    <div key={day.dayNumber} style={{ background: "var(--bg-secondary)", padding: "20px", borderRadius: "12px", border: "1px solid var(--border-color)", boxShadow: "0 2px 4px rgba(0,0,0,0.02)" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--border-color)", paddingBottom: "12px", marginBottom: "16px" }}>
-                        <h4 style={{ color: "#4f46e5", fontWeight: 800, fontSize: "1.1rem", margin: 0 }}>Day {day.dayNumber}</h4>
-                        <div style={{ fontSize: "0.75rem", display: "flex", gap: "8px", fontWeight: 700, color: "var(--text-muted)", flexWrap: "wrap", background: "var(--bg-hover)", padding: "4px 8px", borderRadius: "6px" }}>
-                          <span title="Calories">🔥 {day.calories} kcal</span>
-                          <span title="Protein">🥩 {day.protein}g P</span>
-                          <span title="Carbs">🍞 {day.carbs}g C</span>
-                          <span title="Fats">🥑 {day.fats}g F</span>
+                <div style={{ marginBottom: "24px" }}>
+                  {dietPlans[0].days.length > 1 && (
+                    <div style={{ display: "flex", gap: "8px", overflowX: "auto", marginBottom: "24px", paddingBottom: "8px", msOverflowStyle: "none", scrollbarWidth: "none" }}>
+                      {dietPlans[0].days.map((day: any, i: number) => {
+                        const dayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+                        const label = dietPlans[0].days.length === 7 ? dayLabels[i] : `Day ${day.dayNumber}`;
+                        const isSelected = selectedDietDay === day.dayNumber;
+                        return (
+                          <button
+                            key={day.dayNumber}
+                            onClick={() => setSelectedDietDay(day.dayNumber)}
+                            style={{
+                              padding: "12px 24px",
+                              borderRadius: "16px",
+                              border: "none",
+                              background: isSelected ? "#2d3748" : "var(--bg-secondary)",
+                              color: isSelected ? "#fff" : "var(--text-primary)",
+                              fontWeight: 700,
+                              cursor: "pointer",
+                              minWidth: "80px",
+                              transition: "all 0.2s",
+                              boxShadow: isSelected ? "0 4px 12px rgba(0,0,0,0.1)" : "none"
+                            }}
+                          >
+                            {label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {dietPlans[0].days.filter((d: any) => d.dayNumber === selectedDietDay).map((day: any) => (
+                    <div key={day.dayNumber}>
+                      {/* Macros */}
+                      <div style={{ display: "flex", gap: "12px", marginBottom: "24px", flexWrap: "wrap" }}>
+                        <div style={{ background: "var(--bg-secondary)", padding: "12px 16px", borderRadius: "12px", border: "1px solid var(--border-color)", display: "flex", flexDirection: "column", flex: 1, minWidth: "120px" }}>
+                          <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 700, marginBottom: "4px" }}>Calories</span>
+                          <span style={{ fontSize: "1.1rem", fontWeight: 800, color: "#f59e0b" }}>🔥 {day.calories}</span>
+                        </div>
+                        <div style={{ background: "var(--bg-secondary)", padding: "12px 16px", borderRadius: "12px", border: "1px solid var(--border-color)", display: "flex", flexDirection: "column", flex: 1, minWidth: "120px" }}>
+                          <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 700, marginBottom: "4px" }}>Protein</span>
+                          <span style={{ fontSize: "1.1rem", fontWeight: 800, color: "#3b82f6" }}>🥩 {day.protein}g</span>
+                        </div>
+                        <div style={{ background: "var(--bg-secondary)", padding: "12px 16px", borderRadius: "12px", border: "1px solid var(--border-color)", display: "flex", flexDirection: "column", flex: 1, minWidth: "120px" }}>
+                          <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 700, marginBottom: "4px" }}>Carbs</span>
+                          <span style={{ fontSize: "1.1rem", fontWeight: 800, color: "#10b981" }}>🍞 {day.carbs}g</span>
+                        </div>
+                        <div style={{ background: "var(--bg-secondary)", padding: "12px 16px", borderRadius: "12px", border: "1px solid var(--border-color)", display: "flex", flexDirection: "column", flex: 1, minWidth: "120px" }}>
+                          <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 700, marginBottom: "4px" }}>Fats</span>
+                          <span style={{ fontSize: "1.1rem", fontWeight: 800, color: "#8b5cf6" }}>🥑 {day.fats}g</span>
                         </div>
                       </div>
 
-                      <div style={{ fontSize: "0.85rem", display: "flex", flexDirection: "column", gap: "12px" }}>
-                        {day.breakfast && <div><strong style={{ color: "var(--text-primary)", display: "block", marginBottom: "2px" }}>Breakfast</strong> <span style={{ color: "var(--text-secondary)", lineHeight: 1.4 }}>{day.breakfast}</span></div>}
-                        {day.morningSnack && <div><strong style={{ color: "var(--text-primary)", display: "block", marginBottom: "2px" }}>Morning Snack</strong> <span style={{ color: "var(--text-secondary)", lineHeight: 1.4 }}>{day.morningSnack}</span></div>}
-                        {day.lunch && <div><strong style={{ color: "var(--text-primary)", display: "block", marginBottom: "2px" }}>Lunch</strong> <span style={{ color: "var(--text-secondary)", lineHeight: 1.4 }}>{day.lunch}</span></div>}
-                        {day.eveningSnack && <div><strong style={{ color: "var(--text-primary)", display: "block", marginBottom: "2px" }}>Evening Snack</strong> <span style={{ color: "var(--text-secondary)", lineHeight: 1.4 }}>{day.eveningSnack}</span></div>}
-                        {day.dinner && <div><strong style={{ color: "var(--text-primary)", display: "block", marginBottom: "2px" }}>Dinner</strong> <span style={{ color: "var(--text-secondary)", lineHeight: 1.4 }}>{day.dinner}</span></div>}
-                        {day.bedtimeSnack && <div><strong style={{ color: "var(--text-primary)", display: "block", marginBottom: "2px" }}>Bedtime</strong> <span style={{ color: "var(--text-secondary)", lineHeight: 1.4 }}>{day.bedtimeSnack}</span></div>}
+                      {/* Meals Accordion */}
+                      <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                        {[
+                          { key: "morningSnack", label: "Morning Snacks", icon: "🥣" },
+                          { key: "breakfast", label: "Breakfast", icon: "🥛" },
+                          { key: "lunch", label: "Lunch", icon: "🍛" },
+                          { key: "eveningSnack", label: "Evening Snack", icon: "🥗" },
+                          { key: "dinner", label: "Dinner", icon: "🍗" },
+                          { key: "bedtimeSnack", label: "Bedtime", icon: "🥙" }
+                        ].filter(meal => day[meal.key]).map(meal => {
+                          return (
+                            <div key={meal.key} style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: "16px", padding: "16px 20px", display: "flex", flexDirection: "column", gap: "8px", boxShadow: "0 2px 4px rgba(0,0,0,0.02)" }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                                <div style={{ background: "var(--bg-secondary)", padding: "10px", borderRadius: "12px", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
+                                  <span style={{ fontSize: "1.5rem", display: "flex" }}>{meal.icon}</span>
+                                </div>
+                                <span style={{ fontWeight: 700, color: "var(--text-primary)", fontSize: "1.1rem" }}>{meal.label}</span>
+                              </div>
+                              <div style={{ paddingLeft: "58px", color: "var(--text-secondary)", fontSize: "0.95rem", lineHeight: 1.5 }}>
+                                {day[meal.key]}
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
                     </div>
                   ))}
@@ -1494,14 +1788,27 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
                 <img src="/empty_diet_plan_illustration.png" alt="No Diet Plan" style={{ width: "180px", marginBottom: "24px", opacity: 0.9, filter: "drop-shadow(0 10px 15px rgba(0,0,0,0.05))" }} />
                 <h4 style={{ fontSize: "1.3rem", fontWeight: 800, color: "var(--text-primary)", marginBottom: "8px", margin: 0 }}>No Diet Plan Yet</h4>
                 <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem", marginBottom: "24px", fontWeight: 500 }}>Generate your first AI diet plan to view it here.</p>
-                <button
-                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                  style={{ background: "var(--bg-secondary)", border: "2px solid #6366f1", color: "#6366f1", padding: "10px 24px", borderRadius: "12px", fontWeight: 700, cursor: "pointer", fontSize: "0.9rem", transition: "all 0.2s", boxShadow: "0 4px 12px rgba(99,102,241,0.1)" }}
-                  onMouseOver={(e) => { e.currentTarget.style.background = "var(--bg-hover)"; e.currentTarget.style.transform = "translateY(-2px)" }}
-                  onMouseOut={(e) => { e.currentTarget.style.background = "var(--bg-secondary)"; e.currentTarget.style.transform = "translateY(0)" }}
-                >
-                  Generate Your Plan
-                </button>
+                <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", justifyContent: "center" }}>
+                  <button
+                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                    style={{ background: "var(--bg-secondary)", border: "2px solid #6366f1", color: "#6366f1", padding: "10px 24px", borderRadius: "12px", fontWeight: 700, cursor: "pointer", fontSize: "0.9rem", transition: "all 0.2s", boxShadow: "0 4px 12px rgba(99,102,241,0.1)" }}
+                    onMouseOver={(e) => { e.currentTarget.style.background = "var(--bg-hover)"; e.currentTarget.style.transform = "translateY(-2px)" }}
+                    onMouseOut={(e) => { e.currentTarget.style.background = "var(--bg-secondary)"; e.currentTarget.style.transform = "translateY(0)" }}
+                  >
+                    Generate Your Plan
+                  </button>
+                  <button
+                    onClick={handleLoadSamplePlan}
+                    style={{ background: "#f59e0b", border: "2px solid #f59e0b", color: "#fff", padding: "10px 24px", borderRadius: "12px", fontWeight: 700, cursor: "pointer", fontSize: "0.9rem", transition: "all 0.2s", boxShadow: "0 4px 12px rgba(245, 158, 11, 0.2)" }}
+                    onMouseOver={(e) => { e.currentTarget.style.transform = "translateY(-2px)" }}
+                    onMouseOut={(e) => { e.currentTarget.style.transform = "translateY(0)" }}
+                  >
+                    Load Sample Layout
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
               </div>
             )}
           </div>

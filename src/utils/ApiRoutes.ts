@@ -53,5 +53,6 @@ export const apiRoutes = {
   bmiLatest: "/bmi/latest",
   dietGenerate: "/diet/generate",
   dietGenerateFromWorkout: "/diet/generate-from-workout",
+  dietManual: "/diet/manual",
   dietMember: "/diet/member",
 } as const;

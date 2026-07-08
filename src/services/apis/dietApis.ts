@@ -12,3 +12,7 @@ export const generateDietPlanFromWorkoutApi = async (data: { age: number; height
 export const getMemberDietHistoryApi = async (memberId: string) => {
   return await AxiosInstance.get(`${apiRoutes.dietMember}/${memberId}`);
 };
+
+export const createManualDietPlanApi = async (data: any) => {
+  return await AxiosInstance.post(apiRoutes.dietManual, data);
+};
