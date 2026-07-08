@@ -1589,8 +1589,14 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
                     {/* Latest BMI Report Card */}
                     <div style={{ background: "var(--bg-secondary)", padding: "12px 16px", borderRadius: "12px", display: "flex", alignItems: "center", gap: "12px", border: "1px solid var(--border-color)", boxShadow: "0 2px 4px rgba(0,0,0,0.02)", minWidth: "320px", width: "fit-content", position: "relative" }}>
                       {latestBmiPhoto ? (
-                        <div style={{ width: "36px", height: "36px", borderRadius: "8px", overflow: "hidden", border: "1px solid var(--border-color)", flexShrink: 0 }}>
-                          <img src={latestBmiPhoto.reportImageUrl.startsWith("http") ? latestBmiPhoto.reportImageUrl : `http://localhost:5000${latestBmiPhoto.reportImageUrl}`} alt="BMI Report" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                        <div style={{ width: "36px", height: "36px", borderRadius: "8px", overflow: "hidden", border: "1px solid var(--border-color)", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg-card)" }}>
+                          {latestBmiPhoto.reportImageUrl.toLowerCase().endsWith(".pdf") ? (
+                            <FileText size={20} color="#ef4444" />
+                          ) : latestBmiPhoto.reportImageUrl.toLowerCase().endsWith(".csv") || latestBmiPhoto.reportImageUrl.toLowerCase().includes(".xls") ? (
+                            <FileText size={20} color="#10b981" />
+                          ) : (
+                            <img src={latestBmiPhoto.reportImageUrl.startsWith("http") ? latestBmiPhoto.reportImageUrl : `http://localhost:5000${latestBmiPhoto.reportImageUrl}`} alt="BMI Report" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                          )}
                         </div>
                       ) : (
                         <div style={{ background: "rgba(16, 185, 129, 0.15)", padding: "8px", borderRadius: "8px", color: "#10b981", flexShrink: 0 }}>
