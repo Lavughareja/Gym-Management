@@ -72,6 +72,75 @@ const WorkoutLibraryPage: React.FC = () => {
   const [videosLoading, setVideosLoading] = useState(false);
   const [playingVideo, setPlayingVideo] = useState<VideoItem | null>(null);
 
+  // New states for the top panel
+  const todayName = new Date().toLocaleDateString('en-US', { weekday: 'long' });
+  const [selectedDay, setSelectedDay] = useState(todayName);
+  const [selectedPlanItem, setSelectedPlanItem] = useState("");
+  
+  // Calculate current week's dates
+  const weekDays = React.useMemo(() => {
+    const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+    const now = new Date();
+    const currentDay = now.getDay();
+    const distanceToMonday = currentDay === 0 ? -6 : 1 - currentDay;
+    
+    const mondayDate = new Date(now);
+    mondayDate.setDate(now.getDate() + distanceToMonday);
+    
+    return days.map((dayName, index) => {
+      const d = new Date(mondayDate);
+      d.setDate(mondayDate.getDate() + index);
+      const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      return { dayName, dateStr };
+    });
+  }, []);
+
+  const WORKOUT_PLAN: Record<string, string[]> = {
+    "Monday": ["Chest", "Triceps"],
+    "Tuesday": ["Back", "Biceps"],
+    "Wednesday": ["Legs"],
+    "Thursday": ["Shoulders", "Abs"],
+    "Friday": ["Arms", "Forearms"],
+    "Saturday": ["Cardio"],
+    "Sunday": ["Rest"]
+  };
+
+  // Reset plan item when day changes
+  useEffect(() => {
+    setSelectedPlanItem("");
+    setSelectedCat(null);
+    setVideos([]);
+  }, [selectedDay]);
+
+  const handlePlanSelection = (item: string) => {
+    setSelectedPlanItem(item);
+    if (!item || item === "Rest") {
+      setSelectedCat(null);
+      setVideos([]);
+      return;
+    }
+    
+    // Try to find a category that matches 'item' loosely
+    const match = categories.find(c => 
+      c.name.toLowerCase().includes(item.toLowerCase()) || 
+      item.toLowerCase().includes(c.name.toLowerCase())
+    );
+    
+    if (match) {
+      loadCategory(match);
+    } else {
+      // Create a dummy category to show "No Exercises Yet"
+      setSelectedCat({
+        _id: "dummy-" + item,
+        name: item,
+        coverImage: "",
+        description: `Workout videos for ${item} are not uploaded yet.`,
+        videoCount: 0
+      });
+      setVideos([]);
+    }
+  };
+
   const loadCategories = async () => {
     setLoading(true);
     try {
@@ -124,6 +193,86 @@ const WorkoutLibraryPage: React.FC = () => {
           </p>
         </div>
       </header>
+
+      {/* ── Daily Planner Panel ────────────────────────────────────────────── */}
+      <div style={{ 
+        display: "flex", 
+        flexWrap: "wrap", 
+        justifyContent: "space-between", 
+        alignItems: "center", 
+        marginBottom: 24, 
+        background: "var(--bg-primary)", 
+        padding: "16px 20px", 
+        borderRadius: 16, 
+        border: "1px solid var(--border-color)",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.02)",
+        gap: 16
+      }}>
+        {/* Left Side: Days */}
+        <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 4, flex: "1 1 auto" }} className="hide-scrollbar">
+          {weekDays.map(({ dayName, dateStr }) => (
+            <button
+              key={dayName}
+              onClick={() => setSelectedDay(dayName)}
+              style={{
+                padding: "8px 16px",
+                borderRadius: 12,
+                border: "none",
+                background: selectedDay === dayName ? "var(--primary)" : "var(--bg-secondary)",
+                color: selectedDay === dayName ? "#fff" : "var(--text-secondary)",
+                cursor: "pointer",
+                transition: "all 0.2s",
+                whiteSpace: "nowrap",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                minWidth: 90
+              }}
+            >
+              <span style={{ fontWeight: 600, fontSize: 14 }}>{dayName}</span>
+              <span style={{ fontSize: 11, opacity: selectedDay === dayName ? 0.9 : 0.6, marginTop: 2 }}>{dateStr}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Right Side: Category Dropdown */}
+        <div style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 12 }}>
+          <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text-secondary)" }}>
+            Workout for {selectedDay}:
+          </span>
+          <div style={{ position: "relative" }}>
+            <select
+              value={selectedPlanItem}
+              onChange={(e) => handlePlanSelection(e.target.value)}
+              style={{
+                padding: "10px 36px 10px 16px",
+                borderRadius: 12,
+                border: "1px solid var(--border-color)",
+                background: "var(--bg-secondary)",
+                color: "var(--text-primary)",
+                fontWeight: 600,
+                fontSize: 14,
+                appearance: "none",
+                outline: "none",
+                cursor: "pointer",
+                minWidth: 180
+              }}
+            >
+              <option value="">Select Workout...</option>
+              {WORKOUT_PLAN[selectedDay].map(workout => (
+                <option key={workout} value={workout}>{workout}</option>
+              ))}
+            </select>
+            {/* Custom dropdown arrow */}
+            <div style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "var(--text-muted)" }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m6 9 6 6 6-6"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* ── Category grid ──────────────────────────────────────────────────── */}
       {!selectedCat && (
@@ -413,6 +562,8 @@ const WorkoutLibraryPage: React.FC = () => {
         .workout-cat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.1) !important; }
         .workout-cat-card:hover .cat-hover-overlay { opacity: 1 !important; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
     </div>
   );
