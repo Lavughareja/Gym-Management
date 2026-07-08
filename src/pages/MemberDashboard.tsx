@@ -22,6 +22,7 @@ import {
 } from "../redux/actions/ptActions";
 import BMICalculator from "../components/BMICalculator/BMICalculator";
 import CaloriesCalculator from "../components/CaloriesCalculator/CaloriesCalculator";
+import WaterReminder from "../components/WaterReminder/WaterReminder";
 
 const DEFAULT_WORKOUTS = [
   { _id: "def_chest_1", name: "Bench Press", bodyPart: "Chest" },
@@ -2098,12 +2099,13 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
         <BMICalculator />
       ) : healthMonitorSection === "calories" ? (
         <CaloriesCalculator />
+      ) : healthMonitorSection === "water" ? (
+        <WaterReminder />
       ) : (
         <div className="gym-card" style={{ padding: "32px", textAlign: "center", minHeight: "300px", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <div>
             <ClipboardList size={48} style={{ color: "var(--border-color)", margin: "0 auto 16px" }} />
             <h3 style={{ fontSize: "1.2rem", fontWeight: 700, marginBottom: "8px" }}>
-              {healthMonitorSection === "water" && "Water Reminder Coming Soon"}
               {healthMonitorSection === "health_kit" && "Health Kit Integration Coming Soon"}
             </h3>
             <p style={{ color: "var(--text-muted)" }}>This feature is currently under development.</p>
