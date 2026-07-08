@@ -1257,7 +1257,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
                 <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                   <div style={{ display: "flex", gap: "16px" }}>
                     {/* Latest BMI Report Card */}
-                    <div style={{ background: "var(--bg-secondary)", padding: "12px 16px", borderRadius: "12px", display: "flex", alignItems: "center", gap: "12px", border: "1px solid var(--border-color)", boxShadow: "0 2px 4px rgba(0,0,0,0.02)", width: "260px", position: "relative" }}>
+                    <div style={{ background: "var(--bg-secondary)", padding: "12px 16px", borderRadius: "12px", display: "flex", alignItems: "center", gap: "12px", border: "1px solid var(--border-color)", boxShadow: "0 2px 4px rgba(0,0,0,0.02)", minWidth: "320px", width: "fit-content", position: "relative" }}>
                       {latestBmiPhoto ? (
                         <div style={{ width: "36px", height: "36px", borderRadius: "8px", overflow: "hidden", border: "1px solid var(--border-color)", flexShrink: 0 }}>
                           <img src={latestBmiPhoto.reportImageUrl.startsWith("http") ? latestBmiPhoto.reportImageUrl : `http://localhost:5000${latestBmiPhoto.reportImageUrl}`} alt="BMI Report" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
@@ -1268,7 +1268,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
                         </div>
                       )}
                       <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
-                        <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--text-primary)", marginBottom: "2px" }}>Latest BMI Report</span>
+                        <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--text-primary)", marginBottom: "2px", whiteSpace: "nowrap" }}>Latest BMI Report</span>
                         {latestBmiPhoto ? (
                           <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", fontWeight: 500 }}>Uploaded on <strong style={{ color: "var(--text-secondary)" }}>{new Date(latestBmiPhoto.createdAt).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" })}</strong></span>
                         ) : (
