@@ -20,6 +20,7 @@ import {
   fetchPtDietPlansAction,
   fetchPtMeasurementsAction,
 } from "../redux/actions/ptActions";
+import BMICalculator from "../components/BMICalculator/BMICalculator";
 
 const DEFAULT_WORKOUTS = [
   { _id: "def_chest_1", name: "Bench Press", bodyPart: "Chest" },
@@ -57,7 +58,7 @@ interface Props {
   gymName?: string;
 }
 
-type Tab = "overview" | "workouts" | "reports" | "plans" | "diet" | "library" | "pt" | "challenges";
+type Tab = "overview" | "health_monitor" | "workouts" | "reports" | "plans" | "diet" | "library" | "pt" | "challenges";
 
 export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName = "Trainix Gym" }) => {
   const dispatch = useAppDispatch();
@@ -66,6 +67,8 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
   const [activeTab, setActiveTab] = useState<Tab>("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarDietExpanded, setSidebarDietExpanded] = useState(false);
+  const [sidebarHealthExpanded, setSidebarHealthExpanded] = useState(false);
+  const [healthMonitorSection, setHealthMonitorSection] = useState<"bmi" | "calories" | "water" | "health_kit">("bmi");
   const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains("dark-theme"));
   const [showChangePassword, setShowChangePassword] = useState(false);
 
@@ -1154,6 +1157,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
 
   const navItems: { id: Tab; label: string; icon: React.FC<{ size?: number }> }[] = [
     { id: "overview",  label: "Overview",   icon: LayoutDashboard as any },
+    { id: "health_monitor", label: "Health Monitor", icon: ClipboardList as any },
     { id: "workouts",  label: "Workouts",   icon: Dumbbell as any },
     { id: "library",   label: "Workout Video",    icon: BookOpen as any },
     { id: "reports",   label: "Reports",    icon: BarChart3 as any },
@@ -1191,6 +1195,57 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
         <nav style={{ flex: 1, display: "flex", flexDirection: "column" }}>
           <ul className="sidebar-menu">
             {navItems.map(({ id, label, icon: Icon }) => {
+              if (id === "health_monitor") {
+                return (
+                  <li key={id} style={{ display: "flex", flexDirection: "column" }}>
+                    <a
+                      className={`sidebar-menu-item ${activeTab === id ? "active" : ""}`}
+                      onClick={() => setSidebarHealthExpanded(!sidebarHealthExpanded)}
+                      style={{ justifyContent: "space-between", cursor: "pointer" }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                        <Icon size={20} />
+                        <span>{label}</span>
+                      </div>
+                      {sidebarHealthExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                    </a>
+                    {sidebarHealthExpanded && (
+                      <div style={{ display: "flex", flexDirection: "column", paddingLeft: "42px", gap: "4px", marginTop: "4px", marginBottom: "8px" }}>
+                        {[
+                          { key: "bmi", label: "BMI" },
+                          { key: "calories", label: "Calories" },
+                          { key: "water", label: "Water Reminder" },
+                          { key: "health_kit", label: "Health Kit" }
+                        ].map(sub => (
+                          <a
+                            key={sub.key}
+                            style={{
+                              padding: "8px 12px",
+                              borderRadius: "8px",
+                              cursor: "pointer",
+                              fontSize: "0.9rem",
+                              fontWeight: 600,
+                              color: activeTab === "health_monitor" && healthMonitorSection === sub.key ? "var(--primary)" : "var(--text-secondary)",
+                              background: activeTab === "health_monitor" && healthMonitorSection === sub.key ? "rgba(99, 102, 241, 0.1)" : "transparent",
+                              transition: "all 0.2s"
+                            }}
+                            onClick={() => {
+                              setActiveTab("health_monitor");
+                              setHealthMonitorSection(sub.key as any);
+                              setSidebarOpen(false);
+                            }}
+                            onMouseOver={(e) => e.currentTarget.style.color = "var(--primary)"}
+                            onMouseOut={(e) => e.currentTarget.style.color = activeTab === "health_monitor" && healthMonitorSection === sub.key ? "var(--primary)" : "var(--text-secondary)"}
+                          >
+                            {sub.label}
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </li>
+                );
+              }
+
               if (id === "diet") {
                 return (
                   <li key={id} style={{ display: "flex", flexDirection: "column" }}>
@@ -2006,8 +2061,46 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
     </div>
   );
 
+  const HealthMonitorPanel = (
+    <div className="page-container" style={{ padding: "16px 24px", maxWidth: "1200px", margin: "0 auto" }}>
+      <header className="page-header" style={{ marginBottom: "24px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <div style={{ background: "var(--bg-card)", padding: "10px", borderRadius: "12px", border: "1px solid var(--border-color)" }}>
+            <ClipboardList size={24} style={{ color: "var(--primary)" }} />
+          </div>
+          <div>
+            <h2 className="page-title" style={{ marginBottom: "2px", fontSize: "1.4rem", fontWeight: 800 }}>Health Monitor</h2>
+            <p className="page-subtitle" style={{ fontSize: "0.85rem", margin: 0 }}>
+              {healthMonitorSection === "bmi" && "Track your Body Mass Index."}
+              {healthMonitorSection === "calories" && "Monitor your calorie intake and burn."}
+              {healthMonitorSection === "water" && "Stay hydrated with water reminders."}
+              {healthMonitorSection === "health_kit" && "Connect with your Health Kit."}
+            </p>
+          </div>
+        </div>
+      </header>
+
+      {healthMonitorSection === "bmi" ? (
+        <BMICalculator />
+      ) : (
+        <div className="gym-card" style={{ padding: "32px", textAlign: "center", minHeight: "300px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div>
+            <ClipboardList size={48} style={{ color: "var(--border-color)", margin: "0 auto 16px" }} />
+            <h3 style={{ fontSize: "1.2rem", fontWeight: 700, marginBottom: "8px" }}>
+              {healthMonitorSection === "calories" && "Calorie Monitoring Coming Soon"}
+              {healthMonitorSection === "water" && "Water Reminder Coming Soon"}
+              {healthMonitorSection === "health_kit" && "Health Kit Integration Coming Soon"}
+            </h3>
+            <p style={{ color: "var(--text-muted)" }}>This feature is currently under development.</p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
   const panels: Record<Tab, React.ReactNode> = {
     overview: OverviewPanel,
+    health_monitor: HealthMonitorPanel,
     workouts: WorkoutsPanel,
     reports: ReportsPanel,
     plans: PlansPanel,
