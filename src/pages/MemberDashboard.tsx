@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { LogOut, Activity, Dumbbell, BarChart3, Clock, Play, Square, Loader, Menu, X, Moon, Sun, LayoutDashboard, CreditCard, ChevronRight, CheckCircle2, User, KeyRound, Sparkles, ShoppingCart, FileText, Target, ClipboardList, TrendingUp, ShieldCheck, PenLine, Eye, Trash2, BookOpen, UserCheck, Calendar, Salad, Ruler, ChevronDown, ChevronUp, Flame } from "lucide-react";
+import { LogOut, Activity, Dumbbell, BarChart3, Clock, Play, Square, Loader, Menu, X, Moon, Sun, LayoutDashboard, CreditCard, ChevronRight, CheckCircle2, User, KeyRound, Sparkles, ShoppingCart, FileText, Target, ClipboardList, TrendingUp, ShieldCheck, PenLine, Eye, Trash2, BookOpen, UserCheck, Calendar, Salad, Ruler, ChevronDown, ChevronUp, Flame, Upload, Download } from "lucide-react";
 import UserProfileModal from "../components/UserProfileModal/UserProfileModal";
 import PurchaseAICreditsModal from "../components/PurchaseAICreditsModal/PurchaseAICreditsModal";
 import ConfirmationModal from "../components/ConfirmationModal/ConfirmationModal";
@@ -11,7 +11,7 @@ import { useAppDispatch, useAppSelector } from "../utils/reduxHooks";
 import { showSnackbar } from "../redux/slices/snackbarSlice";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { getWeeklyStatsApi, getStreakStatsApi, completeChallengeApi } from "../services/apis/memberApis";
-import { getLatestBmiReportApi } from "../services/apis/bmiApis";
+import { getLatestBmiReportApi, uploadBmiReportApi } from "../services/apis/bmiApis";
 import { getMemberDietHistoryApi, generateDietPlanApi, generateDietPlanFromWorkoutApi } from "../services/apis/dietApis";
 import WorkoutLibraryPage from "../components/WorkoutLibrary/WorkoutLibraryPage";
 import {
@@ -106,6 +106,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
   const [dietPlans, setDietPlans] = useState<any[]>([]);
   const [latestBmiPhoto, setLatestBmiPhoto] = useState<any>(null);
   const [loadingDiet, setLoadingDiet] = useState(false);
+  const [uploadingBmi, setUploadingBmi] = useState(false);
   const [isGeneratingDiet, setIsGeneratingDiet] = useState(false);
   const [dietGoal, setDietGoal] = useState("Weight Loss");
   const [showAiModal, setShowAiModal] = useState(false);
@@ -269,6 +270,60 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
   };
 
 
+
+  const handleDownloadReport = async (url: string) => {
+    try {
+      if (url.includes('cloudinary.com')) {
+        const parts = url.split('/upload/');
+        if (parts.length === 2) {
+          const downloadUrl = `${parts[0]}/upload/fl_attachment/${parts[1]}`;
+          const link = document.createElement('a');
+          link.href = downloadUrl;
+          link.download = '';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          return;
+        }
+      }
+      
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = url.split('/').pop() || 'report';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (error) {
+      console.error("Download failed", error);
+      window.open(url, '_blank');
+    }
+  };
+
+  const handleUploadBmi = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    if (!profile?._id) return;
+    const file = e.target.files[0];
+    const formData = new FormData();
+    formData.append("image", file);
+    formData.append("memberId", profile._id);
+    formData.append("goal", dietGoal);
+
+    setUploadingBmi(true);
+    try {
+      await uploadBmiReportApi(formData);
+      dispatch(showSnackbar({ message: "BMI Report uploaded successfully!", type: "success" }));
+      fetchDietData();
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || "Failed to upload BMI Report";
+      dispatch(showSnackbar({ message: msg, type: "error" }));
+    } finally {
+      setUploadingBmi(false);
+    }
+  };
 
   const handleGenerateDiet = async (bmiReportId: string) => {
     if ((profile?.aiCredits || 0) < 1) {
@@ -1220,17 +1275,39 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
                           <span style={{ fontSize: "0.7rem", color: "#ef4444", fontWeight: 500 }}>No report uploaded</span>
                         )}
                       </div>
-                      {latestBmiPhoto && (
-                        <button
-                          onClick={() => window.open(latestBmiPhoto.reportImageUrl.startsWith("http") ? latestBmiPhoto.reportImageUrl : `http://localhost:5000${latestBmiPhoto.reportImageUrl}`, "_blank")}
+                      <div style={{ display: "flex", gap: "8px" }}>
+                        <label
                           style={{ background: "var(--bg-hover)", border: "none", padding: "6px", borderRadius: "6px", color: "var(--text-muted)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.2s" }}
                           onMouseOver={(e) => e.currentTarget.style.background = "var(--border-color)"}
                           onMouseOut={(e) => e.currentTarget.style.background = "var(--bg-hover)"}
-                          title="View Report"
+                          title="Upload Report (PDF, CSV, Excel, Image)"
                         >
-                          <Eye size={16} />
-                        </button>
-                      )}
+                          {uploadingBmi ? <Loader size={16} style={{ animation: "spin 1s linear infinite" }} /> : <Upload size={16} />}
+                          <input type="file" style={{ display: "none" }} onChange={handleUploadBmi} accept=".pdf,.csv,.xls,.xlsx,image/*" />
+                        </label>
+                        {latestBmiPhoto && (
+                          <button
+                            onClick={() => window.open(latestBmiPhoto.reportImageUrl.startsWith("http") ? latestBmiPhoto.reportImageUrl : `http://localhost:5000${latestBmiPhoto.reportImageUrl}`, "_blank")}
+                            style={{ background: "var(--bg-hover)", border: "none", padding: "6px", borderRadius: "6px", color: "var(--text-muted)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.2s" }}
+                            onMouseOver={(e) => e.currentTarget.style.background = "var(--border-color)"}
+                            onMouseOut={(e) => e.currentTarget.style.background = "var(--bg-hover)"}
+                            title="View Report"
+                          >
+                            <Eye size={16} />
+                          </button>
+                        )}
+                        {latestBmiPhoto && (
+                          <button
+                            onClick={() => handleDownloadReport(latestBmiPhoto.reportImageUrl.startsWith("http") ? latestBmiPhoto.reportImageUrl : `http://localhost:5000${latestBmiPhoto.reportImageUrl}`)}
+                            style={{ background: "var(--bg-hover)", border: "none", padding: "6px", borderRadius: "6px", color: "var(--text-muted)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.2s" }}
+                            onMouseOver={(e) => e.currentTarget.style.background = "var(--border-color)"}
+                            onMouseOut={(e) => e.currentTarget.style.background = "var(--bg-hover)"}
+                            title="Download Report"
+                          >
+                            <Download size={16} />
+                          </button>
+                        )}
+                      </div>
                     </div>
 
                     {/* Goal Dropdown */}
