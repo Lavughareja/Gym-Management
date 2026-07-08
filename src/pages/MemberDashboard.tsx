@@ -140,6 +140,14 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
   const [profile, setProfile] = useState<any>(null);
   // PT date selector
   const [ptDate, setPtDate] = useState<string>(new Date().toISOString().split("T")[0]);
+  const handlePtDateChange = (newDate: string) => {
+    setPtDate(newDate);
+    if (profile?._id) {
+      dispatch(fetchPtWorkoutPlansAction(profile._id, newDate));
+      dispatch(fetchPtDietPlansAction(profile._id, newDate));
+      dispatch(fetchPtMeasurementsAction(profile._id, newDate));
+    }
+  };
 
   // Challenges state
   const [dailyChallenges, setDailyChallenges] = useState([
@@ -1335,18 +1343,20 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
             <p className="page-subtitle" style={{ fontSize: "0.85rem", color: "var(--text-secondary)", margin: 0 }}>Track your nutrition and physical progress.</p>
           </div>
         </div>
-        <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-          <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", padding: "8px 16px", borderRadius: "10px", display: "flex", alignItems: "center", gap: "10px", boxShadow: "0 2px 4px rgba(0,0,0,0.02)" }}>
-            <Sparkles size={18} style={{ color: "#f59e0b" }} />
-            <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.2 }}>
-              <span style={{ fontSize: "0.7rem", color: "var(--primary)", fontWeight: 700 }}>AI Credits</span>
-              <span style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--text-primary)" }}>{profile?.aiCredits || 0} credit{profile?.aiCredits !== 1 ? 's' : ''}</span>
+        {expandedMainSections.aiDiet && (
+          <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+            <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", padding: "8px 16px", borderRadius: "10px", display: "flex", alignItems: "center", gap: "10px", boxShadow: "0 2px 4px rgba(0,0,0,0.02)" }}>
+              <Sparkles size={18} style={{ color: "#f59e0b" }} />
+              <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.2 }}>
+                <span style={{ fontSize: "0.7rem", color: "var(--primary)", fontWeight: 700 }}>AI Credits</span>
+                <span style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--text-primary)" }}>{profile?.aiCredits || 0} credit{profile?.aiCredits !== 1 ? 's' : ''}</span>
+              </div>
             </div>
+            <button className="btn-blue" onClick={() => setShowAiModal(true)} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 20px", borderRadius: "10px", background: "linear-gradient(135deg, #6366f1, #4f46e5)", color: "white", fontWeight: 600, border: "none", cursor: "pointer", boxShadow: "0 4px 10px rgba(99, 102, 241, 0.3)", fontSize: "0.9rem" }}>
+              <ShoppingCart size={16} /> Buy Credits
+            </button>
           </div>
-          <button className="btn-blue" onClick={() => setShowAiModal(true)} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 20px", borderRadius: "10px", background: "linear-gradient(135deg, #6366f1, #4f46e5)", color: "white", fontWeight: 600, border: "none", cursor: "pointer", boxShadow: "0 4px 10px rgba(99, 102, 241, 0.3)", fontSize: "0.9rem" }}>
-            <ShoppingCart size={16} /> Buy Credits
-          </button>
-        </div>
+        )}
       </header>
 
       {loadingDiet ? (
@@ -1354,24 +1364,36 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
 
-          {/* 1. Normal Diet Plan (Free) Accordion */}
-          <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: "20px", overflow: "hidden", boxShadow: "0 4px 12px rgba(0,0,0,0.03)" }}>
-            <div 
-              onClick={() => setExpandedMainSections(p => ({ ...p, normalDiet: !p.normalDiet }))}
-              style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "24px 32px", cursor: "pointer", background: "var(--bg-secondary)", transition: "background 0.2s" }}
-              onMouseOver={(e) => e.currentTarget.style.background = "var(--bg-hover)"}
-              onMouseOut={(e) => e.currentTarget.style.background = "var(--bg-secondary)"}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-                <div style={{ background: "rgba(16, 185, 129, 0.1)", color: "#10b981", padding: "12px", borderRadius: "12px" }}>
-                  <CheckCircle size={24} />
+          {expandedMainSections.normalDiet && (
+            <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: "20px", overflow: "hidden", boxShadow: "0 4px 12px rgba(0,0,0,0.03)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "24px 32px", background: "var(--bg-secondary)", borderBottom: "1px solid var(--border-color)" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+                  <div style={{ background: "rgba(16, 185, 129, 0.1)", color: "#10b981", padding: "12px", borderRadius: "12px" }}>
+                    <CheckCircle size={24} />
+                  </div>
+                  <h3 style={{ fontSize: "1.3rem", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>Normal Diet Plan (Free)</h3>
                 </div>
-                <h3 style={{ fontSize: "1.3rem", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>Normal Diet Plan (Free)</h3>
+                <button onClick={() => {
+                  const element = document.getElementById('normal-diet-plan-container');
+                  if (!element) return;
+                  const loadHtml2Pdf = () => new Promise((resolve) => {
+                    if ((window as any).html2pdf) return resolve((window as any).html2pdf);
+                    const script = document.createElement("script");
+                    script.src = "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
+                    script.onload = () => resolve((window as any).html2pdf);
+                    document.body.appendChild(script);
+                  });
+                  loadHtml2Pdf().then((html2pdf: any) => {
+                    html2pdf().set({
+                      margin: 10, filename: 'My_Normal_Diet_Plan.pdf', image: { type: 'jpeg', quality: 0.98 },
+                      html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                    }).from(element).save();
+                  });
+                }} style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", padding: "8px 16px", borderRadius: "10px", color: "var(--text-primary)", fontWeight: 600, cursor: "pointer", fontSize: "0.85rem", boxShadow: "0 1px 2px rgba(0,0,0,0.05)", transition: "all 0.2s" }} onMouseOver={(e) => e.currentTarget.style.background = "var(--bg-hover)"} onMouseOut={(e) => e.currentTarget.style.background = "var(--bg-card)"}>
+                  Download PDF
+                </button>
               </div>
-              {expandedMainSections.normalDiet ? <ChevronUp size={24} color="var(--text-muted)" /> : <ChevronDown size={24} color="var(--text-muted)" />}
-            </div>
-            {expandedMainSections.normalDiet && (
-              <div style={{ padding: "32px", borderTop: "1px solid var(--border-color)" }}>
+              <div id="normal-diet-plan-container" style={{ padding: "32px" }}>
                 <div style={{ marginBottom: "24px" }}>
                   <div style={{ display: "flex", gap: "8px", overflowX: "auto", marginBottom: "24px", paddingBottom: "8px", msOverflowStyle: "none", scrollbarWidth: "none" }}>
                     {genericDietPlan.map((day: any, i: number) => {
@@ -1452,27 +1474,20 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
                   ))}
                 </div>
               </div>
-            )}
-          </div>
-
-          {/* 2. AI Based Diet Plan (Premium) Accordion */}
-          <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: "20px", overflow: "hidden", boxShadow: "0 4px 12px rgba(0,0,0,0.03)" }}>
-            <div 
-              onClick={() => setExpandedMainSections(p => ({ ...p, aiDiet: !p.aiDiet }))}
-              style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "24px 32px", cursor: "pointer", background: "var(--bg-secondary)", transition: "background 0.2s" }}
-              onMouseOver={(e) => e.currentTarget.style.background = "var(--bg-hover)"}
-              onMouseOut={(e) => e.currentTarget.style.background = "var(--bg-secondary)"}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-                <div style={{ background: "rgba(99, 102, 241, 0.1)", color: "#6366f1", padding: "12px", borderRadius: "12px" }}>
-                  <Sparkles size={24} />
-                </div>
-                <h3 style={{ fontSize: "1.3rem", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>AI Based Diet Plan (Premium)</h3>
-              </div>
-              {expandedMainSections.aiDiet ? <ChevronUp size={24} color="var(--text-muted)" /> : <ChevronDown size={24} color="var(--text-muted)" />}
             </div>
-            {expandedMainSections.aiDiet && (
-              <div style={{ padding: "32px", borderTop: "1px solid var(--border-color)", display: "flex", flexDirection: "column", gap: "24px" }}>
+          )}
+
+          {expandedMainSections.aiDiet && (
+            <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: "20px", overflow: "hidden", boxShadow: "0 4px 12px rgba(0,0,0,0.03)" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "24px 32px", background: "var(--bg-secondary)", borderBottom: "1px solid var(--border-color)" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+                  <div style={{ background: "rgba(99, 102, 241, 0.1)", color: "#6366f1", padding: "12px", borderRadius: "12px" }}>
+                    <Sparkles size={24} />
+                  </div>
+                  <h3 style={{ fontSize: "1.3rem", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>AI Based Diet Plan (Premium)</h3>
+                </div>
+              </div>
+              <div style={{ padding: "32px", display: "flex", flexDirection: "column", gap: "24px" }}>
 
           {/* Hero Banner */}
           <div style={{ background: "var(--bg-card)", borderRadius: "20px", padding: "32px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", position: "relative", overflow: "hidden", border: "1px solid var(--border-color)", boxShadow: "0 2px 10px rgba(139, 92, 246, 0.05)" }}>
@@ -1797,21 +1812,13 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
                   >
                     Generate Your Plan
                   </button>
-                  <button
-                    onClick={handleLoadSamplePlan}
-                    style={{ background: "#f59e0b", border: "2px solid #f59e0b", color: "#fff", padding: "10px 24px", borderRadius: "12px", fontWeight: 700, cursor: "pointer", fontSize: "0.9rem", transition: "all 0.2s", boxShadow: "0 4px 12px rgba(245, 158, 11, 0.2)" }}
-                    onMouseOver={(e) => { e.currentTarget.style.transform = "translateY(-2px)" }}
-                    onMouseOut={(e) => { e.currentTarget.style.transform = "translateY(0)" }}
-                  >
-                    Load Sample Layout
-                  </button>
                 </div>
               </div>
             )}
           </div>
-              </div>
-            )}
-          </div>
+        </div>
+      </div>
+    )}
 
         </div>
       )}
@@ -1819,14 +1826,6 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
   );
 
   // ── Personal Trainer Panel (member view) ────────────────────────────────
-  const handlePtDateChange = (newDate: string) => {
-    setPtDate(newDate);
-    if (profile?._id) {
-      dispatch(fetchPtWorkoutPlansAction(profile._id, newDate));
-      dispatch(fetchPtDietPlansAction(profile._id, newDate));
-      dispatch(fetchPtMeasurementsAction(profile._id, newDate));
-    }
-  };
 
   const PersonalTrainerPanel = (
     <div className="page-container">
