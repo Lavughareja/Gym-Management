@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Users, CheckCircle2, Dumbbell, CreditCard, ChevronRight, UserPlus, ClipboardList, UserCog } from "lucide-react";
+import { Users, CheckCircle2, Dumbbell, CreditCard, ChevronRight, UserPlus, ClipboardList, UserCog, AlertTriangle, Activity, Target } from "lucide-react";
 import { useAppSelector } from "../../utils/reduxHooks";
 import { AxiosInstance } from "../../axios/axiosInstance";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
@@ -30,6 +30,9 @@ const OverviewPanel: React.FC<Props> = ({
     activeMembers: members.filter((m: any) => m.status === "Active").length,
     membersJoinedThisMonth: 0,
     revenueThisMonth: 0,
+    expiringMembersCount: 0,
+    todayAttendanceCount: 0,
+    pendingLeadsCount: 0,
     chartData: []
   });
 
@@ -55,6 +58,9 @@ const OverviewPanel: React.FC<Props> = ({
     { label: "Active Members", value: dashboardData.activeMembers, icon: CheckCircle2, color: "#10b981", bg: "rgba(16,185,129,0.1)" },
     { label: "Joined This Month", value: dashboardData.membersJoinedThisMonth, icon: UserPlus, color: "#f59e0b", bg: "rgba(245,158,11,0.1)" },
     { label: "Revenue (Mo.)", value: `₹${dashboardData.revenueThisMonth.toLocaleString('en-IN')}`, icon: CreditCard, color: "#8b5cf6", bg: "rgba(139,92,246,0.1)" },
+    { label: "Expiring (7 Days)", value: dashboardData.expiringMembersCount, icon: AlertTriangle, color: "#ef4444", bg: "rgba(239,68,68,0.1)" },
+    { label: "Today's Footfall", value: dashboardData.todayAttendanceCount, icon: Activity, color: "#0ea5e9", bg: "rgba(14,165,233,0.1)" },
+    { label: "Pending Leads", value: dashboardData.pendingLeadsCount, icon: Target, color: "#ec4899", bg: "rgba(236,72,153,0.1)" },
   ];
 
   return (
@@ -66,13 +72,13 @@ const OverviewPanel: React.FC<Props> = ({
 
       <div className="stats-grid">
         {stats.map((s, i) => (
-          <div key={i} className="gym-card stat-card">
-            <div className="stat-icon-container" style={{ background: s.bg }}>
-              <s.icon size={22} style={{ color: s.color }} />
+          <div key={i} className="gym-card stat-card" style={{ padding: "16px", minWidth: "220px", display: "flex", gap: "16px", alignItems: "center" }}>
+            <div className="stat-icon-container" style={{ background: s.bg, padding: "12px", borderRadius: "12px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <s.icon size={26} style={{ color: s.color }} />
             </div>
-            <div className="stat-info">
-              <span className="stat-value">{s.value}</span>
-              <span className="stat-label">{s.label}</span>
+            <div className="stat-info" style={{ display: "flex", flexDirection: "column" }}>
+              <span className="stat-value" style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--text-primary)" }}>{s.value}</span>
+              <span className="stat-label" style={{ fontSize: "0.85rem", color: "var(--text-muted)", fontWeight: 500 }}>{s.label}</span>
             </div>
           </div>
         ))}
