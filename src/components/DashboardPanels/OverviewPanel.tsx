@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Users, CheckCircle2, Dumbbell, CreditCard, ChevronRight, UserPlus, ClipboardList, UserCog } from "lucide-react";
 import { useAppSelector } from "../../utils/reduxHooks";
+import { AxiosInstance } from "../../axios/axiosInstance";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 interface Props {
   ownerName: string;
@@ -23,12 +25,36 @@ const OverviewPanel: React.FC<Props> = ({
 }) => {
   const { members } = useAppSelector((state) => state.member);
   const { trainers } = useAppSelector((state) => state.trainer);
+  const [dashboardData, setDashboardData] = useState<any>({
+    totalMembers: members.length,
+    activeMembers: members.filter((m: any) => m.status === "Active").length,
+    membersJoinedThisMonth: 0,
+    revenueThisMonth: 0,
+    chartData: []
+  });
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const response = await AxiosInstance.get('/dashboard/overview');
+        if (response.data) {
+          setDashboardData((prev: any) => ({
+            ...prev,
+            ...response.data
+          }));
+        }
+      } catch (error) {
+        console.error("Error fetching dashboard overview:", error);
+      }
+    };
+    fetchDashboardData();
+  }, []);
 
   const stats = [
-    { label: "Total Members", value: members.length, icon: Users, color: "#2563eb", bg: "rgba(37,99,235,0.1)" },
-    { label: "Active Members", value: members.filter((m: any) => m.status === "Active").length, icon: CheckCircle2, color: "#10b981", bg: "rgba(16,185,129,0.1)" },
-    { label: "Trainers", value: trainers.length, icon: Dumbbell, color: "#f59e0b", bg: "rgba(245,158,11,0.1)" },
-    { label: "Revenue (Mo.)", value: "₹1,24,500", icon: CreditCard, color: "#8b5cf6", bg: "rgba(139,92,246,0.1)" },
+    { label: "Total Members", value: dashboardData.totalMembers, icon: Users, color: "#2563eb", bg: "rgba(37,99,235,0.1)" },
+    { label: "Active Members", value: dashboardData.activeMembers, icon: CheckCircle2, color: "#10b981", bg: "rgba(16,185,129,0.1)" },
+    { label: "Joined This Month", value: dashboardData.membersJoinedThisMonth, icon: UserPlus, color: "#f59e0b", bg: "rgba(245,158,11,0.1)" },
+    { label: "Revenue (Mo.)", value: `₹${dashboardData.revenueThisMonth.toLocaleString('en-IN')}`, icon: CreditCard, color: "#8b5cf6", bg: "rgba(139,92,246,0.1)" },
   ];
 
   return (
@@ -50,6 +76,25 @@ const OverviewPanel: React.FC<Props> = ({
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Chart Section */}
+      <div className="gym-card" style={{ marginBottom: "20px" }}>
+        <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "var(--text-primary)", marginBottom: 20 }}>Member Joins (This Year)</h3>
+        <div style={{ width: "100%", height: 300 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={dashboardData.chartData}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color, #e5e7eb)" />
+              <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "var(--text-muted, #6b7280)" }} />
+              <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "var(--text-muted, #6b7280)" }} />
+              <Tooltip 
+                contentStyle={{ borderRadius: 8, border: "none", boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)" }}
+                cursor={{ fill: "rgba(37,99,235,0.05)" }}
+              />
+              <Bar dataKey="joined" fill="#2563eb" radius={[4, 4, 0, 0]} barSize={30} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </div>
 
       <div className="dashboard-grid">
