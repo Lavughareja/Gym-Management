@@ -11,6 +11,7 @@ import healthReducer from "./slices/healthSlice";
 import attendanceReducer from "./slices/attendanceSlice";
 import deviceReducer from "./slices/deviceSlice";
 import ptReducer from "./slices/ptSlice";
+import crmReducer from "./slices/crmSlice";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Redux Store
@@ -30,6 +31,7 @@ export const store = configureStore({
     attendance: attendanceReducer,
     device:     deviceReducer,
     pt:         ptReducer,
+    crm:        crmReducer,
   },
 });
 

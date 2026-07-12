@@ -55,4 +55,10 @@ export const apiRoutes = {
   dietGenerateFromWorkout: "/diet/generate-from-workout",
   dietManual: "/diet/manual",
   dietMember: "/diet/member",
+
+  // ── CRM (Leads & FollowUps) ───────────────────────────────────────────────
+  crmDashboard: "/crm/dashboard",
+  crmLeads: "/crm/leads",
+  crmLeadsConvert: "/crm/leads/:id/convert",
+  crmFollowUps: "/crm/followups",
 } as const;

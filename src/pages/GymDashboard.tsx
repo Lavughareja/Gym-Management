@@ -20,6 +20,7 @@ import { fetchMembersAction } from "../redux/actions/memberActions";
 import { fetchTrainersAction } from "../redux/actions/trainerActions";
 import { fetchManagersAction } from "../redux/actions/managerActions";
 import { fetchPlansAction } from "../redux/actions/planActions";
+import CrmPanel from "../components/DashboardPanels/CrmPanel";
 
 interface GymDashboardProps {
   onLogout?: () => void;
@@ -30,7 +31,13 @@ const GymDashboard: React.FC<GymDashboardProps> = ({ onLogout }) => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
 
-  const userObj = user as any;
+  const localUserStr = localStorage.getItem("dashUser");
+  const localUser = localUserStr ? JSON.parse(localUserStr) : null;
+  const userObj = (user as any) || (localUser ? {
+    name: localUser.ownerName,
+    role: localUser.role,
+    canAddMember: localUser.canAddMember,
+  } : {});
 
   const [activeTab, setActiveTab] = useState("overview");
   const [isDarkMode, setIsDarkMode] = useState(() => localStorage.getItem("theme") === "dark");
@@ -69,6 +76,7 @@ const GymDashboard: React.FC<GymDashboardProps> = ({ onLogout }) => {
 
   const navItems = [
     { id: "overview", label: "Overview", icon: LayoutDashboard },
+    { id: "crm", label: "CRM (Leads)", icon: Activity, hide: userObj?.role !== "admin" },
     { id: "members", label: "Members", icon: Users },
     { id: "bmi", label: "BMI & Diet", icon: Activity },
     { id: "trainers", label: "Trainers", icon: Dumbbell, hide: userObj?.role === "trainer" },
@@ -167,6 +175,12 @@ const GymDashboard: React.FC<GymDashboardProps> = ({ onLogout }) => {
             setActiveTab={setActiveTab}
             setShowAddMember={setShowAddMember}
             setShowAddTrainer={setShowAddTrainer}
+          />
+        )}
+        {activeTab === "crm" && (
+          <CrmPanel
+            role={userObj?.role || "admin"}
+            gymName={userObj?.gymId?.name || "Your Gym"}
           />
         )}
         {activeTab === "members" && (

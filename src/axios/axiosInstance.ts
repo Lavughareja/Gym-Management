@@ -42,7 +42,7 @@ AxiosInstance.interceptors.response.use(
       if (!isLoginRequest) {
         // Token expired / unauthorized — clear storage and redirect
         localStorage.removeItem(AUTH_TOKEN_KEY);
-        if (window.location.pathname !== "/" && window.location.pathname !== "/login") {
+        if (window.location.pathname !== "/login") {
           window.location.href = "/login";
         }
       }
