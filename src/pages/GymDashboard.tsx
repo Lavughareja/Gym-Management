@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { LogOut, Settings, Sun, Moon, Dumbbell, Users, ClipboardList, Activity, LayoutDashboard, UserCog, UserCheck, Menu } from "lucide-react";
+import { LogOut, Settings, Sun, Moon, Dumbbell, Users, ClipboardList, Activity, LayoutDashboard, UserCog, UserCheck, Menu, Bell } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../utils/reduxHooks";
 import { logoutAction } from "../redux/actions/authActions";
@@ -14,6 +14,8 @@ import PlansPanel from "../components/DashboardPanels/PlansPanel";
 import AttendancePanel from "../components/DashboardPanels/AttendancePanel";
 import SettingsPanel from "../components/DashboardPanels/SettingsPanel";
 import PtManagementPanel from "../components/DashboardPanels/PtManagementPanel";
+import AnnouncementsPanel from "../components/DashboardPanels/AnnouncementsPanel";
+import EventsViewPanel from "../components/DashboardPanels/EventsViewPanel";
 
 // Actions
 import { fetchMembersAction } from "../redux/actions/memberActions";
@@ -76,12 +78,13 @@ const GymDashboard: React.FC<GymDashboardProps> = ({ onLogout }) => {
 
   const navItems = [
     { id: "overview", label: "Overview", icon: LayoutDashboard },
-    { id: "crm", label: "CRM (Leads)", icon: Activity, hide: userObj?.role !== "admin" },
+    { id: "crm", label: "CRM (Leads)", icon: Activity, hide: userObj?.role !== "admin" && userObj?.role !== "owner" },
     { id: "members", label: "Members", icon: Users },
     { id: "bmi", label: "BMI & Diet", icon: Activity },
     { id: "trainers", label: "Trainers", icon: Dumbbell, hide: userObj?.role === "trainer" },
     { id: "managers", label: "Managers", icon: UserCog, hide: userObj?.role === "gymmanager" || userObj?.role === "trainer" },
     { id: "pt", label: "PT Management", icon: UserCheck },
+    { id: "events", label: "Announcements", icon: Bell },
     { id: "plans", label: "Plans", icon: ClipboardList },
     { id: "attendance", label: "Attendance", icon: Users },
     { id: "settings", label: "Settings", icon: Settings, hide: userObj?.role === "trainer" },
@@ -201,6 +204,7 @@ const GymDashboard: React.FC<GymDashboardProps> = ({ onLogout }) => {
         )}
         {activeTab === "managers" && <ManagersPanel role={userObj?.role || "admin"} />}
         {activeTab === "pt" && <PtManagementPanel role={userObj?.role || "admin"} userId={userObj?._id} />}
+        {activeTab === "events" && ((userObj?.role === "admin" || userObj?.role === "owner") ? <AnnouncementsPanel /> : <EventsViewPanel />)}
         {activeTab === "plans" && <PlansPanel gymName={userObj?.gymId?.name || "Your Gym"} />}
         {activeTab === "attendance" && <AttendancePanel />}
         {activeTab === "settings" && <SettingsPanel gymName={userObj?.gymId?.name || "Your Gym"} />}

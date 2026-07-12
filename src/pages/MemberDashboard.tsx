@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { LogOut, Activity, Dumbbell, BarChart3, Clock, Play, Square, Loader, Menu, X, Moon, Sun, LayoutDashboard, CreditCard, ChevronRight, CheckCircle2, User, KeyRound, Sparkles, ShoppingCart, FileText, Target, ClipboardList, TrendingUp, ShieldCheck, PenLine, Eye, Trash2, BookOpen, UserCheck, Calendar, Salad, Ruler, ChevronDown, ChevronUp, Flame, Upload, Download, CheckCircle } from "lucide-react";
+import { LogOut, Activity, Dumbbell, BarChart3, Clock, Play, Square, Loader, Menu, X, Moon, Sun, LayoutDashboard, CreditCard, ChevronRight, CheckCircle2, User, KeyRound, Sparkles, ShoppingCart, FileText, Target, ClipboardList, TrendingUp, ShieldCheck, PenLine, Eye, Trash2, BookOpen, UserCheck, Calendar, Salad, Ruler, ChevronDown, ChevronUp, Flame, Upload, Download, CheckCircle, Bell } from "lucide-react";
 import UserProfileModal from "../components/UserProfileModal/UserProfileModal";
 import PurchaseAICreditsModal from "../components/PurchaseAICreditsModal/PurchaseAICreditsModal";
 import ConfirmationModal from "../components/ConfirmationModal/ConfirmationModal";
@@ -23,6 +23,7 @@ import {
 import BMICalculator from "../components/BMICalculator/BMICalculator";
 import CaloriesCalculator from "../components/CaloriesCalculator/CaloriesCalculator";
 import WaterReminder from "../components/WaterReminder/WaterReminder";
+import EventsViewPanel from "../components/DashboardPanels/EventsViewPanel";
 
 const DEFAULT_WORKOUTS = [
   { _id: "def_chest_1", name: "Bench Press", bodyPart: "Chest" },
@@ -60,7 +61,7 @@ interface Props {
   gymName?: string;
 }
 
-type Tab = "overview" | "health_monitor" | "workouts" | "reports" | "plans" | "diet" | "library" | "pt" | "challenges";
+type Tab = "overview" | "health_monitor" | "workouts" | "reports" | "plans" | "diet" | "library" | "pt" | "challenges" | "events";
 
 export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName = "Trainix Gym" }) => {
   const dispatch = useAppDispatch();
