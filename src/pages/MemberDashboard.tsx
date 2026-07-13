@@ -3,7 +3,7 @@ import { LogOut, Activity, Dumbbell, BarChart3, Clock, Play, Square, Loader, Men
 import UserProfileModal from "../components/UserProfileModal/UserProfileModal";
 import PurchaseAICreditsModal from "../components/PurchaseAICreditsModal/PurchaseAICreditsModal";
 import ConfirmationModal from "../components/ConfirmationModal/ConfirmationModal";
-import { getTodayAttendanceApi } from "../services/apis/attendanceApis";
+import { getTodayAttendanceApi, getMemberAttendanceHistoryApi } from "../services/apis/attendanceApis";
 import { getWorkoutsApi, createWorkoutApi, logWorkoutApi, getWorkoutReportApi, deleteWorkoutApi } from "../services/apis/workoutApis";
 import { getMeApi } from "../services/apis/memberApis";
 import { getPlansApi } from "../services/apis/planApis";
@@ -77,6 +77,8 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
 
   // Daily Log / Overview state
   const [attendance, setAttendance] = useState<any[]>([]);
+  const [attendanceHistory, setAttendanceHistory] = useState<any[]>([]);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [loadingAttendance, setLoadingAttendance] = useState(false);
   const [weeklyStats, setWeeklyStats] = useState<{ dailyData: any[]; trends: any[] } | null>(null);
   const [streakStats, setStreakStats] = useState<{ currentStreak: number; milestones: any[] } | null>(null);
@@ -237,6 +239,15 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
         { id: 1, time: "07:30 AM", status: "SUCCESS" },
         { id: 2, time: "09:00 AM", status: "SUCCESS" },
       ]);
+    }
+
+    try {
+      const historyRes = await getMemberAttendanceHistoryApi();
+      if (historyRes.data?.attendance) {
+        setAttendanceHistory(historyRes.data.attendance);
+      }
+    } catch (err) {
+      console.error("History fetch error", err);
     }
 
     try {
@@ -595,6 +606,35 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
 
   // ── Panels ───────────────────────────────────────────────────────────────
 
+  // Calendar Helpers
+  const getDaysInMonth = (year: number, month: number) => {
+    return new Date(year, month + 1, 0).getDate();
+  };
+  
+  const getFirstDayOfMonth = (year: number, month: number) => {
+    return new Date(year, month, 1).getDay();
+  };
+
+  const currentYear = selectedDate.getFullYear();
+  const currentMonth = selectedDate.getMonth();
+  const daysInMonth = getDaysInMonth(currentYear, currentMonth);
+  const firstDay = getFirstDayOfMonth(currentYear, currentMonth);
+
+  const prevMonth = () => {
+    setSelectedDate(new Date(currentYear, currentMonth - 1, 1));
+  };
+
+  const nextMonth = () => {
+    setSelectedDate(new Date(currentYear, currentMonth + 1, 1));
+  };
+
+  // Convert history array to a set of date strings for easy lookup
+  const attendedDates = new Set(attendanceHistory.map(a => a.date));
+
+  // Get logs for the selected date
+  const selectedDateString = selectedDate.toISOString().split("T")[0];
+  const selectedDateLogs = attendanceHistory.filter(a => a.date === selectedDateString).sort((a, b) => a.time.localeCompare(b.time));
+
   const OverviewPanel = (
     <div className="page-container">
       <header className="page-header">
@@ -618,94 +658,162 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
           </div>
         )}
 
-        {weeklyStats && (
-          <div className="gym-card" style={{ padding: "24px" }}>
-            <h3 style={{ fontSize: "1.2rem", fontWeight: 700, marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
-              <BarChart3 size={20} color="var(--primary)" /> Weekly Overview
-            </h3>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 20, alignItems: "flex-start" }}>
+          {/* Calendar side */}
+          <div style={{ flex: "1 1 350px", display: "flex", flexDirection: "column", gap: 20 }}>
+            <div className="gym-card">
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                <h3 style={{ fontSize: "1.2rem", fontWeight: 700 }}>Attendance Calendar</h3>
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <button onClick={prevMonth} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-primary)" }}><ChevronRight size={20} style={{ transform: "rotate(180deg)" }} /></button>
+                  <span style={{ fontWeight: 600, fontSize: "0.9rem" }}>{selectedDate.toLocaleString('default', { month: 'short', year: 'numeric' })}</span>
+                  <button onClick={nextMonth} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-primary)" }}><ChevronRight size={20} /></button>
+                </div>
+              </div>
+              
+              {loadingAttendance ? (
+                <div style={{ display: "flex", justifyContent: "center", padding: "20px" }}>
+                  <Loader size={24} style={{ animation: "spin 1s linear infinite", color: "var(--primary)" }} />
+                </div>
+              ) : (
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 4 }}>
+                  {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(day => (
+                    <div key={day} style={{ textAlign: "center", fontWeight: 600, fontSize: "0.75rem", color: "var(--text-secondary)", marginBottom: 4 }}>{day}</div>
+                  ))}
+                  
+                  {Array.from({ length: firstDay }).map((_, i) => (
+                    <div key={`empty-${i}`} />
+                  ))}
+                  
+                  {Array.from({ length: daysInMonth }).map((_, i) => {
+                    const day = i + 1;
+                    const dateObj = new Date(currentYear, currentMonth, day);
+                    const localDate = new Date(dateObj.getTime() - (dateObj.getTimezoneOffset() * 60000)).toISOString().split("T")[0];
+                    const isAttended = attendedDates.has(localDate);
+                    const isSelected = selectedDateString === localDate;
+                    
+                    const isPastOrToday = new Date().toISOString().split("T")[0] >= localDate;
+                    let bg = "var(--bg-secondary)";
+                    let color = "var(--text-primary)";
+                    if (isAttended) {
+                      bg = "rgba(16,185,129,0.15)";
+                      color = "#10b981";
+                    } else if (isPastOrToday) {
+                      bg = "rgba(239,68,68,0.15)";
+                      color = "var(--danger)";
+                    }
 
-            <div style={{ height: 300, width: "100%", marginBottom: 24 }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={weeklyStats.dailyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="colorGym" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
-                    </linearGradient>
-                    <linearGradient id="colorWorkout" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                    </linearGradient>
-                  </defs>
-                  <XAxis dataKey="date" tickFormatter={(val) => new Date(val).toLocaleDateString(undefined, { weekday: 'short' })} style={{ fontSize: 12, fill: "var(--text-secondary)" }} axisLine={false} tickLine={false} />
-                  <YAxis style={{ fontSize: 12, fill: "var(--text-secondary)" }} axisLine={false} tickLine={false} />
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color)" />
-                  <Tooltip contentStyle={{ borderRadius: 8, border: "none", boxShadow: "0 4px 12px rgba(0,0,0,0.1)", background: "var(--bg-primary)", color: "var(--text-primary)" }} />
-                  <Area type="monotone" dataKey="gymMinutes" name="Gym Time (min)" stroke="var(--primary)" strokeWidth={2} fillOpacity={1} fill="url(#colorGym)" />
-                  <Area type="monotone" dataKey="workoutMinutes" name="Workout Time (min)" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorWorkout)" />
-                </AreaChart>
-              </ResponsiveContainer>
+                    return (
+                      <div 
+                        key={day} 
+                        onClick={() => setSelectedDate(dateObj)}
+                        style={{ 
+                          padding: "8px 0",
+                          display: "flex", 
+                          alignItems: "center", 
+                          justifyContent: "center", 
+                          borderRadius: 6,
+                          background: bg,
+                          color: color,
+                          fontWeight: 600,
+                          cursor: "pointer",
+                          border: isSelected ? "2px solid var(--primary)" : "1px solid transparent",
+                          fontSize: "0.85rem"
+                        }}
+                      >
+                        {day}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
-            <h4 style={{ fontSize: "1rem", fontWeight: 600, marginBottom: 12 }}>Muscle Group Trends (vs Last Week)</h4>
-            {weeklyStats.trends.length === 0 ? (
-              <div style={{ fontSize: "0.9rem", color: "var(--text-muted)" }}>No trend data available yet.</div>
-            ) : (
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 12 }}>
-                {weeklyStats.trends.map((t: any) => (
-                  <div key={t.bodyPart} style={{ background: "var(--bg-secondary)", padding: 16, borderRadius: 12, border: "1px solid var(--border-color)" }}>
-                    <div style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginBottom: 4, fontWeight: 600 }}>{t.bodyPart}</div>
-                    <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-                      <span style={{ fontSize: "1.2rem", fontWeight: 700 }}>{t.currentWeekMins}m</span>
-                      {t.status === 'gain' ? (
-                        <span style={{ color: "#10b981", fontSize: "0.8rem", fontWeight: 600, display: "flex", alignItems: "center" }}>
-                          <ChevronRight size={14} style={{ transform: "rotate(-90deg)" }} /> +{t.currentWeekMins - t.lastWeekMins}m
+            {selectedDateLogs.length > 0 && (
+              <div className="gym-card">
+                <h3 style={{ fontSize: "1.1rem", fontWeight: 700, marginBottom: 12 }}>Logs for {selectedDate.toLocaleDateString()}</h3>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {selectedDateLogs.map((a: any, i) => (
+                    <div key={i} style={{ display: "flex", justifyContent: "space-between", background: "var(--bg-secondary)", padding: "10px 12px", borderRadius: 8, border: "1px solid var(--border-color)" }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <div style={{ background: "var(--primary-light)", padding: 6, borderRadius: 6, color: "var(--primary)" }}>
+                          <CheckCircle2 size={16} />
+                        </div>
+                        <div>
+                          <span style={{ fontWeight: 600, color: "var(--text-primary)", display: "block", fontSize: "0.9rem" }}>
+                            {i === 0 ? "Check In" : i === selectedDateLogs.length - 1 ? "Check Out" : "Log"}
+                          </span>
+                          <span style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>{a.time}</span>
+                        </div>
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center" }}>
+                        <span style={{ color: a.status === "SUCCESS" ? "#10b981" : "var(--danger)", fontSize: "0.75rem", fontWeight: 700, padding: "2px 6px", background: a.status === "SUCCESS" ? "rgba(16,185,129,0.1)" : "rgba(239,68,68,0.1)", borderRadius: 10 }}>
+                          {a.status}
                         </span>
-                      ) : t.status === 'loss' ? (
-                        <span style={{ color: "var(--danger)", fontSize: "0.8rem", fontWeight: 600, display: "flex", alignItems: "center" }}>
-                          <ChevronRight size={14} style={{ transform: "rotate(90deg)" }} /> {t.currentWeekMins - t.lastWeekMins}m
-                        </span>
-                      ) : (
-                        <span style={{ color: "var(--text-muted)", fontSize: "0.8rem", fontWeight: 600 }}>No change</span>
-                      )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             )}
           </div>
-        )}
 
+          {/* Weekly Stats side */}
+          {weeklyStats && (
+            <div className="gym-card" style={{ flex: "2 1 500px", padding: "24px" }}>
+              <h3 style={{ fontSize: "1.2rem", fontWeight: 700, marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
+                <BarChart3 size={20} color="var(--primary)" /> Weekly Overview
+              </h3>
 
+              <div style={{ height: 300, width: "100%", marginBottom: 24 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={weeklyStats.dailyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="colorGym" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
+                      </linearGradient>
+                      <linearGradient id="colorWorkout" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <XAxis dataKey="date" tickFormatter={(val) => new Date(val).toLocaleDateString(undefined, { weekday: 'short' })} style={{ fontSize: 12, fill: "var(--text-secondary)" }} axisLine={false} tickLine={false} />
+                    <YAxis style={{ fontSize: 12, fill: "var(--text-secondary)" }} axisLine={false} tickLine={false} />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color)" />
+                    <Tooltip contentStyle={{ borderRadius: 8, border: "none", boxShadow: "0 4px 12px rgba(0,0,0,0.1)", background: "var(--bg-primary)", color: "var(--text-primary)" }} />
+                    <Area type="monotone" dataKey="gymMinutes" name="Gym Time (min)" stroke="var(--primary)" strokeWidth={2} fillOpacity={1} fill="url(#colorGym)" />
+                    <Area type="monotone" dataKey="workoutMinutes" name="Workout Time (min)" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorWorkout)" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
 
-        <div className="gym-card">
-          <h3 style={{ fontSize: "1.2rem", fontWeight: 700, marginBottom: 16 }}>Today's Check-ins</h3>
-          {loadingAttendance ? (
-            <div style={{ display: "flex", justifyContent: "center", padding: "20px" }}>
-              <Loader size={24} style={{ animation: "spin 1s linear infinite", color: "var(--primary)" }} />
-            </div>
-          ) : attendance.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "30px 0" }}>
-              <Clock size={32} style={{ color: "var(--border-color)", margin: "0 auto 12px" }} />
-              <p style={{ color: "var(--text-muted)", fontSize: "0.95rem" }}>No check-ins today.</p>
-            </div>
-          ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              {attendance.map((a: any, i) => (
-                <div key={i} style={{ display: "flex", justifyContent: "space-between", background: "var(--bg-secondary)", padding: 12, borderRadius: 8, border: "1px solid var(--border-color)" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                    <div style={{ background: "var(--primary-light)", padding: 8, borderRadius: 8, color: "var(--primary)" }}>
-                      <CheckCircle2 size={18} />
+              <h4 style={{ fontSize: "1rem", fontWeight: 600, marginBottom: 12 }}>Muscle Group Trends (vs Last Week)</h4>
+              {weeklyStats.trends.length === 0 ? (
+                <div style={{ fontSize: "0.9rem", color: "var(--text-muted)" }}>No trend data available yet.</div>
+              ) : (
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: 12 }}>
+                  {weeklyStats.trends.map((t: any) => (
+                    <div key={t.bodyPart} style={{ background: "var(--bg-secondary)", padding: 12, borderRadius: 12, border: "1px solid var(--border-color)" }}>
+                      <div style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginBottom: 4, fontWeight: 600 }}>{t.bodyPart}</div>
+                      <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+                        <span style={{ fontSize: "1.1rem", fontWeight: 700 }}>{t.currentWeekMins}m</span>
+                        {t.status === 'gain' ? (
+                          <span style={{ color: "#10b981", fontSize: "0.75rem", fontWeight: 600, display: "flex", alignItems: "center" }}>
+                            <ChevronRight size={14} style={{ transform: "rotate(-90deg)" }} /> +{t.currentWeekMins - t.lastWeekMins}m
+                          </span>
+                        ) : t.status === 'loss' ? (
+                          <span style={{ color: "var(--danger)", fontSize: "0.75rem", fontWeight: 600, display: "flex", alignItems: "center" }}>
+                            <ChevronRight size={14} style={{ transform: "rotate(90deg)" }} /> {t.currentWeekMins - t.lastWeekMins}m
+                          </span>
+                        ) : (
+                          <span style={{ color: "var(--text-muted)", fontSize: "0.75rem", fontWeight: 600 }}>No change</span>
+                        )}
+                      </div>
                     </div>
-                    <span style={{ fontWeight: 600, color: "var(--text-primary)" }}>{a.time || a.timestamp}</span>
-                  </div>
-                  <div style={{ display: "flex", alignItems: "center" }}>
-                    <span style={{ color: a.status === "SUCCESS" ? "#10b981" : "var(--danger)", fontSize: "0.85rem", fontWeight: 700, padding: "4px 8px", background: a.status === "SUCCESS" ? "rgba(16,185,129,0.1)" : "rgba(239,68,68,0.1)", borderRadius: 12 }}>
-                      {a.status}
-                    </span>
-                  </div>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
           )}
         </div>
@@ -1187,7 +1295,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
         {/* Brand */}
         <div className="sidebar-brand">
           <div className="brand-icon-wrapper" style={{ background: 'none', boxShadow: 'none', padding: 0 }}>
-            <img src="/logo.png" alt="IronPulse Logo" style={{ width: 44, height: 44, objectFit: 'contain', borderRadius: 10 }} />
+            <img src="/logo.png" alt="Trainix Logo" style={{ width: 44, height: 44, objectFit: 'contain', borderRadius: 10 }} />
           </div>
           <div>
             <h1 className="brand-name">TRAINIX</h1>

@@ -1,6 +1,6 @@
 import { lazy, Suspense, useState, useEffect } from "react";
 import { Loader } from "lucide-react";
-import { SidebarLayout } from "./components/SidebarLayout";
+import { TopNavLayout } from "./components/TopNavLayout";
 import GlobalSnackbar from "./components/GlobalSnackbar/GlobalSnackbar";
 import "./App.css";
 import type { PlanType } from "./utils/constant";
@@ -183,7 +183,7 @@ function App() {
         )}
 
         {mode === "public" && (
-          <SidebarLayout onLoginClick={() => { setMode("login"); window.history.pushState({}, "", "/login"); }}>
+          <TopNavLayout onLoginClick={() => { setMode("login"); window.history.pushState({}, "", "/login"); }}>
             {(activeTab) => (
               <Suspense fallback={<PageLoader />}>
                 {activeTab === "home"     && <Home />}
@@ -196,7 +196,7 @@ function App() {
                 {!["home","features","pricing","about","contact"].includes(activeTab) && <Home />}
               </Suspense>
             )}
-          </SidebarLayout>
+          </TopNavLayout>
         )}
 
       </Suspense>

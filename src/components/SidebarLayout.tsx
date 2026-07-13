@@ -74,10 +74,10 @@ export const SidebarLayout: React.FC<SidebarLayoutProps> = ({ children, onLoginC
         {/* Brand Section */}
         <div className="sidebar-brand">
           <div className="brand-icon-wrapper" style={{ background: 'none', boxShadow: 'none', padding: 0 }}>
-            <img src="/logo.png" alt="IronPulse Logo" style={{ width: 44, height: 44, objectFit: 'contain', borderRadius: 10 }} />
+            <img src="/logo.png" alt="Trainix Logo" style={{ width: 44, height: 44, objectFit: 'contain', borderRadius: 10 }} />
           </div>
           <div>
-            <h1 className="brand-name">IRONPULSE</h1>
+            <h1 className="brand-name">Trainix</h1>
             <p className="brand-subtitle">Gym Management Portal</p>
           </div>
         </div>
@@ -150,8 +150,8 @@ export const SidebarLayout: React.FC<SidebarLayoutProps> = ({ children, onLoginC
           </button>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <img src="/logo.png" alt="IronPulse Logo" style={{ width: 32, height: 32, objectFit: 'contain', borderRadius: 8 }} />
-            <span className="brand-name" style={{ fontSize: '1rem' }}>IRONPULSE</span>
+            <img src="/logo.png" alt="Trainix Logo" style={{ width: 32, height: 32, objectFit: 'contain', borderRadius: 8 }} />
+            <span className="brand-name" style={{ fontSize: '1rem' }}>Trainix</span>
           </div>
 
           <div style={{ width: 40 }}>

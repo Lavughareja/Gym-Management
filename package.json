@@ -15,10 +15,12 @@
     "@mui/material": "^9.0.1",
     "@reduxjs/toolkit": "^2.12.0",
     "axios": "^1.17.0",
+    "framer-motion": "^12.42.2",
     "html2pdf.js": "^0.14.0",
     "lucide-react": "^1.17.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
+    "react-parallax-tilt": "^1.7.333",
     "react-redux": "^9.3.0",
     "react-router-dom": "^7.17.0",
     "recharts": "^3.8.1"

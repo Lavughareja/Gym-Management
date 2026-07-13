@@ -28,6 +28,7 @@ export const apiRoutes = {
 
   // ── Attendance ────────────────────────────────────────────────────────────
   attendanceToday: "/attendance/today",
+  attendanceHistory: "/attendance/history",
 
   // ── Members ───────────────────────────────────────────────────────────────
   bulkImportMembers: "/manager/members/bulk-import",
