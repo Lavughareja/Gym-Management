@@ -1167,6 +1167,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
     { id: "diet",      label: "My Diet",    icon: Activity as any },
     { id: "plans",     label: "Gym Plans",  icon: CreditCard as any },
     { id: "challenges",label: "Challenges", icon: ShieldCheck as any },
+    { id: "events",    label: "Announcements", icon: Bell as any },
     // Only shown if member has an active PT
     ...(ptState.memberPtInfo ? [{ id: "pt" as Tab, label: "Personal Trainer", icon: UserCheck as any }] : []),
   ];
@@ -1195,7 +1196,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
         </div>
 
         {/* Nav */}
-        <nav style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+        <nav style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
           <ul className="sidebar-menu">
             {navItems.map(({ id, label, icon: Icon }) => {
               if (id === "health_monitor") {
@@ -2126,6 +2127,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
     library: <WorkoutLibraryPage />,
     pt: PersonalTrainerPanel,
     challenges: ChallengesPanel,
+    events: <EventsViewPanel />,
   };
 
   return (
