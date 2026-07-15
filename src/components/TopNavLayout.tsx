@@ -1,229 +1,88 @@
-import React, { useState } from 'react';
-import { 
-  ChevronDown, 
-  MonitorSmartphone, 
-  Globe, 
-  Dumbbell, 
-  Building2, 
-  Flame, 
-  Users, 
-  Heart, 
-  ActivitySquare, 
-  Music, 
-  Swords,
-  Sparkles,
-  Users2,
-  UserPlus,
-  Smartphone,
-  ShieldCheck,
-  BrainCircuit,
-  Fingerprint,
-  CalendarDays,
-  CreditCard,
-  Receipt,
-  Salad,
-  ScanLine,
-  Menu,
-  X
-} from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Menu, X, ArrowRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface TopNavLayoutProps {
   onLoginClick?: () => void;
-  children: (
-    activeTab: string, 
-    setActiveTab: (tab: string) => void
-  ) => React.ReactNode;
+  children: React.ReactNode;
 }
 
+const navLinks = [
+  { name: 'Home', href: '#home' },
+  { name: 'Features', href: '#features' },
+  { name: 'Solutions', href: '#solutions' },
+  { name: 'Pricing', href: '#pricing' },
+  { name: 'Screenshots', href: '#screenshots' },
+  { name: 'Integrations', href: '#integrations' },
+  { name: 'Testimonials', href: '#testimonials' },
+  { name: 'FAQ', href: '#faq' },
+  { name: 'Contact', href: '#contact' },
+];
+
 export const TopNavLayout: React.FC<TopNavLayoutProps> = ({ children, onLoginClick }) => {
-  const [activeTab, setActiveTab] = useState<string>('home');
+  const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
-  let timeoutId: ReturnType<typeof setTimeout>;
-
-  const handleMouseEnter = (menu: string) => {
-    clearTimeout(timeoutId);
-    setActiveDropdown(menu);
-  };
-
-  const handleMouseLeave = () => {
-    timeoutId = setTimeout(() => {
-      setActiveDropdown(null);
-    }, 150);
-  };
-
-  const navTo = (tab: string) => {
-    setActiveTab(tab);
-    setMobileMenuOpen(false);
-    setActiveDropdown(null);
-  };
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
-    <div className="topnav-layout">
-      {/* Top Navigation Bar */}
-      <header className="topnav-header">
-        <div className="topnav-container">
-          
-          {/* Logo */}
-          <div className="topnav-brand" onClick={() => navTo('home')} style={{ cursor: 'pointer' }}>
-            <img src="/logo.png" alt="Trainix Logo" className="topnav-logo-img" />
-            <span className="topnav-logo-text">Trainix</span>
-          </div>
-
-          {/* Desktop Navigation */}
-          <nav className="topnav-desktop">
-            {/* Products */}
-            <div 
-              className="topnav-item"
-              onMouseEnter={() => handleMouseEnter('products')}
-              onMouseLeave={handleMouseLeave}
-            >
-              <button className={`topnav-btn ${activeDropdown === 'products' ? 'active' : ''}`}>
-                Products <ChevronDown size={14} className="topnav-chevron" />
-              </button>
-              
-              {activeDropdown === 'products' && (
-                <div className="mega-menu products-menu">
-                  <div className="mega-menu-header">OUR PRODUCTS</div>
-                  <div className="mega-menu-grid-1">
-                    <div className="mega-item">
-                      <div className="mega-icon"><MonitorSmartphone size={20} /></div>
-                      <div>
-                        <h4>Gym Management Software</h4>
-                        <p>All-in-one solution to manage members, billing, attendance & more</p>
-                      </div>
-                    </div>
-                    <div className="mega-item">
-                      <div className="mega-icon"><Globe size={20} /></div>
-                      <div>
-                        <h4>Member App & Portal</h4>
-                        <p>Branded app for plans, payments & class bookings</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Solutions */}
-            <div 
-              className="topnav-item"
-              onMouseEnter={() => handleMouseEnter('solutions')}
-              onMouseLeave={handleMouseLeave}
-            >
-              <button className={`topnav-btn ${activeDropdown === 'solutions' ? 'active' : ''}`}>
-                Solutions <ChevronDown size={14} className="topnav-chevron" />
-              </button>
-              
-              {activeDropdown === 'solutions' && (
-                <div className="mega-menu solutions-menu">
-                  <div className="solutions-grid">
-                    <div>
-                      <div className="mega-menu-header">GYM & FITNESS</div>
-                      <div className="mega-item"><div className="mega-icon-small"><Dumbbell size={16} /></div> <h4>Gym</h4></div>
-                      <div className="mega-item"><div className="mega-icon-small"><Building2 size={16} /></div> <h4>Fitness Center</h4></div>
-                      <div className="mega-item"><div className="mega-icon-small"><Flame size={16} /></div> <h4>CrossFit Box</h4></div>
-                      <div className="mega-item"><div className="mega-icon-small"><Users size={16} /></div> <h4>Personal Training</h4></div>
-                    </div>
-                    <div>
-                      <div className="mega-menu-header">STUDIOS & SPECIALTY</div>
-                      <div className="mega-item"><div className="mega-icon-small"><Heart size={16} /></div> <h4>Yoga Studio</h4></div>
-                      <div className="mega-item"><div className="mega-icon-small"><ActivitySquare size={16} /></div> <h4>Pilates Studio</h4></div>
-                      <div className="mega-item"><div className="mega-icon-small"><Music size={16} /></div> <h4>Dance Studio</h4></div>
-                      <div className="mega-item"><div className="mega-icon-small"><Swords size={16} /></div> <h4>MMA & Martial Arts</h4></div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Features */}
-            <div 
-              className="topnav-item"
-              onMouseEnter={() => handleMouseEnter('features')}
-              onMouseLeave={handleMouseLeave}
-            >
-              <button className={`topnav-btn ${activeDropdown === 'features' || activeTab === 'features' ? 'active' : ''}`} onClick={() => navTo('features')}>
-                Features <ChevronDown size={14} className="topnav-chevron" />
-              </button>
-
-              {activeDropdown === 'features' && (
-                <div className="mega-menu features-menu">
-                  <div className="features-grid">
-                    <div>
-                      <div className="mega-menu-header">MEMBER MANAGEMENT</div>
-                      <div className="mega-item"><div className="mega-icon-small"><Sparkles size={16} /></div> <div><h4>Member Self-Serve <span className="badge">NEW</span></h4></div></div>
-                      <div className="mega-item"><div className="mega-icon-small"><Users2 size={16} /></div> <div><h4>Member Profiles & History</h4></div></div>
-                      <div className="mega-item"><div className="mega-icon-small"><UserPlus size={16} /></div> <div><h4>Lead Management</h4></div></div>
-                      <div className="mega-item"><div className="mega-icon-small"><Smartphone size={16} /></div> <div><h4>Member Portal</h4></div></div>
-                    </div>
-                    <div>
-                      <div className="mega-menu-header">OPERATIONS</div>
-                      <div className="mega-item"><div className="mega-icon-small"><BrainCircuit size={16} /></div> <div><h4>AI Business Pack</h4></div></div>
-                      <div className="mega-item"><div className="mega-icon-small"><Fingerprint size={16} /></div> <div><h4>Biometric Attendance</h4></div></div>
-                      <div className="mega-item"><div className="mega-icon-small"><ScanLine size={16} /></div> <div><h4>QR Attendance</h4></div></div>
-                      <div className="mega-item"><div className="mega-icon-small"><CalendarDays size={16} /></div> <div><h4>Class Scheduling</h4></div></div>
-                    </div>
-                    <div>
-                      <div className="mega-menu-header">BILLING & EXTRAS</div>
-                      <div className="mega-item"><div className="mega-icon-small"><CreditCard size={16} /></div> <div><h4>Payment Gateway</h4></div></div>
-                      <div className="mega-item"><div className="mega-icon-small"><Receipt size={16} /></div> <div><h4>Billing & Invoicing</h4></div></div>
-                      <div className="mega-item"><div className="mega-icon-small"><Salad size={16} /></div> <div><h4>Diet & Workout Plans</h4></div></div>
-                      <div className="mega-item"><div className="mega-icon-small"><ShieldCheck size={16} /></div> <div><h4>Staff Management</h4></div></div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Resources */}
-            <div 
-              className="topnav-item"
-              onMouseEnter={() => handleMouseEnter('resources')}
-              onMouseLeave={handleMouseLeave}
-            >
-              <button className={`topnav-btn ${activeDropdown === 'resources' ? 'active' : ''}`}>
-                Resources <ChevronDown size={14} className="topnav-chevron" />
-              </button>
-
-              {activeDropdown === 'resources' && (
-                <div className="mega-menu resources-menu">
-                  <div className="mega-menu-grid-1">
-                    <div className="mega-item" onClick={() => navTo('about')}>
-                      <div>
-                        <h4>About Us</h4>
-                        <p>Learn more about our mission and team.</p>
-                      </div>
-                    </div>
-                    <div className="mega-item" onClick={() => navTo('contact')}>
-                      <div>
-                        <h4>Contact Us</h4>
-                        <p>Get in touch with our support team.</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
+    <div className="min-h-screen bg-white text-dark font-sans selection:bg-primary selection:text-white">
+      {/* Header */}
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b border-transparent ${
+          isScrolled ? 'bg-white/80 backdrop-blur-md border-gray-200 py-3 shadow-sm' : 'bg-transparent py-5'
+        }`}
+      >
+        <div className="container mx-auto px-6 max-w-7xl">
+          <div className="flex items-center justify-between">
             
-            {/* Pricing */}
-            <div className="topnav-item">
-               <button className={`topnav-btn ${activeTab === 'pricing' ? 'active' : ''}`} onClick={() => navTo('pricing')}>
-                 Pricing
-               </button>
+            {/* Logo */}
+            <div className="flex items-center gap-2 cursor-pointer z-50">
+              <div className="w-8 h-8 rounded-lg bg-dark flex items-center justify-center">
+                <div className="w-4 h-4 bg-white rounded-sm"></div>
+              </div>
+              <span className="text-xl font-bold tracking-tight">GymCore</span>
             </div>
-          </nav>
 
-          {/* Right Actions */}
-          <div className="topnav-actions">
-            {onLoginClick && (
-              <button className="topnav-login-btn" onClick={onLoginClick}>Login</button>
-            )}
-            <button className="topnav-cta-btn" onClick={() => navTo('pricing')}>Start Free Trial</button>
-            
+            {/* Desktop Navigation */}
+            <nav className="hidden lg:flex items-center gap-5">
+              <a href="#features" className="text-xs font-medium text-gray-600 hover:text-dark transition-colors">Features</a>
+              <a href="#screenshots" className="text-xs font-medium text-gray-600 hover:text-dark transition-colors">Screenshots</a>
+              <a href="#integrations" className="text-xs font-medium text-gray-600 hover:text-dark transition-colors">Integrations</a>
+              <a href="#pricing" className="text-xs font-medium text-gray-600 hover:text-dark transition-colors">Pricing</a>
+              <a href="#testimonials" className="text-xs font-medium text-gray-600 hover:text-dark transition-colors">Testimonials</a>
+              <a href="#faq" className="text-xs font-medium text-gray-600 hover:text-dark transition-colors">FAQ</a>
+            </nav>
+
+            {/* Right Actions */}
+            <div className="hidden lg:flex items-center gap-4">
+              {onLoginClick && (
+                <button
+                  onClick={onLoginClick}
+                  className="text-sm font-medium text-gray-600 hover:text-dark transition-colors"
+                >
+                  Login
+                </button>
+              )}
+              <button className="text-sm font-medium text-dark hover:text-primary transition-colors">
+                Book Demo
+              </button>
+              <button className="bg-dark hover:bg-gray-800 text-white text-sm font-medium py-2 px-5 rounded-full transition-all flex items-center gap-2 hover:shadow-lg hover:shadow-dark/20">
+                Get Started <ArrowRight size={16} />
+              </button>
+            </div>
+
             {/* Mobile Menu Toggle */}
-            <button className="mobile-menu-toggle" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            <button
+              className="lg:hidden z-50 p-2 -mr-2 text-dark"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
               {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
@@ -231,121 +90,112 @@ export const TopNavLayout: React.FC<TopNavLayoutProps> = ({ children, onLoginCli
       </header>
 
       {/* Mobile Navigation Dropdown */}
-      {mobileMenuOpen && (
-        <div className="mobile-nav-menu">
-          <button onClick={() => navTo('home')}>Home</button>
-          <button onClick={() => navTo('features')}>Features</button>
-          <button onClick={() => navTo('pricing')}>Pricing</button>
-          <button onClick={() => navTo('about')}>About Us</button>
-          <button onClick={() => navTo('contact')}>Contact Us</button>
-          {onLoginClick && (
-            <button onClick={onLoginClick} style={{ color: 'var(--primary)', fontWeight: 600 }}>Login</button>
-          )}
-        </div>
-      )}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed inset-0 z-40 bg-white/95 backdrop-blur-xl pt-24 px-6 pb-6 overflow-y-auto"
+          >
+            <div className="flex flex-col gap-4">
+              {navLinks.map((link) => (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="text-lg font-medium text-gray-800 py-2 border-b border-gray-100"
+                >
+                  {link.name}
+                </a>
+              ))}
+              <div className="flex flex-col gap-3 mt-6">
+                {onLoginClick && (
+                  <button
+                    onClick={() => { onLoginClick(); setMobileMenuOpen(false); }}
+                    className="w-full text-center py-3 rounded-xl border border-gray-200 font-medium text-dark"
+                  >
+                    Login
+                  </button>
+                )}
+                <button className="w-full text-center py-3 rounded-xl bg-gray-100 font-medium text-dark">
+                  Book Demo
+                </button>
+                <button className="w-full text-center py-3 rounded-xl bg-primary text-white font-medium shadow-lg shadow-primary/30">
+                  Get Started
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Main Content Area */}
-      <main className="topnav-main-content">
-        {children(activeTab, setActiveTab)}
+      <main className="w-full pt-20">
+        {children}
       </main>
 
-      {/* Massive Multi-Column Footer */}
-      <footer className="mega-footer">
-        <div className="mega-footer-container">
-          <div className="footer-col-main">
-            <div className="footer-brand-logo">
-              <img src="/logo.png" alt="Trainix Logo" />
-              <span>Trainix</span>
+      {/* Footer */}
+      <footer className="bg-dark text-white pt-20 pb-10 border-t border-gray-800">
+        <div className="container mx-auto px-6 max-w-7xl">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
+            <div className="lg:col-span-2">
+              <div className="flex items-center gap-2 mb-6">
+                <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center">
+                  <div className="w-4 h-4 bg-dark rounded-sm"></div>
+                </div>
+                <span className="text-xl font-bold tracking-tight text-white">GymCore</span>
+              </div>
+              <p className="text-gray-400 mb-6 max-w-sm">
+                The complete operating system for modern gyms and fitness studios. Manage everything from one powerful platform.
+              </p>
+              <div className="flex items-center gap-4">
+                {['Twitter', 'LinkedIn', 'Instagram', 'Facebook'].map(social => (
+                  <a key={social} href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-gray-400 hover:text-white hover:bg-white/10 transition-colors">
+                    <span className="sr-only">{social}</span>
+                    <div className="w-4 h-4 bg-current rounded-sm"></div>
+                  </a>
+                ))}
+              </div>
             </div>
-            <p className="footer-tagline">The most intuitive platform for fitness businesses in India.</p>
-            <p className="footer-address">
-              Trainix Technologies Private Limited<br/>
-              Aparna Sarovar Ziron, Nallagandla,<br/>
-              Serilingampally, Hyderabad, 500019, Telangana
-            </p>
             
-            <div className="social-links">
-              <a href="#" className="social-btn">in</a>
-              <a href="#" className="social-btn">f</a>
-              <a href="#" className="social-btn">X</a>
-              <a href="#" className="social-btn">ig</a>
+            <div>
+              <h4 className="font-semibold text-white mb-6">Product</h4>
+              <ul className="flex flex-col gap-4">
+                {['Features', 'Pricing', 'Integrations', 'Changelog', 'Docs'].map(item => (
+                  <li key={item}><a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">{item}</a></li>
+                ))}
+              </ul>
             </div>
 
-            <div className="footer-apps">
-              <div className="app-download-btn">
-                <Smartphone size={20} className="app-icon" />
-                <div>
-                  <strong>Business App</strong>
-                  <div style={{fontSize: '0.7rem', color: '#9ca3af'}}>Run from your phone</div>
-                </div>
-                <div style={{marginLeft: 'auto'}}>&rarr;</div>
-              </div>
-              <div className="app-download-btn">
-                <Smartphone size={20} className="app-icon" />
-                <div>
-                  <strong>Member App</strong>
-                  <div style={{fontSize: '0.7rem', color: '#9ca3af'}}>iOS &middot; Android</div>
-                </div>
-                <div style={{marginLeft: 'auto'}}>&rarr;</div>
-              </div>
+            <div>
+              <h4 className="font-semibold text-white mb-6">Company</h4>
+              <ul className="flex flex-col gap-4">
+                {['About Us', 'Careers', 'Blog', 'Contact', 'Partners'].map(item => (
+                  <li key={item}><a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">{item}</a></li>
+                ))}
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-white mb-6">Legal</h4>
+              <ul className="flex flex-col gap-4">
+                {['Privacy Policy', 'Terms of Service', 'Cookie Policy', 'Security'].map(item => (
+                  <li key={item}><a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">{item}</a></li>
+                ))}
+              </ul>
             </div>
           </div>
-
-          <div className="footer-col-links">
-            <h4>Products</h4>
-            <a href="#">Gym Management Software</a>
-            <a href="#">Premium Gym Websites</a>
-            <a href="#">Payroll Management</a>
-            <a href="#">Custom Software Development</a>
+          
+          <div className="pt-8 border-t border-gray-800 flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-gray-500 text-sm">
+              &copy; {new Date().getFullYear()} GymCore Technologies. All rights reserved.
+            </p>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-success"></div>
+              <span className="text-gray-400 text-sm">All systems operational</span>
+            </div>
           </div>
-
-          <div className="footer-col-links">
-            <h4>Features</h4>
-            <a href="#">AI Business Pack <span className="badge-new" style={{fontSize: '0.6rem', padding: '2px 6px'}}>NEW</span></a>
-            <a href="#">WhatsApp Marketing <span className="badge-new" style={{fontSize: '0.6rem', padding: '2px 6px', background: '#10b981'}}>NEW</span></a>
-            <a href="#">WhatsApp Automation</a>
-            <a href="#">Member Management</a>
-            <a href="#">Staff Management</a>
-            <a href="#">Billing & Invoicing</a>
-            <a href="#">Biometric Attendance</a>
-            <a href="#">Member App & Portal</a>
-            <a href="#">Class Scheduling</a>
-            <a href="#">Lead Management</a>
-            <a href="#">Diet & Workout Plans</a>
-            <a href="#">Payment Integration</a>
-          </div>
-
-          <div className="footer-col-links">
-            <h4>Solutions</h4>
-            <a href="#">Gym</a>
-            <a href="#">Yoga Studio</a>
-            <a href="#">Pilates Studio</a>
-            <a href="#">Personal Training</a>
-            <a href="#">MMA & Martial Arts</a>
-            <a href="#">Fitness Center</a>
-            <a href="#">CrossFit Box</a>
-            <a href="#">Dance Studio</a>
-          </div>
-
-          <div className="footer-col-links">
-            <h4>Legal</h4>
-            <a href="#">About</a>
-            <a href="#">Partner Program</a>
-            <a href="#">Privacy Policy</a>
-            <a href="#">Terms of Service</a>
-            <a href="#">Refund Policy</a>
-            <a href="#">Contact</a>
-            <a href="#">Cookie Preferences</a>
-          </div>
-        </div>
-        
-        <div className="footer-bottom-bar">
-          <div className="fb-text">&copy; {new Date().getFullYear()} Trainix - Trainix Technologies Private Limited</div>
-          <div className="cookie-banner-inline">
-            <span style={{fontSize: '0.8rem'}}>🍪 We use cookies to improve your experience.</span>
-            <button className="btn-primary-small" style={{padding: '4px 12px', fontSize: '0.75rem', background: 'white', color: 'black'}}>Got it</button>
-          </div>
-          <div className="fb-text">All rights reserved. &nbsp;&middot;&nbsp; Built in India <Heart size={12} fill="#ef4444" color="#ef4444" style={{display: 'inline', margin: '0 4px'}}/> for the world.</div>
         </div>
       </footer>
     </div>

@@ -1,6 +1,5 @@
 import { lazy, Suspense, useState, useEffect } from "react";
 import { Loader } from "lucide-react";
-import { TopNavLayout } from "./components/TopNavLayout";
 import GlobalSnackbar from "./components/GlobalSnackbar/GlobalSnackbar";
 import "./App.css";
 import type { PlanType } from "./utils/constant";
@@ -183,20 +182,9 @@ function App() {
         )}
 
         {mode === "public" && (
-          <TopNavLayout onLoginClick={() => { setMode("login"); window.history.pushState({}, "", "/login"); }}>
-            {(activeTab) => (
-              <Suspense fallback={<PageLoader />}>
-                {activeTab === "home"     && <Home />}
-                {activeTab === "features" && <Features />}
-                {activeTab === "pricing"  && (
-                  <Pricing onPaymentVerified={handlePaymentVerified} />
-                )}
-                {activeTab === "about"    && <About />}
-                {activeTab === "contact"  && <Contact />}
-                {!["home","features","pricing","about","contact"].includes(activeTab) && <Home />}
-              </Suspense>
-            )}
-          </TopNavLayout>
+          <Suspense fallback={<PageLoader />}>
+            <Home />
+          </Suspense>
         )}
 
       </Suspense>

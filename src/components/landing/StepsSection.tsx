@@ -1,77 +1,51 @@
 import React from 'react';
-import { CalendarDays, TrendingUp } from 'lucide-react';
-import Tilt from 'react-parallax-tilt';
+import { motion } from 'framer-motion';
+
+const steps = [
+  { num: '01', title: 'Book Demo', desc: 'Schedule a personalized walkthrough of the platform with our fitness tech experts.' },
+  { num: '02', title: 'Create Gym', desc: 'Set up your branches, define membership plans, and configure your dashboard.' },
+  { num: '03', title: 'Add Members', desc: 'Import your existing members via CSV or start adding them one by one.' },
+  { num: '04', title: 'Manage Everything', desc: 'Sit back and watch your gym run efficiently on autopilot with GymCore.' },
+];
 
 export const StepsSection: React.FC = () => {
   return (
-    <>
-      {/* 3 Simple Steps Section */}
-      <section className="steps-section">
-        <div className="steps-content">
-          <div className="section-eyebrow">HOW IT WORKS</div>
-          <h2 className="section-title">
-            Launch your dashboard<br/><span className="text-primary-gradient">in 3 simple steps</span>
+    <section className="py-24 bg-white">
+      <div className="container mx-auto px-6 max-w-7xl">
+        <div className="text-center mb-20">
+          <h2 className="text-4xl lg:text-5xl font-bold text-dark mb-6 tracking-tight">
+            Get started in minutes.
           </h2>
-          <p className="section-subtitle" style={{ textAlign: 'left', margin: '0 0 32px 0' }}>Get your fitness center online and organized in minutes.</p>
-
-          <div className="step-item premium-hover-card" style={{ padding: '16px', borderRadius: '12px' }}>
-            <div className="step-number">1</div>
-            <div>
-              <h4>Create Your Space</h4>
-              <p>Register as a Gym Owner and set up your initial profile securely.</p>
-            </div>
-          </div>
-          <div className="step-item premium-hover-card" style={{ padding: '16px', borderRadius: '12px' }}>
-            <div className="step-number">2</div>
-            <div>
-              <h4>Add Plans & Staff</h4>
-              <p>Define your membership packages and invite your managers and trainers.</p>
-            </div>
-          </div>
-          <div className="step-item premium-hover-card" style={{ padding: '16px', borderRadius: '12px' }}>
-            <div className="step-number">3</div>
-            <div>
-              <h4>Manage Members</h4>
-              <p>Start registering members, assigning plans, and tracking attendance.</p>
-            </div>
-          </div>
-
-          <div className="hero-actions" style={{ justifyContent: 'flex-start', marginTop: 32 }}>
-            <button className="btn-primary-large premium-hover-card" style={{ padding: '12px 24px', fontSize: '1rem', border: 'none' }}>
-              Start Free Trial &rarr;
-            </button>
-          </div>
+          <p className="text-lg text-gray-600">
+            Transitioning to GymCore is frictionless. We handle the heavy lifting.
+          </p>
         </div>
-        
-        <div className="steps-image-container">
-          <Tilt tiltMaxAngleX={4} tiltMaxAngleY={4} scale={1.02} transitionSpeed={2500} className="steps-dashboard-mockup premium-hover-card">
-            <div className="floating-card top-left">
-              <div className="bell-icon"><CalendarDays size={14}/></div>
-              <div>
-                <div style={{ fontSize: '0.7rem', fontWeight: 700 }}>Stay Organized</div>
-                <div style={{ fontSize: '0.6rem', color: '#6b7280' }}>Easily monitor daily check-ins and member status...</div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 relative">
+          
+          {/* Connecting line */}
+          <div className="hidden lg:block absolute top-8 left-[10%] right-[10%] h-0.5 bg-gray-100 z-0"></div>
+
+          {steps.map((step, idx) => (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: idx * 0.1 }}
+              className="relative z-10 flex flex-col items-center text-center group"
+            >
+              <div className="w-16 h-16 rounded-2xl bg-white border-2 border-gray-100 shadow-xl flex items-center justify-center mb-8 group-hover:border-primary group-hover:text-primary transition-colors text-2xl font-bold text-gray-300">
+                {step.num}
               </div>
-            </div>
-            <div className="floating-card top-right">
-              <TrendingUp size={14} color="#10b981"/> 
-              <div style={{ fontSize: '0.7rem', fontWeight: 700 }}>Peak Analytics</div>
-            </div>
-            <div className="floating-card bottom-right" style={{ padding: '16px' }}>
-              <div style={{ fontSize: '0.7rem', color: '#6b7280' }}>Total Members</div>
-              <div style={{ fontSize: '1.2rem', fontWeight: 800 }}>845 <span style={{ color: '#10b981', fontSize: '0.7rem' }}>+12%</span></div>
-            </div>
-            
-            <div className="internal-mockup">
-              <div className="m-header"></div>
-              <div className="m-body">
-                <div className="m-chart"></div>
-                <div className="m-donut"></div>
-              </div>
-              <div className="m-list"></div>
-            </div>
-          </Tilt>
+              <h3 className="text-xl font-bold text-dark mb-4">{step.title}</h3>
+              <p className="text-gray-500 leading-relaxed">
+                {step.desc}
+              </p>
+            </motion.div>
+          ))}
         </div>
-      </section>
-    </>
+      </div>
+    </section>
   );
 };
