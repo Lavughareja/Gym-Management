@@ -2,10 +2,17 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 const stats = [
-  { value: '500+', label: 'Gyms' },
-  { value: '50,000+', label: 'Members Managed' },
-  { value: '99.99%', label: 'Uptime' },
-  { value: '20+', label: 'Countries' },
+  { value: '20+', label: 'Gyms', icon: '🏋️' },
+  { value: '50,000+', label: 'Members Managed', icon: '👥' },
+  { value: '500+', label: 'Trainers Onboarded', icon: '🎯' },
+  { value: '24/7', label: 'Support Available', icon: '🛡️' },
+];
+
+const logos = [
+  'GoldsGym',
+  'AnytimeFit',
+  'CrossFit',
+  'Equinox',
 ];
 
 export const TrustSection: React.FC = () => {
@@ -19,14 +26,11 @@ export const TrustSection: React.FC = () => {
             Trusted by industry leaders worldwide
           </p>
           
-          {/* Logo Carousel Placeholder */}
+          {/* Logo row — matches 20+ gyms */}
           <div className="flex flex-wrap justify-center items-center gap-12 lg:gap-24 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
-            {/* Using text placeholders instead of images for now */}
-            <div className="text-2xl font-bold tracking-tight">FitnessFirst</div>
-            <div className="text-2xl font-bold tracking-tight">GoldsGym</div>
-            <div className="text-2xl font-bold tracking-tight">AnytimeFit</div>
-            <div className="text-2xl font-bold tracking-tight">CrossFit</div>
-            <div className="text-2xl font-bold tracking-tight">Equinox</div>
+            {logos.map((name) => (
+              <div key={name} className="text-2xl font-bold tracking-tight">{name}</div>
+            ))}
           </div>
         </div>
 
@@ -41,6 +45,7 @@ export const TrustSection: React.FC = () => {
               transition={{ duration: 0.5, delay: idx * 0.1 }}
               className="text-center"
             >
+              <div className="text-3xl mb-2">{stat.icon}</div>
               <h3 className="text-4xl lg:text-5xl font-bold text-white mb-2">{stat.value}</h3>
               <p className="text-gray-400 font-medium">{stat.label}</p>
             </motion.div>

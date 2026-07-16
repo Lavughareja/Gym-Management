@@ -11,7 +11,7 @@ import {
   MessageCircle, Calendar, Video, FileSpreadsheet, Server,
   CheckCircle2, XCircle, Star, ChevronLeft, ChevronRight,
   Plus, Minus, ArrowRight, Play, TrendingUp, Activity,
-  Send
+  Send, Monitor, UserCog, Bell, ShieldCheck
 } from 'lucide-react';
 
 /* ===================== DATA ===================== */
@@ -26,27 +26,32 @@ const navLinks = [
 ];
 
 const features = [
+  // Management & Staff
   { icon: Users, title: 'Member Management', desc: 'Complete profiles, history, and engagement tracking.' },
   { icon: UserCheck, title: 'Trainer Management', desc: 'Assign clients, track sessions, and calculate payouts.' },
-  { icon: CalendarCheck, title: 'Attendance', desc: 'Real-time tracking of staff and member visits.' },
+  { icon: UserCog, title: 'PT Management', desc: 'Assign and track personal training sessions.' },
+  { icon: Bell, title: 'Announcements', desc: 'Broadcast updates and alerts to all members.' },
+  { icon: Shield, title: 'Role Permissions', desc: 'Granular access control for managers and trainers.' },
+  { icon: Building2, title: 'Branch Management', desc: 'Control multiple locations from a single dashboard.' },
+  { icon: Smartphone, title: 'Mobile Friendly', desc: 'Manage your gym on-the-go from any device.' },
+  
+  // Operations & Tracking
+  { icon: Target, title: 'CRM & Leads', desc: 'Track inquiries and convert prospects into members.' },
+  { icon: CalendarCheck, title: 'Attendance Tracking', desc: 'Real-time tracking of staff and member visits.' },
   { icon: Fingerprint, title: 'Biometric Integration', desc: 'Seamlessly sync with fingerprint and face scanners.' },
+  { icon: QrCode, title: 'QR Check-in', desc: 'Contactless entry using mobile app QR codes.' },
+  { icon: Play, title: 'Workout Library', desc: 'Extensive library of exercise video tutorials.' },
+  { icon: Activity, title: 'Workout Timing', desc: 'Live workout logging and session timing.' },
+  { icon: ShieldCheck, title: 'Daily Challenges', desc: 'Engage members with goals, streaks, and XP.' },
+
+  // Health & Billing
+  { icon: Dumbbell, title: 'Workout Plans', desc: 'Create and assign custom exercise routines.' },
+  { icon: Salad, title: 'AI Diet Generation', desc: 'Generate customized diet plans based on goals.' },
+  { icon: FileSpreadsheet, title: 'BMI & Macro Reports', desc: 'Track progress photos, BMI, and calorie consumption.' },
   { icon: CreditCard, title: 'Payment Tracking', desc: 'Monitor dues, collect payments, and send reminders.' },
   { icon: FileText, title: 'Invoices & Billing', desc: 'Automated billing and professional invoice generation.' },
-  { icon: Dumbbell, title: 'Workout Plans', desc: 'Create and assign custom exercise routines.' },
-  { icon: Salad, title: 'Diet & Nutrition', desc: 'Nutrition tracking and customized meal plans.' },
-  { icon: Building2, title: 'Branch Management', desc: 'Control multiple locations from a single dashboard.' },
-  { icon: LineChart, title: 'Analytics', desc: 'Deep insights into revenue, growth, and retention.' },
-  { icon: PieChart, title: 'Reports', desc: 'Exportable data on every aspect of your business.' },
-  { icon: MessageSquare, title: 'WhatsApp Alerts', desc: 'Automated alerts for payments and birthdays.' },
-  { icon: Mail, title: 'Email Notifications', desc: 'Newsletters and transactional email updates.' },
-  { icon: QrCode, title: 'QR Check-in', desc: 'Contactless entry using mobile app QR codes.' },
-  { icon: ClipboardList, title: 'Membership Plans', desc: 'Flexible packages, daily passes, and subscriptions.' },
-  { icon: Target, title: 'Lead Management', desc: 'Track inquiries and convert prospects into members.' },
   { icon: Wallet, title: 'Expense Tracking', desc: 'Log daily expenses to calculate true profit.' },
-  { icon: Banknote, title: 'Payroll', desc: 'Manage staff salaries and commission payouts.' },
-  { icon: Shield, title: 'Role Permissions', desc: 'Granular access control for managers and trainers.' },
-  { icon: Cloud, title: 'Cloud Backup', desc: 'Bank-level security with automated daily backups.' },
-  { icon: Smartphone, title: 'Mobile Friendly', desc: 'Manage your gym on-the-go from any device.' },
+  { icon: LineChart, title: 'Analytics & Reports', desc: 'Deep insights into revenue, growth, and retention.' },
 ];
 
 const screenTabs = [
@@ -177,34 +182,193 @@ const faqs = [
 
 /* ===================== COMPONENTS ===================== */
 
-// Navbar
+const featuresMenu = {
+  management: [
+    { title: 'Member Management', desc: 'Complete profiles, history & tracking', icon: <Users style={{ width: 18, height: 18 }} /> },
+    { title: 'Trainer Management', desc: 'Assign trainers & calculate payouts', icon: <UserCheck style={{ width: 18, height: 18 }} /> },
+    { title: 'PT Management', desc: 'Assign & track personal training', icon: <UserCog style={{ width: 18, height: 18 }} /> },
+    { title: 'Announcements', desc: 'Broadcast updates to members', icon: <Bell style={{ width: 18, height: 18 }} /> },
+    { title: 'Role Permissions', desc: 'Granular access control', icon: <Shield style={{ width: 18, height: 18 }} /> },
+    { title: 'Branch Management', desc: 'Control multiple locations', icon: <Building2 style={{ width: 18, height: 18 }} /> },
+    { title: 'Mobile Friendly', desc: 'Manage your gym on-the-go', icon: <Smartphone style={{ width: 18, height: 18 }} /> },
+  ],
+  operations: [
+    { title: 'CRM & Leads', desc: 'Track inquiries & convert prospects', icon: <Target style={{ width: 18, height: 18 }} /> },
+    { title: 'Attendance Tracking', desc: 'Real-time tracking of visits', icon: <CalendarCheck style={{ width: 18, height: 18 }} /> },
+    { title: 'Biometric & QR', desc: 'Fingerprint, face scanners & QR', icon: <Fingerprint style={{ width: 18, height: 18 }} /> },
+    { title: 'Workout Library', desc: 'Member exercise video tutorials', icon: <Play style={{ width: 18, height: 18 }} /> },
+    { title: 'Workout Timing', desc: 'Live workout logging & timing', icon: <Activity style={{ width: 18, height: 18 }} /> },
+    { title: 'Daily Challenges', desc: 'Goals, streaks, and XP rewards', icon: <ShieldCheck style={{ width: 18, height: 18 }} /> },
+    { title: 'AI Diet Generation', desc: 'Custom diets based on goals', icon: <Salad style={{ width: 18, height: 18 }} /> },
+  ],
+  billing: [
+    { title: 'BMI & Macro Reports', desc: 'Progress photos & calories tracking', icon: <FileSpreadsheet style={{ width: 18, height: 18 }} /> },
+    { title: 'Workout Plans', desc: 'Create custom exercise routines', icon: <Dumbbell style={{ width: 18, height: 18 }} /> },
+    { title: 'Payment Tracking', desc: 'Monitor dues & collect payments', icon: <CreditCard style={{ width: 18, height: 18 }} /> },
+    { title: 'Invoices & Billing', desc: 'Automated billing & invoices', icon: <FileText style={{ width: 18, height: 18 }} /> },
+    { title: 'Expense Tracking', desc: 'Log expenses to calculate profit', icon: <Wallet style={{ width: 18, height: 18 }} /> },
+    { title: 'Analytics & Reports', desc: 'Deep insights into revenue', icon: <LineChart style={{ width: 18, height: 18 }} /> },
+  ]
+};
+
+const primaryLinks = [
+  { name: 'Pricing',   href: '#pricing' },
+  { name: 'Contact',   href: '#contact' },
+];
+
+const resourcesLinks = [
+  {
+    href: '#screenshots',
+    icon: <Monitor style={{ width: 18, height: 18 }} />,
+    title: 'Screenshots',
+    desc: 'See every screen of the platform in detail',
+  },
+  {
+    href: '#integrations',
+    icon: <Cloud style={{ width: 18, height: 18 }} />,
+    title: 'Integrations',
+    desc: 'WhatsApp, Zoom, Stripe, Biometrics & more',
+  },
+  {
+    href: '#testimonials',
+    icon: <Star style={{ width: 18, height: 18 }} />,
+    title: 'Testimonials',
+    desc: 'What gym owners say about GymCore',
+  },
+  {
+    href: '#faq',
+    icon: <MessageSquare style={{ width: 18, height: 18 }} />,
+    title: 'FAQ',
+    desc: 'Common questions answered quickly',
+  },
+];
+
 const Navbar: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
   const [scrolled, setScrolled] = useState(false);
+  const [featuresOpen, setFeaturesOpen] = useState(false);
+  const [resourcesOpen, setResourcesOpen] = useState(false);
+
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', fn);
     return () => window.removeEventListener('scroll', fn);
   }, []);
+
   return (
     <header className="gc-navbar" style={{ boxShadow: scrolled ? '0 2px 20px rgba(0,0,0,0.08)' : 'none' }}>
-      <div className="gc-container">
+      <div className="gc-container gc-navbar-container">
         <div className="gc-navbar-inner">
+          {/* Logo */}
           <div className="gc-navbar-logo">
             <div className="gc-navbar-logo-icon">
               <Dumbbell style={{ width: 20, height: 20, color: 'white' }} />
             </div>
             <span className="gc-navbar-logo-text">GymCore</span>
           </div>
+
+          {/* Nav links */}
           <nav>
             <ul className="gc-navbar-nav">
-              {navLinks.map(l => (
+              {/* Features Mega Menu */}
+              <li
+                className="gc-nav-more"
+                onMouseEnter={() => setFeaturesOpen(true)}
+                onMouseLeave={() => setFeaturesOpen(false)}
+              >
+                <button className="gc-nav-more-btn">
+                  Features <span className={`gc-nav-more-chevron${featuresOpen ? ' open' : ''}`}>^</span>
+                </button>
+
+                {featuresOpen && (
+                  <div className="gc-mega-dropdown gc-mega-dropdown-large">
+                    <div className="gc-mega-columns">
+                      <div className="gc-mega-column">
+                        <p className="gc-mega-label">MANAGEMENT & STAFF</p>
+                        {featuresMenu.management.map(l => (
+                          <a key={l.title} href="#features" className="gc-mega-item" onClick={() => setFeaturesOpen(false)}>
+                            <span className="gc-mega-icon">{l.icon}</span>
+                            <span className="gc-mega-text">
+                              <span className="gc-mega-title">
+                                {l.title}
+                              </span>
+                              <span className="gc-mega-desc">{l.desc}</span>
+                            </span>
+                          </a>
+                        ))}
+                      </div>
+                      <div className="gc-mega-column">
+                        <p className="gc-mega-label">OPERATIONS & TRACKING</p>
+                        {featuresMenu.operations.map(l => (
+                          <a key={l.title} href="#features" className="gc-mega-item" onClick={() => setFeaturesOpen(false)}>
+                            <span className="gc-mega-icon">{l.icon}</span>
+                            <span className="gc-mega-text">
+                              <span className="gc-mega-title">
+                                {l.title}
+                              </span>
+                              <span className="gc-mega-desc">{l.desc}</span>
+                            </span>
+                          </a>
+                        ))}
+                      </div>
+                      <div className="gc-mega-column">
+                        <p className="gc-mega-label">BILLING & ANALYTICS</p>
+                        {featuresMenu.billing.map(l => (
+                          <a key={l.title} href="#features" className="gc-mega-item" onClick={() => setFeaturesOpen(false)}>
+                            <span className="gc-mega-icon">{l.icon}</span>
+                            <span className="gc-mega-text">
+                              <span className="gc-mega-title">
+                                {l.title}
+                              </span>
+                              <span className="gc-mega-desc">{l.desc}</span>
+                            </span>
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </li>
+
+              {primaryLinks.map(l => (
                 <li key={l.name}><a href={l.href}>{l.name}</a></li>
               ))}
+
+              {/* Resources dropdown */}
+              <li
+                className="gc-nav-more"
+                onMouseEnter={() => setResourcesOpen(true)}
+                onMouseLeave={() => setResourcesOpen(false)}
+              >
+                <button className="gc-nav-more-btn">
+                  Resources <span className={`gc-nav-more-chevron${resourcesOpen ? ' open' : ''}`}>^</span>
+                </button>
+
+                {resourcesOpen && (
+                  <div className="gc-mega-dropdown">
+                    <p className="gc-mega-label">LEARN & TOOLS</p>
+                    {resourcesLinks.map(l => (
+                      <a
+                        key={l.title}
+                        href={l.href}
+                        className="gc-mega-item"
+                        onClick={() => setResourcesOpen(false)}
+                      >
+                        <span className="gc-mega-icon">{l.icon}</span>
+                        <span className="gc-mega-text">
+                          <span className="gc-mega-title">{l.title}</span>
+                          <span className="gc-mega-desc">{l.desc}</span>
+                        </span>
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </li>
             </ul>
           </nav>
+
+          {/* Actions */}
           <div className="gc-navbar-actions">
             <button className="gc-btn-ghost" onClick={onLogin}>Login</button>
-            <button className="gc-btn-outline" onClick={onLogin}>Book Demo</button>
             <button className="gc-btn-primary" onClick={onLogin}>
               Get Started <ArrowRight />
             </button>
@@ -325,11 +489,10 @@ const Trust: React.FC = () => (
       <p className="gc-trust-label">Trusted by Industry Leaders Worldwide</p>
       <div className="gc-trust-grid">
         {[
-          { name: 'FitnessFirst', number: '500+', sub: 'Gyms' },
-          { name: 'GoldsGym', number: '50,000+', sub: 'Members Managed' },
-          { name: 'AnytimeFit', number: '99.99%', sub: 'Uptime' },
-          { name: 'CrossFit', number: '$2M+', sub: 'Revenue Tracked' },
-          { name: 'Equinox', number: '20+', sub: 'Countries' },
+          { name: 'GoldsGym',   number: '20+',     sub: 'Gyms' },
+          { name: 'AnytimeFit', number: '50,000+', sub: 'Members Managed' },
+          { name: 'CrossFit',   number: '500+',    sub: 'Trainers Onboarded' },
+          { name: 'Equinox',    number: '24/7',    sub: 'Support Available' },
         ].map((s) => (
           <div className="gc-trust-item" key={s.name}>
             <div className="gc-trust-name">{s.name}</div>
