@@ -32,6 +32,8 @@ const WorkoutLibrary = lazy(() => import("./pages/features/WorkoutLibrary").then
 const WorkoutTiming = lazy(() => import("./pages/features/WorkoutTiming").then(m => ({ default: m.WorkoutTiming })));
 const DailyChallenges = lazy(() => import("./pages/features/DailyChallenges").then(m => ({ default: m.DailyChallenges })));
 const AIDietGeneration = lazy(() => import("./pages/features/AIDietGeneration").then(m => ({ default: m.AIDietGeneration })));
+const BMIMacroReports = lazy(() => import("./pages/features/BMIMacroReports").then(m => ({ default: m.BMIMacroReports })));
+
 
 // ── Shared page-level loading fallback ──────────────────────────────────────
 const PageLoader = () => (
@@ -256,6 +258,8 @@ function App() {
               <DailyChallenges onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
             ) : featureId === 'ai-diet-generation' ? (
               <AIDietGeneration onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
+            ) : featureId === 'bmi-macro-reports' ? (
+              <BMIMacroReports onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
             ) : (
               <FeatureDetail featureId={featureId} onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
             )}
