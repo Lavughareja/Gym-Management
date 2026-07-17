@@ -23,6 +23,10 @@ const MemberManagement = lazy(() => import("./pages/features/MemberManagement").
 const TrainerManagement = lazy(() => import("./pages/features/TrainerManagement").then(m => ({ default: m.TrainerManagement })));
 const PTManagement = lazy(() => import("./pages/features/PTManagement").then(m => ({ default: m.PTManagement })));
 const Announcements = lazy(() => import("./pages/features/Announcements").then(m => ({ default: m.Announcements })));
+const RolePermissions = lazy(() => import("./pages/features/RolePermissions").then(m => ({ default: m.RolePermissions })));
+const MobileFriendly = lazy(() => import("./pages/features/MobileFriendly").then(m => ({ default: m.MobileFriendly })));
+const CRMLeads = lazy(() => import("./pages/features/CRMLeads").then(m => ({ default: m.CRMLeads })));
+const AttendanceTracking = lazy(() => import("./pages/features/AttendanceTracking").then(m => ({ default: m.AttendanceTracking })));
 
 // ── Shared page-level loading fallback ──────────────────────────────────────
 const PageLoader = () => (
@@ -229,6 +233,14 @@ function App() {
               <PTManagement onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
             ) : featureId === 'announcements' ? (
               <Announcements onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
+            ) : featureId === 'role-permissions' ? (
+              <RolePermissions onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
+            ) : featureId === 'mobile-friendly' ? (
+              <MobileFriendly onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
+            ) : featureId === 'crm-leads' ? (
+              <CRMLeads onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
+            ) : featureId === 'attendance-tracking' ? (
+              <AttendanceTracking onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
             ) : (
               <FeatureDetail featureId={featureId} onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
             )}
