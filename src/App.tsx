@@ -27,6 +27,11 @@ const RolePermissions = lazy(() => import("./pages/features/RolePermissions").th
 const MobileFriendly = lazy(() => import("./pages/features/MobileFriendly").then(m => ({ default: m.MobileFriendly })));
 const CRMLeads = lazy(() => import("./pages/features/CRMLeads").then(m => ({ default: m.CRMLeads })));
 const AttendanceTracking = lazy(() => import("./pages/features/AttendanceTracking").then(m => ({ default: m.AttendanceTracking })));
+const BiometricQR = lazy(() => import("./pages/features/BiometricQR").then(m => ({ default: m.BiometricQR })));
+const WorkoutLibrary = lazy(() => import("./pages/features/WorkoutLibrary").then(m => ({ default: m.WorkoutLibrary })));
+const WorkoutTiming = lazy(() => import("./pages/features/WorkoutTiming").then(m => ({ default: m.WorkoutTiming })));
+const DailyChallenges = lazy(() => import("./pages/features/DailyChallenges").then(m => ({ default: m.DailyChallenges })));
+const AIDietGeneration = lazy(() => import("./pages/features/AIDietGeneration").then(m => ({ default: m.AIDietGeneration })));
 
 // ── Shared page-level loading fallback ──────────────────────────────────────
 const PageLoader = () => (
@@ -241,6 +246,16 @@ function App() {
               <CRMLeads onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
             ) : featureId === 'attendance-tracking' ? (
               <AttendanceTracking onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
+            ) : featureId === 'biometric-qr' ? (
+              <BiometricQR onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
+            ) : featureId === 'workout-library' ? (
+              <WorkoutLibrary onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
+            ) : featureId === 'workout-timing' ? (
+              <WorkoutTiming onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
+            ) : featureId === 'daily-challenges' ? (
+              <DailyChallenges onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
+            ) : featureId === 'ai-diet-generation' ? (
+              <AIDietGeneration onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
             ) : (
               <FeatureDetail featureId={featureId} onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
             )}
