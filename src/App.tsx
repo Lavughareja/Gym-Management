@@ -18,6 +18,9 @@ const MemberSetup   = lazy(() => import("./pages/MemberSetup").then((m) => ({ de
 const MemberDashboard = lazy(() => import("./pages/MemberDashboard").then((m) => ({ default: m.MemberDashboard })));
 const ResetPassword = lazy(() => import("./pages/ResetPassword").then((m) => ({ default: m.ResetPassword })));
 const SuperAdminRoutes = lazy(() => import("./SuperAdmin/routes/SuperAdminRoutes"));
+const FeatureDetail = lazy(() => import("./pages/FeatureDetail"));
+const MemberManagement = lazy(() => import("./pages/features/MemberManagement").then(m => ({ default: m.MemberManagement })));
+const TrainerManagement = lazy(() => import("./pages/features/TrainerManagement").then(m => ({ default: m.TrainerManagement })));
 
 // ── Shared page-level loading fallback ──────────────────────────────────────
 const PageLoader = () => (
@@ -30,7 +33,7 @@ const PageLoader = () => (
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared types
 // ─────────────────────────────────────────────────────────────────────────────
-export type AppMode = "public" | "register" | "dashboard" | "login" | "manager-setup" | "trainer-setup" | "member-setup" | "reset-password" | "super-admin";
+export type AppMode = "public" | "register" | "dashboard" | "login" | "manager-setup" | "trainer-setup" | "member-setup" | "reset-password" | "super-admin" | "feature-detail";
 
 export interface DashboardUser {
   ownerName:    string;
@@ -58,7 +61,14 @@ function App() {
     if (hasDashUser && window.location.pathname === "/") {
       return "dashboard";
     }
+    const searchParams = new URLSearchParams(window.location.search);
+    if (searchParams.has("feature")) {
+      return "feature-detail";
+    }
     return "public";
+  });
+  const [featureId, setFeatureId] = useState<string | null>(() => {
+    return new URLSearchParams(window.location.search).get("feature");
   });
   const [paymentPayload, setPaymentPayload] = useState<PaymentVerifiedPayload | null>(null);
   const [dashUser, setDashUser] = useState<DashboardUser | null>(() => {
@@ -82,6 +92,26 @@ function App() {
     } else if (path === "/reset-password") {
       setMode("reset-password");
     }
+
+    const search = new URLSearchParams(window.location.search);
+    if (search.has("feature")) {
+      setFeatureId(search.get("feature"));
+      setMode("feature-detail");
+    }
+
+    // Handle logo click → go home
+    const handlePopState = () => {
+      const s = new URLSearchParams(window.location.search);
+      if (s.has("feature")) {
+        setFeatureId(s.get("feature"));
+        setMode("feature-detail");
+      } else if (window.location.pathname === "/") {
+        setMode("public");
+        setFeatureId(null);
+      }
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
   }, []);
 
   const handlePaymentVerified = (payload: PaymentVerifiedPayload) => {
@@ -184,6 +214,18 @@ function App() {
         {mode === "public" && (
           <Suspense fallback={<PageLoader />}>
             <Home />
+          </Suspense>
+        )}
+
+        {mode === "feature-detail" && featureId && (
+          <Suspense fallback={<PageLoader />}>
+            {featureId === 'member-management' ? (
+              <MemberManagement onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
+            ) : featureId === 'trainer-management' ? (
+              <TrainerManagement onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
+            ) : (
+              <FeatureDetail featureId={featureId} onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
+            )}
           </Suspense>
         )}
 

@@ -4,7 +4,7 @@ import { Plus, Minus } from 'lucide-react';
 
 const faqs = [
   {
-    q: "How long does it take to set up GymCore?",
+    q: "How long does it take to set up Trainix?",
     a: "Most gyms are fully set up within 24 hours. Our onboarding team will help you import your existing member data, set up your branches, and configure your biometric devices during your first onboarding call."
   },
   {
@@ -13,7 +13,7 @@ const faqs = [
   },
   {
     q: "Do you support biometric fingerprint scanners?",
-    a: "Absolutely. GymCore integrates natively with most popular biometric devices (Fingerprint, Face Recognition, RFID). Attendance is synced to the cloud in real-time."
+    a: "Absolutely. Trainix integrates natively with most popular biometric devices (Fingerprint, Face Recognition, RFID). Attendance is synced to the cloud in real-time."
   },
   {
     q: "Can I manage multiple branches?",
@@ -21,7 +21,7 @@ const faqs = [
   },
   {
     q: "How do automated WhatsApp notifications work?",
-    a: "GymCore automatically sends WhatsApp messages for payment reminders, successful renewals, birthday greetings, and attendance alerts. You don't have to lift a finger."
+    a: "Trainix automatically sends WhatsApp messages for payment reminders, successful renewals, birthday greetings, and attendance alerts. You don't have to lift a finger."
   },
   {
     q: "Is my data secure in the cloud?",
@@ -67,7 +67,7 @@ export const FaqAccordion: React.FC = () => {
                   {openIndex === idx ? <Minus size={16} /> : <Plus size={16} />}
                 </span>
               </button>
-              
+
               <AnimatePresence>
                 {openIndex === idx && (
                   <motion.div

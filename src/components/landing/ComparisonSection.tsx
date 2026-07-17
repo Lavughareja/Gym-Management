@@ -30,12 +30,12 @@ export const ComparisonSection: React.FC = () => {
             Stop doing it the hard way.
           </h2>
           <p className="text-lg text-gray-400">
-            See why modern gym owners are switching from spreadsheets to GymCore.
+            See why modern gym owners are switching from spreadsheets to Trainix.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
-          
+
           {/* Old Way Card */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
@@ -65,8 +65,8 @@ export const ComparisonSection: React.FC = () => {
           >
             {/* Glow effect inside card */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 blur-3xl rounded-full translate-x-1/2 -translate-y-1/2"></div>
-            
-            <div className="text-primary font-semibold tracking-wider uppercase mb-8 text-sm relative z-10">Using GymCore</div>
+
+            <div className="text-primary font-semibold tracking-wider uppercase mb-8 text-sm relative z-10">Using Trainix</div>
             <ul className="space-y-6 relative z-10">
               {newWay.map((item, i) => (
                 <li key={i} className="flex items-start gap-4 text-white">

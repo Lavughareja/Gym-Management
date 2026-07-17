@@ -34,7 +34,7 @@ const features = [
   { icon: Shield, title: 'Role Permissions', desc: 'Granular access control for managers and trainers.' },
   { icon: Building2, title: 'Branch Management', desc: 'Control multiple locations from a single dashboard.' },
   { icon: Smartphone, title: 'Mobile Friendly', desc: 'Manage your gym on-the-go from any device.' },
-  
+
   // Operations & Tracking
   { icon: Target, title: 'CRM & Leads', desc: 'Track inquiries and convert prospects into members.' },
   { icon: CalendarCheck, title: 'Attendance Tracking', desc: 'Real-time tracking of staff and member visits.' },
@@ -78,7 +78,7 @@ const steps = [
   { num: '01', title: 'Book Demo', desc: 'Schedule a personalized walkthrough of the platform with our fitness tech experts.' },
   { num: '02', title: 'Create Gym', desc: 'Set up your branches, define membership plans, and configure your dashboard.' },
   { num: '03', title: 'Add Members', desc: 'Import your existing members via CSV or start adding them one by one.' },
-  { num: '04', title: 'Manage Everything', desc: 'Sit back and watch your gym run efficiently on autopilot with GymCore.' },
+  { num: '04', title: 'Manage Everything', desc: 'Sit back and watch your gym run efficiently on autopilot with Trainix.' },
 ];
 
 const integrations = [
@@ -131,7 +131,7 @@ const testimonials = [
     name: 'Sarah Jenkins',
     role: 'Owner, Elevate Fitness Studio',
     image: 'https://i.pravatar.cc/150?img=44',
-    text: 'GymCore completely transformed how we run our daily operations. The biometric integration alone saved us hours of manual work every week.',
+    text: 'Trainix completely transformed how we run our daily operations. The biometric integration alone saved us hours of manual work every week.',
     rating: 5,
     type: 'Fitness Studio',
   },
@@ -139,7 +139,7 @@ const testimonials = [
     name: 'Marcus Rodriguez',
     role: 'Head Coach, Iron & Chalk CrossFit',
     image: 'https://i.pravatar.cc/150?img=11',
-    text: 'Moving our 300+ members from spreadsheets to GymCore was seamless. The automated WhatsApp reminders for payments have reduced our outstanding dues by 80%.',
+    text: 'Moving our 300+ members from spreadsheets to Trainix was seamless. The automated WhatsApp reminders for payments have reduced our outstanding dues by 80%.',
     rating: 5,
     type: 'CrossFit',
   },
@@ -147,7 +147,7 @@ const testimonials = [
     name: 'Elena Rostova',
     role: 'Founder, Zen Flow Yoga',
     image: 'https://i.pravatar.cc/150?img=5',
-    text: 'We needed something simple yet powerful for our boutique studio. GymCore\'s beautiful interface and member portal is exactly what our high-end clients expect.',
+    text: 'We needed something simple yet powerful for our boutique studio. Trainix\'s beautiful interface and member portal is exactly what our high-end clients expect.',
     rating: 5,
     type: 'Yoga Studio',
   },
@@ -155,7 +155,7 @@ const testimonials = [
 
 const faqs = [
   {
-    q: 'How long does it take to set up GymCore?',
+    q: 'How long does it take to set up Trainix?',
     a: 'Most gyms are fully set up within 24 hours. Our onboarding team will help you import your existing member data, set up your branches, and configure your biometric devices during your first onboarding call.',
   },
   {
@@ -164,7 +164,7 @@ const faqs = [
   },
   {
     q: 'Do you support biometric fingerprint scanners?',
-    a: 'Absolutely. GymCore integrates natively with most popular biometric devices (Fingerprint, Face Recognition, RFID). Attendance is synced to the cloud in real-time.',
+    a: 'Absolutely. Trainix integrates natively with most popular biometric devices (Fingerprint, Face Recognition, RFID). Attendance is synced to the cloud in real-time.',
   },
   {
     q: 'Can I manage multiple branches?',
@@ -172,7 +172,7 @@ const faqs = [
   },
   {
     q: 'How do automated WhatsApp notifications work?',
-    a: 'GymCore automatically sends WhatsApp messages for payment reminders, successful renewals, birthday greetings, and attendance alerts. You don\'t have to lift a finger.',
+    a: 'Trainix automatically sends WhatsApp messages for payment reminders, successful renewals, birthday greetings, and attendance alerts. You don\'t have to lift a finger.',
   },
   {
     q: 'Is my data secure in the cloud?',
@@ -212,8 +212,8 @@ const featuresMenu = {
 };
 
 const primaryLinks = [
-  { name: 'Pricing',   href: '#pricing' },
-  { name: 'Contact',   href: '#contact' },
+  { name: 'Pricing', href: '#pricing' },
+  { name: 'Contact', href: '#contact' },
 ];
 
 const resourcesLinks = [
@@ -233,7 +233,7 @@ const resourcesLinks = [
     href: '#testimonials',
     icon: <Star style={{ width: 18, height: 18 }} />,
     title: 'Testimonials',
-    desc: 'What gym owners say about GymCore',
+    desc: 'What gym owners say about Trainix',
   },
   {
     href: '#faq',
@@ -243,10 +243,36 @@ const resourcesLinks = [
   },
 ];
 
-const Navbar: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
+export const Navbar: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
   const [scrolled, setScrolled] = useState(false);
   const [featuresOpen, setFeaturesOpen] = useState(false);
   const [resourcesOpen, setResourcesOpen] = useState(false);
+  
+  // Need to import useRef, or use React.useRef
+  const featuresTimeout = React.useRef<any>(null);
+  const resourcesTimeout = React.useRef<any>(null);
+
+  const handleFeaturesEnter = () => {
+    if (featuresTimeout.current) clearTimeout(featuresTimeout.current);
+    setFeaturesOpen(true);
+  };
+
+  const handleFeaturesLeave = () => {
+    featuresTimeout.current = setTimeout(() => {
+      setFeaturesOpen(false);
+    }, 300);
+  };
+
+  const handleResourcesEnter = () => {
+    if (resourcesTimeout.current) clearTimeout(resourcesTimeout.current);
+    setResourcesOpen(true);
+  };
+
+  const handleResourcesLeave = () => {
+    resourcesTimeout.current = setTimeout(() => {
+      setResourcesOpen(false);
+    }, 300);
+  };
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 20);
@@ -259,11 +285,15 @@ const Navbar: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
       <div className="gc-container gc-navbar-container">
         <div className="gc-navbar-inner">
           {/* Logo */}
-          <div className="gc-navbar-logo">
+          <div
+            className="gc-navbar-logo"
+            onClick={() => { window.history.pushState({}, '', '/'); window.dispatchEvent(new PopStateEvent('popstate')); }}
+            style={{ cursor: 'pointer' }}
+          >
             <div className="gc-navbar-logo-icon">
               <Dumbbell style={{ width: 20, height: 20, color: 'white' }} />
             </div>
-            <span className="gc-navbar-logo-text">GymCore</span>
+            <span className="gc-navbar-logo-text">Trainix</span>
           </div>
 
           {/* Nav links */}
@@ -272,20 +302,20 @@ const Navbar: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
               {/* Features Mega Menu */}
               <li
                 className="gc-nav-more"
-                onMouseEnter={() => setFeaturesOpen(true)}
-                onMouseLeave={() => setFeaturesOpen(false)}
+                onMouseEnter={handleFeaturesEnter}
+                onMouseLeave={handleFeaturesLeave}
               >
                 <button className="gc-nav-more-btn">
                   Features <span className={`gc-nav-more-chevron${featuresOpen ? ' open' : ''}`}>^</span>
                 </button>
 
                 {featuresOpen && (
-                  <div className="gc-mega-dropdown gc-mega-dropdown-large">
+                  <div className="gc-mega-dropdown gc-mega-dropdown-large" onMouseEnter={handleFeaturesEnter} onMouseLeave={handleFeaturesLeave}>
                     <div className="gc-mega-columns">
                       <div className="gc-mega-column">
                         <p className="gc-mega-label">MANAGEMENT & STAFF</p>
                         {featuresMenu.management.map(l => (
-                          <a key={l.title} href="#features" className="gc-mega-item" onClick={() => setFeaturesOpen(false)}>
+                          <a key={l.title} href={`/?feature=${l.title.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-')}`} className="gc-mega-item" onClick={() => setFeaturesOpen(false)}>
                             <span className="gc-mega-icon">{l.icon}</span>
                             <span className="gc-mega-text">
                               <span className="gc-mega-title">
@@ -299,7 +329,7 @@ const Navbar: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
                       <div className="gc-mega-column">
                         <p className="gc-mega-label">OPERATIONS & TRACKING</p>
                         {featuresMenu.operations.map(l => (
-                          <a key={l.title} href="#features" className="gc-mega-item" onClick={() => setFeaturesOpen(false)}>
+                          <a key={l.title} href={`/?feature=${l.title.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-')}`} className="gc-mega-item" onClick={() => setFeaturesOpen(false)}>
                             <span className="gc-mega-icon">{l.icon}</span>
                             <span className="gc-mega-text">
                               <span className="gc-mega-title">
@@ -313,7 +343,7 @@ const Navbar: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
                       <div className="gc-mega-column">
                         <p className="gc-mega-label">BILLING & ANALYTICS</p>
                         {featuresMenu.billing.map(l => (
-                          <a key={l.title} href="#features" className="gc-mega-item" onClick={() => setFeaturesOpen(false)}>
+                          <a key={l.title} href={`/?feature=${l.title.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-')}`} className="gc-mega-item" onClick={() => setFeaturesOpen(false)}>
                             <span className="gc-mega-icon">{l.icon}</span>
                             <span className="gc-mega-text">
                               <span className="gc-mega-title">
@@ -336,15 +366,15 @@ const Navbar: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
               {/* Resources dropdown */}
               <li
                 className="gc-nav-more"
-                onMouseEnter={() => setResourcesOpen(true)}
-                onMouseLeave={() => setResourcesOpen(false)}
+                onMouseEnter={handleResourcesEnter}
+                onMouseLeave={handleResourcesLeave}
               >
                 <button className="gc-nav-more-btn">
                   Resources <span className={`gc-nav-more-chevron${resourcesOpen ? ' open' : ''}`}>^</span>
                 </button>
 
                 {resourcesOpen && (
-                  <div className="gc-mega-dropdown">
+                  <div className="gc-mega-dropdown" onMouseEnter={handleResourcesEnter} onMouseLeave={handleResourcesLeave}>
                     <p className="gc-mega-label">LEARN & TOOLS</p>
                     {resourcesLinks.map(l => (
                       <a
@@ -390,7 +420,7 @@ const Hero: React.FC = () => {
           <div>
             <div className="gc-hero-badge">
               <span className="gc-hero-badge-dot"></span>
-              GymCore 2.0 is now live
+              Trainix 2.0 is now live
             </div>
             <h1 className="gc-hero-title">
               Everything Your Gym Needs.<br />
@@ -489,10 +519,10 @@ const Trust: React.FC = () => (
       <p className="gc-trust-label">Trusted by Industry Leaders Worldwide</p>
       <div className="gc-trust-grid">
         {[
-          { name: 'GoldsGym',   number: '20+',     sub: 'Gyms' },
-          { name: 'AnytimeFit', number: '50,000+', sub: 'Members Managed' },
-          { name: 'CrossFit',   number: '500+',    sub: 'Trainers Onboarded' },
-          { name: 'Equinox',    number: '24/7',    sub: 'Support Available' },
+          { name: 'GoldsGym', number: '20+', sub: 'Gyms' },
+          { name: 'AnytimeFit', number: '10,000+', sub: 'Members Managed' },
+          { name: 'CrossFit', number: '500+', sub: 'Trainers Onboarded' },
+          { name: 'Equinox', number: '24/7', sub: 'Support Available' },
         ].map((s) => (
           <div className="gc-trust-item" key={s.name}>
             <div className="gc-trust-name">{s.name}</div>
@@ -539,7 +569,7 @@ const Screenshots: React.FC = () => {
       <div className="gc-container">
         <div className="gc-section-head">
           <h2 className="gc-section-title">Designed for clarity.<br /><span>Built for speed.</span></h2>
-          <p className="gc-section-subtitle">Every screen in GymCore is meticulously designed to give you exactly what you need, exactly when you need it.</p>
+          <p className="gc-section-subtitle">Every screen in Trainix is meticulously designed to give you exactly what you need, exactly when you need it.</p>
         </div>
         <div className="gc-screen-tabs">
           {screenTabs.map((t, i) => (
@@ -563,13 +593,13 @@ const Screenshots: React.FC = () => {
                 </div>
                 <div className="gc-dash-body">
                   <div className="gc-dash-sidebar">
-                    {[0,1,2,3,4,5].map(i => (
+                    {[0, 1, 2, 3, 4, 5].map(i => (
                       <div key={i} className={`gc-dash-sidebar-item ${i === 0 ? 'gc-dash-sidebar-item-active' : ''}`}></div>
                     ))}
                   </div>
                   <div className="gc-dash-main">
                     <div className="gc-dash-cards">
-                      {[0,1,2,3].map(i => (
+                      {[0, 1, 2, 3].map(i => (
                         <div className="gc-dash-stat-card" key={i}>
                           <div className="gc-dash-stat-label"></div>
                           <div className="gc-dash-stat-val"></div>
@@ -586,7 +616,7 @@ const Screenshots: React.FC = () => {
                         </div>
                       </div>
                       <div className="gc-dash-table">
-                        {[0,1,2,3,4].map(i => (
+                        {[0, 1, 2, 3, 4].map(i => (
                           <div key={i} className="gc-dash-table-row"></div>
                         ))}
                       </div>
@@ -609,7 +639,7 @@ const Comparison: React.FC = () => (
     <div className="gc-container">
       <div className="gc-section-head">
         <h2 className="gc-section-title gc-section-title-white">Stop doing it the hard way.</h2>
-        <p className="gc-section-subtitle gc-section-subtitle-white">See why modern gym owners are switching from spreadsheets to GymCore.</p>
+        <p className="gc-section-subtitle gc-section-subtitle-white">See why modern gym owners are switching from spreadsheets to Trainix.</p>
       </div>
       <div className="gc-compare-grid">
         <div className="gc-compare-card">
@@ -624,7 +654,7 @@ const Comparison: React.FC = () => (
         </div>
         <div className="gc-compare-card gc-compare-card-accent">
           <div className="gc-compare-label gc-compare-label-green">
-            <CheckCircle2 style={{ width: 18, height: 18 }} /> Using GymCore
+            <CheckCircle2 style={{ width: 18, height: 18 }} /> Using Trainix
           </div>
           <ul className="gc-compare-list gc-compare-list-white">
             {newWay.map((item, i) => (
@@ -643,7 +673,7 @@ const Steps: React.FC = () => (
     <div className="gc-container">
       <div className="gc-section-head">
         <h2 className="gc-section-title">Get started in minutes.</h2>
-        <p className="gc-section-subtitle">Transitioning to GymCore is frictionless. We handle the heavy lifting.</p>
+        <p className="gc-section-subtitle">Transitioning to Trainix is frictionless. We handle the heavy lifting.</p>
       </div>
       <div className="gc-steps-grid">
         <div className="gc-steps-line"></div>
@@ -665,7 +695,7 @@ const Integrations: React.FC = () => (
     <div className="gc-container">
       <div className="gc-section-head">
         <h2 className="gc-section-title">Plays well with others.</h2>
-        <p className="gc-section-subtitle">Connect GymCore with the tools you already use. Powerful integrations make managing your business seamless.</p>
+        <p className="gc-section-subtitle">Connect Trainix with the tools you already use. Powerful integrations make managing your business seamless.</p>
       </div>
       <div className="gc-int-grid">
         {integrations.map((int, i) => (
@@ -799,7 +829,7 @@ const Contact: React.FC = () => (
       <div className="gc-contact-grid">
         <div>
           <h2 className="gc-contact-title">Ready to scale your gym?</h2>
-          <p className="gc-contact-desc">Book a free 30-minute personalized demo with our fitness tech experts. See how GymCore can transform your business.</p>
+          <p className="gc-contact-desc">Book a free 30-minute personalized demo with our fitness tech experts. See how Trainix can transform your business.</p>
           <div className="gc-contact-points">
             {[
               'Customized walkthrough of the platform',
@@ -858,14 +888,14 @@ const Contact: React.FC = () => (
 );
 
 // Footer
-const Footer: React.FC = () => (
+export const Footer: React.FC = () => (
   <footer className="gc-footer">
     <div className="gc-container">
       <div className="gc-footer-top">
         <div>
           <div className="gc-footer-brand-name">
             <div className="gc-footer-brand-icon"></div>
-            GymCore
+            Trainix
           </div>
           <p className="gc-footer-brand-desc">The modern gym management platform built for fitness businesses that want to grow smarter, not harder.</p>
         </div>
@@ -895,7 +925,7 @@ const Footer: React.FC = () => (
         </div>
       </div>
       <div className="gc-footer-bottom">
-        <span className="gc-footer-copy">© {new Date().getFullYear()} GymCore. All rights reserved.</span>
+        <span className="gc-footer-copy">© {new Date().getFullYear()} Trainix. All rights reserved.</span>
         <span className="gc-footer-copy">Built with ❤️ for gym owners worldwide</span>
       </div>
     </div>

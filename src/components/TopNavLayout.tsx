@@ -35,19 +35,18 @@ export const TopNavLayout: React.FC<TopNavLayoutProps> = ({ children, onLoginCli
     <div className="min-h-screen bg-white text-dark font-sans selection:bg-primary selection:text-white">
       {/* Header */}
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b border-transparent ${
-          isScrolled ? 'bg-white/80 backdrop-blur-md border-gray-200 py-3 shadow-sm' : 'bg-transparent py-5'
-        }`}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 border-b border-transparent ${isScrolled ? 'bg-white/80 backdrop-blur-md border-gray-200 py-3 shadow-sm' : 'bg-transparent py-5'
+          }`}
       >
         <div className="container mx-auto px-6 max-w-7xl">
           <div className="flex items-center justify-between">
-            
+
             {/* Logo */}
             <div className="flex items-center gap-2 cursor-pointer z-50">
               <div className="w-8 h-8 rounded-lg bg-dark flex items-center justify-center">
                 <div className="w-4 h-4 bg-white rounded-sm"></div>
               </div>
-              <span className="text-xl font-bold tracking-tight">GymCore</span>
+              <span className="text-xl font-bold tracking-tight">Trainix</span>
             </div>
 
             {/* Desktop Navigation */}
@@ -144,7 +143,7 @@ export const TopNavLayout: React.FC<TopNavLayoutProps> = ({ children, onLoginCli
                 <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center">
                   <div className="w-4 h-4 bg-dark rounded-sm"></div>
                 </div>
-                <span className="text-xl font-bold tracking-tight text-white">GymCore</span>
+                <span className="text-xl font-bold tracking-tight text-white">Trainix</span>
               </div>
               <p className="text-gray-400 mb-6 max-w-sm">
                 The complete operating system for modern gyms and fitness studios. Manage everything from one powerful platform.
@@ -158,7 +157,7 @@ export const TopNavLayout: React.FC<TopNavLayoutProps> = ({ children, onLoginCli
                 ))}
               </div>
             </div>
-            
+
             <div>
               <h4 className="font-semibold text-white mb-6">Product</h4>
               <ul className="flex flex-col gap-4">
@@ -186,10 +185,10 @@ export const TopNavLayout: React.FC<TopNavLayoutProps> = ({ children, onLoginCli
               </ul>
             </div>
           </div>
-          
+
           <div className="pt-8 border-t border-gray-800 flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-gray-500 text-sm">
-              &copy; {new Date().getFullYear()} GymCore Technologies. All rights reserved.
+              &copy; {new Date().getFullYear()} Trainix Technologies. All rights reserved.
             </p>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-success"></div>

@@ -23,7 +23,7 @@ export const IntegrationsGrid: React.FC = () => {
             Plays well with others.
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Connect GymCore with the tools you already use. Powerful integrations make managing your business seamless.
+            Connect Trainix with the tools you already use. Powerful integrations make managing your business seamless.
           </p>
         </div>
 

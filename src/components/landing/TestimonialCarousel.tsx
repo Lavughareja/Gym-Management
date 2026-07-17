@@ -8,7 +8,7 @@ const testimonials = [
     name: "Sarah Jenkins",
     role: "Owner, Elevate Fitness Studio",
     image: "https://i.pravatar.cc/150?img=44",
-    text: "GymCore completely transformed how we run our daily operations. The biometric integration alone saved us hours of manual work every week. It's the most polished software we've ever used.",
+    text: "Trainix completely transformed how we run our daily operations. The biometric integration alone saved us hours of manual work every week. It's the most polished software we've ever used.",
     rating: 5,
     type: "Fitness Studio"
   },
@@ -17,7 +17,7 @@ const testimonials = [
     name: "Marcus Rodriguez",
     role: "Head Coach, Iron & Chalk CrossFit",
     image: "https://i.pravatar.cc/150?img=11",
-    text: "Moving our 300+ members from spreadsheets to GymCore was seamless. The automated WhatsApp reminders for payments have reduced our outstanding dues by 80%. Highly recommended.",
+    text: "Moving our 300+ members from spreadsheets to Trainix was seamless. The automated WhatsApp reminders for payments have reduced our outstanding dues by 80%. Highly recommended.",
     rating: 5,
     type: "CrossFit"
   },
@@ -26,7 +26,7 @@ const testimonials = [
     name: "Elena Rostova",
     role: "Founder, Zen Flow Yoga",
     image: "https://i.pravatar.cc/150?img=5",
-    text: "We needed something simple yet powerful for our boutique studio. GymCore's beautiful interface and member portal is exactly what our high-end clients expect.",
+    text: "We needed something simple yet powerful for our boutique studio. Trainix's beautiful interface and member portal is exactly what our high-end clients expect.",
     rating: 5,
     type: "Yoga Studio"
   }
@@ -56,7 +56,7 @@ export const TestimonialCarousel: React.FC = () => {
           <button onClick={prev} className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 lg:-translate-x-12 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center backdrop-blur-md transition-colors z-20">
             <ChevronLeft size={24} />
           </button>
-          
+
           <button onClick={next} className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 lg:translate-x-12 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center backdrop-blur-md transition-colors z-20">
             <ChevronRight size={24} />
           </button>
@@ -64,7 +64,7 @@ export const TestimonialCarousel: React.FC = () => {
           {/* Testimonial Card */}
           <div className="bg-[#14151a] border border-gray-800 rounded-3xl p-8 lg:p-14 relative">
             <Quote className="absolute top-8 left-8 text-gray-800" size={80} />
-            
+
             <AnimatePresence mode="wait">
               <motion.div
                 key={current}
@@ -79,15 +79,15 @@ export const TestimonialCarousel: React.FC = () => {
                     <Star key={i} size={20} fill="currentColor" />
                   ))}
                 </div>
-                
+
                 <p className="text-xl lg:text-3xl font-medium leading-relaxed mb-10 text-gray-200">
                   "{testimonials[current].text}"
                 </p>
-                
+
                 <div className="flex flex-col items-center">
-                  <img 
-                    src={testimonials[current].image} 
-                    alt={testimonials[current].name} 
+                  <img
+                    src={testimonials[current].image}
+                    alt={testimonials[current].name}
                     className="w-16 h-16 rounded-full object-cover mb-4 border-2 border-primary/50"
                   />
                   <h4 className="font-bold text-lg">{testimonials[current].name}</h4>
@@ -99,11 +99,11 @@ export const TestimonialCarousel: React.FC = () => {
               </motion.div>
             </AnimatePresence>
           </div>
-          
+
           {/* Indicators */}
           <div className="flex justify-center gap-2 mt-8">
             {testimonials.map((_, idx) => (
-              <button 
+              <button
                 key={idx}
                 onClick={() => setCurrent(idx)}
                 className={`h-2 rounded-full transition-all ${current === idx ? 'w-8 bg-primary' : 'w-2 bg-gray-800 hover:bg-gray-700'}`}

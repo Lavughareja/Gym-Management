@@ -1,0 +1,231 @@
+import React, { useState } from 'react';
+import { MoreVertical, FileText, QrCode, Trash2, Edit, Repeat, Eye, PauseCircle, UserCheck, Users, Plus } from 'lucide-react';
+
+interface MembersTableProps {
+  members: any[];
+  onViewMember: (member: any) => void;
+  onAddMember: () => void;
+}
+
+const StatusBadge = ({ status }: { status: string }) => {
+  const s = (status || 'active').toLowerCase();
+  const map: Record<string, { bg: string; color: string; label: string }> = {
+    active:         { bg: '#dcfce7', color: '#16a34a', label: 'Active' },
+    'expiring soon':{ bg: '#ffedd5', color: '#ea580c', label: 'Expiring' },
+    expired:        { bg: '#fee2e2', color: '#dc2626', label: 'Expired' },
+    inactive:       { bg: '#fee2e2', color: '#dc2626', label: 'Expired' },
+    frozen:         { bg: '#f1f5f9', color: '#475569', label: 'Frozen' },
+  };
+  const style = map[s] || map.frozen;
+  return (
+    <span style={{ background: style.bg, color: style.color, padding: '3px 10px', borderRadius: 100, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', display: 'inline-block' }}>
+      {style.label}
+    </span>
+  );
+};
+
+const PaymentBadge = ({ status }: { status: string }) => {
+  const s = (status || 'paid').toLowerCase();
+  const map: Record<string, { bg: string; color: string; border: string }> = {
+    paid:    { bg: '#f0fdf4', color: '#16a34a', border: '#bbf7d0' },
+    pending: { bg: '#fefce8', color: '#ca8a04', border: '#fef08a' },
+    overdue: { bg: '#fff1f2', color: '#e11d48', border: '#fecdd3' },
+    partial: { bg: '#eff6ff', color: '#2563eb', border: '#bfdbfe' },
+  };
+  const style = map[s] || map.paid;
+  return (
+    <span style={{ background: style.bg, color: style.color, border: `1px solid ${style.border}`, padding: '3px 10px', borderRadius: 100, fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', display: 'inline-block' }}>
+      {s.charAt(0).toUpperCase() + s.slice(1)}
+    </span>
+  );
+};
+
+export const MembersTable: React.FC<MembersTableProps> = ({ members, onViewMember, onAddMember }) => {
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+
+  const toggleSelect = (id: string) =>
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+
+  const toggleAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) setSelectedIds(members.map(m => m._id || m.id));
+    else setSelectedIds([]);
+  };
+
+  return (
+    <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px rgba(0,0,0,0.04)', border: '1px solid #f1f5f9', overflow: 'visible', position: 'relative' }}>
+
+      {/* Bulk action bar */}
+      {selectedIds.length > 0 && (
+        <div style={{ background: 'rgba(79,70,229,0.05)', padding: '12px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(79,70,229,0.1)' }}>
+          <span style={{ fontSize: 13, fontWeight: 600, color: '#4f46e5' }}>{selectedIds.length} members selected</span>
+          <div style={{ display: 'flex', gap: 8 }}>
+            {[
+              { label: 'Bulk Renew', bg: '#fff', color: '#374151', border: '#e5e7eb' },
+              { label: 'Bulk Export', bg: '#fff', color: '#374151', border: '#e5e7eb' },
+              { label: 'Bulk Delete', bg: '#fff1f2', color: '#e11d48', border: '#fecdd3' },
+            ].map(b => (
+              <button key={b.label} style={{ padding: '6px 14px', fontSize: 12, fontWeight: 600, background: b.bg, color: b.color, border: `1px solid ${b.border}`, borderRadius: 8, cursor: 'pointer' }}>{b.label}</button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div style={{ overflowX: 'auto', paddingBottom: 64 }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 960 }}>
+          <thead>
+            <tr style={{ background: '#f8fafc', borderBottom: '1px solid #f1f5f9' }}>
+              <th style={{ padding: '14px 16px', width: 40 }}>
+                <input type="checkbox" onChange={toggleAll} checked={members.length > 0 && selectedIds.length === members.length} style={{ width: 15, height: 15, accentColor: '#4f46e5', cursor: 'pointer' }} />
+              </th>
+              {['Member', 'Contact', 'Plan Details', 'Status', 'Payment', 'Today', ''].map((h, i) => (
+                <th key={i} style={{ padding: '14px 16px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em', whiteSpace: 'nowrap', width: h === '' ? 48 : 'auto' }}>{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {members.length === 0 ? (
+              <tr>
+                <td colSpan={8} style={{ padding: 64, textAlign: 'center' }}>
+                  <div style={{ width: 64, height: 64, borderRadius: 18, background: 'rgba(79,70,229,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', color: '#4f46e5' }}>
+                    <Users size={32} />
+                  </div>
+                  <h3 style={{ fontSize: 17, fontWeight: 800, color: '#0f172a', margin: '0 0 6px' }}>No Members Found</h3>
+                  <p style={{ fontSize: 14, color: '#64748b', margin: '0 auto 24px', maxWidth: 320, lineHeight: 1.6 }}>Add your first member to start managing your gym from this centralized dashboard.</p>
+                  <button onClick={onAddMember} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 22px', background: '#4f46e5', color: '#fff', border: 'none', borderRadius: 12, fontSize: 14, fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 12px rgba(79,70,229,0.2)' }}>
+                    <Plus size={16} /> Add Member
+                  </button>
+                </td>
+              </tr>
+            ) : (
+              members.map((m, idx) => {
+                const rowId = m._id || m.id || String(idx);
+                const initials = m.name ? m.name.substring(0, 2).toUpperCase() : 'M';
+                const avatarBg = ['#ede9fe','#dbeafe','#dcfce7','#fef3c7','#fce7f3'][idx % 5];
+                const avatarColor = ['#7c3aed','#2563eb','#16a34a','#d97706','#db2777'][idx % 5];
+                const isSelected = selectedIds.includes(rowId);
+                const status = m.status || (m.planEndDate && new Date(m.planEndDate) >= new Date() ? 'Active' : 'Expired');
+
+                return (
+                  <tr key={rowId} style={{ borderBottom: '1px solid #f8fafc', background: isSelected ? 'rgba(79,70,229,0.02)' : '#fff', transition: 'background 0.15s' }}
+                    onMouseEnter={e => { if (!isSelected)(e.currentTarget as HTMLElement).style.background = '#f8fafc'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = isSelected ? 'rgba(79,70,229,0.02)' : '#fff'; }}
+                  >
+                    {/* Checkbox */}
+                    <td style={{ padding: '14px 16px' }}>
+                      <input type="checkbox" checked={isSelected} onChange={() => toggleSelect(rowId)} style={{ width: 15, height: 15, accentColor: '#4f46e5', cursor: 'pointer' }} />
+                    </td>
+
+                    {/* Member name */}
+                    <td style={{ padding: '14px 16px', whiteSpace: 'nowrap', cursor: 'pointer' }} onClick={() => onViewMember(m)}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                        <div style={{ width: 40, height: 40, borderRadius: 12, background: avatarBg, color: avatarColor, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 13, flexShrink: 0 }}>
+                          {initials}
+                        </div>
+                        <div>
+                          <div style={{ fontWeight: 700, fontSize: 14, color: '#0f172a' }}>{m.name || 'Unknown'}</div>
+                          <div style={{ fontSize: 11, color: '#94a3b8', fontFamily: 'monospace', marginTop: 2 }}>{m.memberId || `#${rowId.substring(0, 6)}`}</div>
+                        </div>
+                      </div>
+                    </td>
+
+                    {/* Contact */}
+                    <td style={{ padding: '14px 16px', whiteSpace: 'nowrap' }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: '#374151' }}>{m.mobileNo || '—'}</div>
+                      <div style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>{m.email || '—'}</div>
+                    </td>
+
+                    {/* Plan */}
+                    <td style={{ padding: '14px 16px', whiteSpace: 'nowrap' }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: '#0f172a' }}>{m.plan || 'N/A'}</div>
+                      <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>Exp: {m.planEndDate ? new Date(m.planEndDate).toLocaleDateString() : '—'}</div>
+                    </td>
+
+                    {/* Status */}
+                    <td style={{ padding: '14px 16px', whiteSpace: 'nowrap' }}>
+                      <StatusBadge status={status} />
+                    </td>
+
+                    {/* Payment */}
+                    <td style={{ padding: '14px 16px', whiteSpace: 'nowrap' }}>
+                      <PaymentBadge status={m.paymentStatus || 'Paid'} />
+                    </td>
+
+                    {/* Attendance */}
+                    <td style={{ padding: '14px 16px', whiteSpace: 'nowrap' }}>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 700, color: '#16a34a', background: '#f0fdf4', padding: '4px 10px', borderRadius: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e', display: 'inline-block' }}></span> Present
+                      </span>
+                    </td>
+
+                    {/* Actions dropdown */}
+                    <td style={{ padding: '14px 16px', textAlign: 'right', position: 'relative' }}>
+                      <button
+                        onClick={() => setActiveDropdown(activeDropdown === rowId ? null : rowId)}
+                        style={{ padding: '6px', background: 'transparent', border: 'none', borderRadius: 8, cursor: 'pointer', color: '#94a3b8', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.15s' }}
+                        onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = '#f1f5f9'}
+                        onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}
+                      >
+                        <MoreVertical size={19} />
+                      </button>
+
+                      {activeDropdown === rowId && (
+                        <>
+                          <div style={{ position: 'fixed', inset: 0, zIndex: 40 }} onClick={() => setActiveDropdown(null)} />
+                          <div style={{ position: 'absolute', right: 8, top: '110%', width: 220, background: '#fff', borderRadius: 14, boxShadow: '0 16px 40px rgba(0,0,0,0.12)', border: '1px solid #f1f5f9', padding: '8px 0', zIndex: 50 }}>
+                            {[
+                              { icon: <Eye size={15} />, label: 'View Profile', action: () => { onViewMember(m); setActiveDropdown(null); }, color: '#374151' },
+                              { icon: <Edit size={15} />, label: 'Edit Member', action: () => setActiveDropdown(null), color: '#374151' },
+                              null,
+                              { icon: <Repeat size={15} />, label: 'Renew Membership', action: () => setActiveDropdown(null), color: '#4f46e5' },
+                              { icon: <PauseCircle size={15} />, label: 'Freeze Membership', action: () => setActiveDropdown(null), color: '#374151' },
+                              { icon: <UserCheck size={15} />, label: 'Assign Trainer', action: () => setActiveDropdown(null), color: '#374151' },
+                              null,
+                              { icon: <FileText size={15} />, label: 'Generate Invoice', action: () => setActiveDropdown(null), color: '#374151' },
+                              { icon: <QrCode size={15} />, label: 'Download QR Code', action: () => setActiveDropdown(null), color: '#374151' },
+                              null,
+                              { icon: <Trash2 size={15} />, label: 'Delete Member', action: () => setActiveDropdown(null), color: '#e11d48', danger: true },
+                            ].map((item, i) =>
+                              item === null ? (
+                                <div key={i} style={{ height: 1, background: '#f1f5f9', margin: '6px 0' }} />
+                              ) : (
+                                <button key={i} onClick={item.action} style={{
+                                  width: '100%', textAlign: 'left', padding: '9px 16px',
+                                  display: 'flex', alignItems: 'center', gap: 12,
+                                  fontSize: 13, fontWeight: 600, color: item.color,
+                                  background: 'none', border: 'none', cursor: 'pointer',
+                                  transition: 'background 0.15s',
+                                }}
+                                  onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = (item as any).danger ? '#fff1f2' : '#f8fafc'}
+                                  onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}
+                                >
+                                  <span style={{ color: (item as any).danger ? '#e11d48' : '#94a3b8', display: 'flex' }}>{item.icon}</span>
+                                  {item.label}
+                                </button>
+                              )
+                            )}
+                          </div>
+                        </>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Pagination */}
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '14px 24px', borderTop: '1px solid #f1f5f9', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderRadius: '0 0 16px 16px', zIndex: 10 }}>
+        <span style={{ fontSize: 13, color: '#64748b', fontWeight: 500 }}>
+          Showing <strong style={{ color: '#0f172a' }}>{members.length > 0 ? 1 : 0}</strong> – <strong style={{ color: '#0f172a' }}>{Math.min(members.length, 10)}</strong> of <strong style={{ color: '#0f172a' }}>{members.length}</strong> members
+        </span>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button style={{ padding: '8px 16px', fontSize: 13, fontWeight: 600, background: '#fff', color: '#94a3b8', border: '1px solid #e5e7eb', borderRadius: 10, cursor: 'pointer' }}>Previous</button>
+          <button style={{ padding: '8px 16px', fontSize: 13, fontWeight: 600, background: '#fff', color: '#374151', border: '1px solid #e5e7eb', borderRadius: 10, cursor: 'pointer' }}>Next</button>
+        </div>
+      </div>
+    </div>
+  );
+};

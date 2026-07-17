@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 
 const stats = [
   { value: '20+', label: 'Gyms', icon: '🏋️' },
-  { value: '50,000+', label: 'Members Managed', icon: '👥' },
+  { value: '10,000+', label: 'Members Managed', icon: '👥' },
   { value: '500+', label: 'Trainers Onboarded', icon: '🎯' },
   { value: '24/7', label: 'Support Available', icon: '🛡️' },
 ];
@@ -19,13 +19,13 @@ export const TrustSection: React.FC = () => {
   return (
     <section className="py-20 bg-dark text-white overflow-hidden relative">
       <div className="absolute inset-0 opacity-10 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary via-dark to-dark"></div>
-      
+
       <div className="container mx-auto px-6 max-w-7xl relative z-10">
         <div className="text-center mb-16">
           <p className="text-sm font-medium tracking-widest text-gray-400 uppercase mb-8">
             Trusted by industry leaders worldwide
           </p>
-          
+
           {/* Logo row — matches 20+ gyms */}
           <div className="flex flex-wrap justify-center items-center gap-12 lg:gap-24 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
             {logos.map((name) => (
