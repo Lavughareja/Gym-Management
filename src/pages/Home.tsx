@@ -32,7 +32,6 @@ const features = [
   { icon: UserCog, title: 'PT Management', desc: 'Assign and track personal training sessions.' },
   { icon: Bell, title: 'Announcements', desc: 'Broadcast updates and alerts to all members.' },
   { icon: Shield, title: 'Role Permissions', desc: 'Granular access control for managers and trainers.' },
-  { icon: Building2, title: 'Branch Management', desc: 'Control multiple locations from a single dashboard.' },
   { icon: Smartphone, title: 'Mobile Friendly', desc: 'Manage your gym on-the-go from any device.' },
 
   // Operations & Tracking
@@ -189,7 +188,6 @@ const featuresMenu = {
     { title: 'PT Management', desc: 'Assign & track personal training', icon: <UserCog style={{ width: 18, height: 18 }} /> },
     { title: 'Announcements', desc: 'Broadcast updates to members', icon: <Bell style={{ width: 18, height: 18 }} /> },
     { title: 'Role Permissions', desc: 'Granular access control', icon: <Shield style={{ width: 18, height: 18 }} /> },
-    { title: 'Branch Management', desc: 'Control multiple locations', icon: <Building2 style={{ width: 18, height: 18 }} /> },
     { title: 'Mobile Friendly', desc: 'Manage your gym on-the-go', icon: <Smartphone style={{ width: 18, height: 18 }} /> },
   ],
   operations: [

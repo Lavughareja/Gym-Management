@@ -21,6 +21,8 @@ const SuperAdminRoutes = lazy(() => import("./SuperAdmin/routes/SuperAdminRoutes
 const FeatureDetail = lazy(() => import("./pages/FeatureDetail"));
 const MemberManagement = lazy(() => import("./pages/features/MemberManagement").then(m => ({ default: m.MemberManagement })));
 const TrainerManagement = lazy(() => import("./pages/features/TrainerManagement").then(m => ({ default: m.TrainerManagement })));
+const PTManagement = lazy(() => import("./pages/features/PTManagement").then(m => ({ default: m.PTManagement })));
+const Announcements = lazy(() => import("./pages/features/Announcements").then(m => ({ default: m.Announcements })));
 
 // ── Shared page-level loading fallback ──────────────────────────────────────
 const PageLoader = () => (
@@ -223,6 +225,10 @@ function App() {
               <MemberManagement onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
             ) : featureId === 'trainer-management' ? (
               <TrainerManagement onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
+            ) : featureId === 'pt-management' ? (
+              <PTManagement onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
+            ) : featureId === 'announcements' ? (
+              <Announcements onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
             ) : (
               <FeatureDetail featureId={featureId} onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
             )}

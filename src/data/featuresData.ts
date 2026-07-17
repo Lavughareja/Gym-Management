@@ -136,7 +136,6 @@ export const featuresData: Record<string, FeatureContent> = {
   'pt-management': { title: 'PT Management', desc: 'Assign & track personal training' },
   'announcements': { title: 'Announcements', desc: 'Broadcast updates to members' },
   'role-permissions': { title: 'Role Permissions', desc: 'Granular access control' },
-  'branch-management': { title: 'Branch Management', desc: 'Control multiple locations' },
   'mobile-friendly': { title: 'Mobile Friendly', desc: 'Manage your gym on-the-go' },
 
   // Operations & Tracking

@@ -17,7 +17,6 @@ const features = [
   { icon: FileText, title: 'Invoices', desc: 'Automated billing and professional invoice generation.' },
   { icon: Dumbbell, title: 'Workout Plans', desc: 'Create and assign custom exercise routines.' },
   { icon: Salad, title: 'Diet Plans', desc: 'Nutrition tracking and customized meal plans.' },
-  { icon: Building2, title: 'Branch Management', desc: 'Control multiple locations from a single dashboard.' },
   { icon: LineChart, title: 'Analytics', desc: 'Deep insights into revenue, growth, and retention.' },
   { icon: PieChart, title: 'Reports', desc: 'Exportable data on every aspect of your business.' },
   { icon: MessageSquare, title: 'WhatsApp Notifications', desc: 'Automated alerts for payments and birthdays.' },
