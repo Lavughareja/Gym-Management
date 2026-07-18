@@ -179,11 +179,11 @@ const AnnouncementsPanel = () => {
                 <div style={{ display: 'flex', gap: 16, fontSize: '0.85rem', color: 'var(--text-muted)' }}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                     <Calendar size={14} /> 
-                    {new Date(ev.scheduledDate).toLocaleDateString()}
+                    {new Date(ev.scheduledDate).toLocaleDateString('en-GB')}
                   </span>
                   <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                     <Clock size={14} /> 
-                    Created {new Date(ev.createdAt).toLocaleDateString()}
+                    Created {new Date(ev.createdAt).toLocaleDateString('en-GB')}
                   </span>
                 </div>
               </div>

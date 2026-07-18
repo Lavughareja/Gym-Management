@@ -58,7 +58,7 @@ const EventsViewPanel = () => {
                 <div style={{ display: 'flex', gap: 16, fontSize: '0.85rem', color: 'var(--text-muted)' }}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 500 }}>
                     <Calendar size={16} style={{ color: 'var(--primary)' }} /> 
-                    {new Date(ev.scheduledDate).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                    {new Date(ev.scheduledDate).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
                   </span>
                 </div>
               </div>

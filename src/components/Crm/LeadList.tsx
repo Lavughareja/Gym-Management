@@ -101,7 +101,7 @@ const LeadList: React.FC = () => {
                     </span>
                   </td>
                   <td>{lead.assignedTo?.fullName || 'Unassigned'}</td>
-                  <td>{new Date(lead.createdAt).toLocaleDateString()}</td>
+                  <td>{new Date(lead.createdAt).toLocaleDateString('en-GB')}</td>
                   <td>
                     <div className="action-buttons">
                       <button className="btn-icon" title="View" onClick={() => setViewLead(lead)}><Eye size={16} /></button>

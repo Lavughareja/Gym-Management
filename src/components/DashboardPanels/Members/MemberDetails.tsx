@@ -4,6 +4,7 @@ import { X, User, Activity, CreditCard, Calendar, Dumbbell, Salad, Camera, FileT
 interface Props {
   member: any;
   onClose: () => void;
+  onManage?: (action: 'freeze' | 'transfer' | 'upgrade', member: any) => void;
 }
 
 export const MemberDetails: React.FC<Props> = ({ member, onClose }) => {

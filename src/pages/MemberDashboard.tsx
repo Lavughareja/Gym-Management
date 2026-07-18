@@ -731,7 +731,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
 
             {selectedDateLogs.length > 0 && (
               <div className="gym-card">
-                <h3 style={{ fontSize: "1.1rem", fontWeight: 700, marginBottom: 12 }}>Logs for {selectedDate.toLocaleDateString()}</h3>
+                <h3 style={{ fontSize: "1.1rem", fontWeight: 700, marginBottom: 12 }}>Logs for {selectedDate.toLocaleDateString('en-GB')}</h3>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {selectedDateLogs.map((a: any, i) => (
                     <div key={i} style={{ display: "flex", justifyContent: "space-between", background: "var(--bg-secondary)", padding: "10px 12px", borderRadius: 8, border: "1px solid var(--border-color)" }}>

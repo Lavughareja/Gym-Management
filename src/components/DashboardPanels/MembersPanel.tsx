@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useAppSelector } from "../../utils/reduxHooks";
-import { Users, UserCheck, AlertTriangle, Clock, UserPlus, Snowflake, Fingerprint, Receipt, Download, Upload } from 'lucide-react';
+import { Users, UserCheck, AlertTriangle, Clock, UserPlus, Snowflake, Fingerprint, Receipt, Download, Upload, ArrowUpCircle, Repeat } from 'lucide-react';
 import { MembersTable } from './Members/MembersTable';
 import { MembersFilter } from './Members/MembersFilter';
 import { AddMemberModal } from './Members/AddMemberModal';
-import { MemberDetails } from './Members/MemberDetails';
+import { MembershipManagementModals } from './Members/MembershipManagementModals';
 
 interface Props {
   role: string;
@@ -17,7 +17,10 @@ const MembersPanel: React.FC<Props> = ({ role, canAddMember, showAddMember, setS
   const { members: rawMembers, loading } = useAppSelector((state) => state.member);
   const members: any[] = Array.isArray(rawMembers) ? rawMembers : [];
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedMember, setSelectedMember] = useState<any>(null);
+  
+  // We can pass null to signify global action where the user must select a member inside the modal
+  const [manageAction, setManageAction] = useState<'freeze' | 'transfer' | 'upgrade' | null>(null);
+  const [manageMember, setManageMember] = useState<any | null>(null);
 
   // ── Real calculations from member data ──────────────────────────────────────
   const now = new Date();
@@ -67,6 +70,18 @@ const MembersPanel: React.FC<Props> = ({ role, canAddMember, showAddMember, setS
 
         {(canAddMember || role === "admin" || role === "superadmin" || role === "owner") && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <button onClick={() => { setManageAction('upgrade'); setManageMember(null); }} style={{ padding: '9px 16px', background: '#ecfdf5', border: '1px solid #a7f3d0', color: '#047857', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 7 }}>
+              <ArrowUpCircle size={14} /> Upgrade
+            </button>
+            <button onClick={() => { setManageAction('transfer'); setManageMember(null); }} style={{ padding: '9px 16px', background: '#eff6ff', border: '1px solid #bfdbfe', color: '#1d4ed8', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 7 }}>
+              <Repeat size={14} /> Transfer
+            </button>
+            <button onClick={() => { setManageAction('freeze'); setManageMember(null); }} style={{ padding: '9px 16px', background: '#eef2ff', border: '1px solid #c7d2fe', color: '#4338ca', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 7 }}>
+              <Snowflake size={14} /> Freeze
+            </button>
+            
+            <div style={{ width: 1, height: 24, background: '#e2e8f0', margin: '0 4px' }} />
+
             <button style={{ padding: '9px 16px', background: '#fff', border: '1px solid #e2e8f0', color: '#475569', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 7, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
               <Download size={14} /> Template
             </button>
@@ -110,8 +125,11 @@ const MembersPanel: React.FC<Props> = ({ role, canAddMember, showAddMember, setS
         </div>
         <MembersTable
           members={filteredMembers}
-          onViewMember={setSelectedMember}
           onAddMember={() => setShowAddMember(true)}
+          onManage={(action, member) => {
+            setManageAction(action);
+            setManageMember(member);
+          }}
         />
       </div>
 
@@ -122,10 +140,18 @@ const MembersPanel: React.FC<Props> = ({ role, canAddMember, showAddMember, setS
         />
       )}
 
-      {selectedMember && (
-        <MemberDetails
-          member={selectedMember}
-          onClose={() => setSelectedMember(null)}
+      {manageAction && (
+        <MembershipManagementModals
+          type={manageAction}
+          member={manageMember}
+          onClose={() => {
+            setManageAction(null);
+            setManageMember(null);
+          }}
+          onSuccess={() => {
+            setManageAction(null);
+            setManageMember(null);
+          }}
         />
       )}
     </div>

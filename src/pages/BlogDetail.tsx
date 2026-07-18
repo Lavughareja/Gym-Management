@@ -38,7 +38,7 @@ export const BlogDetail: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   }, []);
 
   const formatDate = (d: string) => {
-    return new Date(d).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    return new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
   };
 
   const handleShare = () => {

@@ -90,7 +90,7 @@ const WorkoutLibraryPage: React.FC = () => {
     return days.map((dayName, index) => {
       const d = new Date(mondayDate);
       d.setDate(mondayDate.getDate() + index);
-      const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const dateStr = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
       return { dayName, dateStr };
     });
   }, []);

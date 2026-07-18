@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, Loader2 } from 'lucide-react';
-import { useAppDispatch } from '../../../utils/reduxHooks';
+import { useAppDispatch, useAppSelector } from '../../../utils/reduxHooks';
 import { addMemberAction } from '../../../redux/actions/memberActions';
 
 interface Props {
@@ -42,20 +42,26 @@ export const AddMemberModal: React.FC<Props> = ({ onClose, onSave }) => {
     secondaryPhone: '',
     emergencyNumber: '',
     bloodGroup: '',
-    durationMonths: '',
+    planId: '',
     startDate: '',
     amountPaid: '',
     extraDays: '',
   });
 
+  const { plans: rawPlans } = useAppSelector((state: any) => state.plan);
+  const plans: any[] = Array.isArray(rawPlans) ? rawPlans : [];
+
   const set = (key: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm(f => ({ ...f, [key]: e.target.value }));
 
-  // Auto-calculate end date from startDate + durationMonths + extraDays
+  // Auto-calculate end date from startDate + plan duration + extraDays
   const calcEndDate = (): string => {
-    if (!form.startDate || !form.durationMonths) return '';
+    if (!form.startDate || !form.planId) return '';
+    const selectedPlan = plans.find(p => (p._id || p.id) === form.planId);
+    if (!selectedPlan) return '';
+    
     const d = new Date(form.startDate);
-    d.setMonth(d.getMonth() + Number(form.durationMonths));
+    d.setMonth(d.getMonth() + Number(selectedPlan.durationMonths || 1));
     if (form.extraDays) d.setDate(d.getDate() + Number(form.extraDays));
     return d.toISOString().split('T')[0];
   };
@@ -78,7 +84,7 @@ export const AddMemberModal: React.FC<Props> = ({ onClose, onSave }) => {
       if (form.secondaryPhone.trim()) payload.secondaryPhone = form.secondaryPhone.trim();
       if (form.emergencyNumber.trim()) payload.emergencyNumber = form.emergencyNumber.trim();
       if (form.bloodGroup) payload.bloodGroup = form.bloodGroup;
-      if (form.durationMonths) payload.durationMonths = Number(form.durationMonths);
+      if (form.planId) payload.planId = form.planId;
       if (form.extraDays) payload.extraDays = Number(form.extraDays);
       if (form.startDate) payload.startDate = form.startDate;
       if (form.amountPaid) payload.amountPaid = Number(form.amountPaid);
@@ -192,17 +198,27 @@ export const AddMemberModal: React.FC<Props> = ({ onClose, onSave }) => {
             />
           </div>
 
-          {/* Duration */}
+          {/* Plan Selection */}
           <div style={{ marginBottom: 18 }}>
-            <label style={labelStyle}>Membership Duration (Months)</label>
-            <input
+            <label style={labelStyle}>Membership Plan</label>
+            <select
               style={inputStyle}
-              type="number"
-              min="1"
-              placeholder="e.g. 1, 3, 6, 12"
-              value={form.durationMonths}
-              onChange={set('durationMonths')}
-            />
+              value={form.planId}
+              onChange={(e) => {
+                set('planId')(e);
+                const p = plans.find(plan => (plan._id || plan.id) === e.target.value);
+                if (p) {
+                  setForm(f => ({ ...f, amountPaid: String(p.basePrice || 0) }));
+                }
+              }}
+            >
+              <option value="">-- Choose a Plan --</option>
+              {plans.map(p => (
+                <option key={p._id || p.id} value={p._id || p.id}>
+                  {p.name} - {p.durationMonths} Months (₹{p.basePrice})
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Start Date + Extra Days in one row */}

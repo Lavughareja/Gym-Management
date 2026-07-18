@@ -25,7 +25,7 @@ export const BlogList: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   }, []);
 
   const formatDate = (d: string) => {
-    return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    return new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
   };
 
   const getExcerpt = (html: string) => {

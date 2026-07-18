@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { MoreVertical, FileText, QrCode, Trash2, Edit, Repeat, Eye, PauseCircle, UserCheck, Users, Plus } from 'lucide-react';
+import { MoreVertical, FileText, QrCode, Trash2, Edit, Repeat, Eye, PauseCircle, UserCheck, Users, Plus, ArrowUpCircle, Snowflake } from 'lucide-react';
 
 interface MembersTableProps {
   members: any[];
-  onViewMember: (member: any) => void;
   onAddMember: () => void;
+  onManage?: (action: 'freeze' | 'transfer' | 'upgrade', member: any) => void;
 }
 
 const StatusBadge = ({ status }: { status: string }) => {
@@ -13,7 +13,7 @@ const StatusBadge = ({ status }: { status: string }) => {
     active: { bg: '#dcfce7', color: '#16a34a', label: 'Active' },
     'expiring soon': { bg: '#ffedd5', color: '#ea580c', label: 'Expiring' },
     expired: { bg: '#fee2e2', color: '#dc2626', label: 'Expired' },
-    inactive: { bg: '#fee2e2', color: '#dc2626', label: 'Expired' },
+    inactive: { bg: '#fef3c7', color: '#d97706', label: 'Pending' },
     frozen: { bg: '#f1f5f9', color: '#475569', label: 'Frozen' },
   };
   const style = map[s] || map.frozen;
@@ -40,43 +40,15 @@ const PaymentBadge = ({ status }: { status: string }) => {
   );
 };
 
-export const MembersTable: React.FC<MembersTableProps> = ({ members, onViewMember, onAddMember }) => {
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
-
-  const toggleSelect = (id: string) =>
-    setSelectedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
-
-  const toggleAll = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.checked) setSelectedIds(members.map(m => m._id || m.id));
-    else setSelectedIds([]);
-  };
-
+export const MembersTable: React.FC<MembersTableProps> = ({ members, onAddMember, onManage }) => {
   return (
     <div style={{ width: '100%' }}>
 
-      {/* Bulk action bar */}
-      {selectedIds.length > 0 && (
-        <div style={{ background: 'rgba(79,70,229,0.05)', padding: '12px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(79,70,229,0.1)' }}>
-          <span style={{ fontSize: 13, fontWeight: 600, color: '#4f46e5' }}>{selectedIds.length} members selected</span>
-          <div style={{ display: 'flex', gap: 8 }}>
-            {[
-              { label: 'Bulk Renew', bg: '#fff', color: '#374151', border: '#e5e7eb' },
-              { label: 'Bulk Export', bg: '#fff', color: '#374151', border: '#e5e7eb' },
-              { label: 'Bulk Delete', bg: '#fff1f2', color: '#e11d48', border: '#fecdd3' },
-            ].map(b => (
-              <button key={b.label} style={{ padding: '6px 14px', fontSize: 12, fontWeight: 600, background: b.bg, color: b.color, border: `1px solid ${b.border}`, borderRadius: 8, cursor: 'pointer' }}>{b.label}</button>
-            ))}
-          </div>
-        </div>
-      )}
 
       <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 960 }}>
           <thead>
             <tr style={{ background: '#f8fafc', borderBottom: '1px solid #f1f5f9' }}>
-              <th style={{ padding: '14px 16px', width: 40 }}>
-                <input type="checkbox" onChange={toggleAll} checked={members.length > 0 && selectedIds.length === members.length} style={{ width: 15, height: 15, accentColor: '#4f46e5', cursor: 'pointer' }} />
-              </th>
               {['Member', 'Contact', 'Plan Details', 'Status', 'Payment', 'Today'].map((h, i) => (
                 <th key={i} style={{ padding: '14px 16px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em', whiteSpace: 'nowrap', width: 'auto' }}>{h}</th>
               ))}
@@ -85,7 +57,7 @@ export const MembersTable: React.FC<MembersTableProps> = ({ members, onViewMembe
           <tbody>
             {members.length === 0 ? (
               <tr>
-                <td colSpan={8} style={{ padding: 64, textAlign: 'center' }}>
+                <td colSpan={7} style={{ padding: 64, textAlign: 'center' }}>
                   <div style={{ width: 64, height: 64, borderRadius: 18, background: 'rgba(79,70,229,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', color: '#4f46e5' }}>
                     <Users size={32} />
                   </div>
@@ -102,21 +74,17 @@ export const MembersTable: React.FC<MembersTableProps> = ({ members, onViewMembe
                 const initials = m.name ? m.name.substring(0, 2).toUpperCase() : 'M';
                 const avatarBg = ['#ede9fe', '#dbeafe', '#dcfce7', '#fef3c7', '#fce7f3'][idx % 5];
                 const avatarColor = ['#7c3aed', '#2563eb', '#16a34a', '#d97706', '#db2777'][idx % 5];
-                const isSelected = selectedIds.includes(rowId);
+                const isSelected = false;
                 const status = m.status || (m.planEndDate && new Date(m.planEndDate) >= new Date() ? 'Active' : 'Expired');
 
                 return (
-                  <tr key={rowId} style={{ borderBottom: '1px solid #f8fafc', background: isSelected ? 'rgba(79,70,229,0.02)' : '#fff', transition: 'background 0.15s' }}
-                    onMouseEnter={e => { if (!isSelected) (e.currentTarget as HTMLElement).style.background = '#f8fafc'; }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = isSelected ? 'rgba(79,70,229,0.02)' : '#fff'; }}
+                  <tr key={rowId} style={{ borderBottom: '1px solid #f8fafc', background: '#fff', transition: 'background 0.15s' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#f8fafc'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = '#fff'; }}
                   >
-                    {/* Checkbox */}
-                    <td style={{ padding: '14px 16px' }}>
-                      <input type="checkbox" checked={isSelected} onChange={() => toggleSelect(rowId)} style={{ width: 15, height: 15, accentColor: '#4f46e5', cursor: 'pointer' }} />
-                    </td>
 
                     {/* Member name */}
-                    <td style={{ padding: '14px 16px', whiteSpace: 'nowrap', cursor: 'pointer' }} onClick={() => onViewMember(m)}>
+                    <td style={{ padding: '14px 16px', whiteSpace: 'nowrap' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                         <div style={{ width: 40, height: 40, borderRadius: 12, background: avatarBg, color: avatarColor, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: 13, flexShrink: 0 }}>
                           {initials}
@@ -137,7 +105,7 @@ export const MembersTable: React.FC<MembersTableProps> = ({ members, onViewMembe
                     {/* Plan */}
                     <td style={{ padding: '14px 16px', whiteSpace: 'nowrap' }}>
                       <div style={{ fontSize: 13, fontWeight: 700, color: '#0f172a' }}>{m.plan || 'N/A'}</div>
-                      <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>Exp: {m.planEndDate ? new Date(m.planEndDate).toLocaleDateString() : '—'}</div>
+                      <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>Exp: {m.planEndDate ? new Date(m.planEndDate).toLocaleDateString('en-GB') : '—'}</div>
                     </td>
 
                     {/* Status */}

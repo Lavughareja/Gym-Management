@@ -61,7 +61,7 @@ const LeadDetailsModal: React.FC<LeadDetailsModalProps> = ({ leadId, onClose }) 
               <h4 style={{ marginBottom: 15 }}>Contact Info</h4>
               <p style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}><Phone size={16} className="text-muted" /> {currentLead.phone}</p>
               {currentLead.email && <p style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}><Mail size={16} className="text-muted" /> {currentLead.email}</p>}
-              <p style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}><CalIcon size={16} className="text-muted" /> Created: {new Date(currentLead.createdAt).toLocaleDateString()}</p>
+              <p style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}><CalIcon size={16} className="text-muted" /> Created: {new Date(currentLead.createdAt).toLocaleDateString('en-GB')}</p>
               {currentLead.assignedTo && <p style={{ display: 'flex', alignItems: 'center', gap: 8 }}><UserCheck size={16} className="text-muted" /> Assigned to: {currentLead.assignedTo.fullName}</p>}
             </div>
             <div className="panel" style={{ padding: 15 }}>
