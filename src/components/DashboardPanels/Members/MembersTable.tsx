@@ -42,7 +42,6 @@ const PaymentBadge = ({ status }: { status: string }) => {
 
 export const MembersTable: React.FC<MembersTableProps> = ({ members, onViewMember, onAddMember }) => {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
   const toggleSelect = (id: string) =>
     setSelectedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
@@ -78,8 +77,8 @@ export const MembersTable: React.FC<MembersTableProps> = ({ members, onViewMembe
               <th style={{ padding: '14px 16px', width: 40 }}>
                 <input type="checkbox" onChange={toggleAll} checked={members.length > 0 && selectedIds.length === members.length} style={{ width: 15, height: 15, accentColor: '#4f46e5', cursor: 'pointer' }} />
               </th>
-              {['Member', 'Contact', 'Plan Details', 'Status', 'Payment', 'Today', ''].map((h, i) => (
-                <th key={i} style={{ padding: '14px 16px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em', whiteSpace: 'nowrap', width: h === '' ? 48 : 'auto' }}>{h}</th>
+              {['Member', 'Contact', 'Plan Details', 'Status', 'Payment', 'Today'].map((h, i) => (
+                <th key={i} style={{ padding: '14px 16px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em', whiteSpace: 'nowrap', width: 'auto' }}>{h}</th>
               ))}
             </tr>
           </thead>
@@ -158,56 +157,6 @@ export const MembersTable: React.FC<MembersTableProps> = ({ members, onViewMembe
                       </span>
                     </td>
 
-                    {/* Actions dropdown */}
-                    <td style={{ padding: '14px 16px', textAlign: 'right', position: 'relative' }}>
-                      <button
-                        onClick={() => setActiveDropdown(activeDropdown === rowId ? null : rowId)}
-                        style={{ padding: '6px', background: 'transparent', border: 'none', borderRadius: 8, cursor: 'pointer', color: '#94a3b8', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.15s' }}
-                        onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = '#f1f5f9'}
-                        onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}
-                      >
-                        <MoreVertical size={19} />
-                      </button>
-
-                      {activeDropdown === rowId && (
-                        <>
-                          <div style={{ position: 'fixed', inset: 0, zIndex: 40 }} onClick={() => setActiveDropdown(null)} />
-                          <div style={{ position: 'absolute', right: 8, top: '110%', width: 220, background: '#fff', borderRadius: 14, boxShadow: '0 16px 40px rgba(0,0,0,0.12)', border: '1px solid #f1f5f9', padding: '8px 0', zIndex: 50 }}>
-                            {[
-                              { icon: <Eye size={15} />, label: 'View Profile', action: () => { onViewMember(m); setActiveDropdown(null); }, color: '#374151' },
-                              { icon: <Edit size={15} />, label: 'Edit Member', action: () => setActiveDropdown(null), color: '#374151' },
-                              null,
-                              { icon: <Repeat size={15} />, label: 'Renew Membership', action: () => setActiveDropdown(null), color: '#4f46e5' },
-                              { icon: <PauseCircle size={15} />, label: 'Freeze Membership', action: () => setActiveDropdown(null), color: '#374151' },
-                              { icon: <UserCheck size={15} />, label: 'Assign Trainer', action: () => setActiveDropdown(null), color: '#374151' },
-                              null,
-                              { icon: <FileText size={15} />, label: 'Generate Invoice', action: () => setActiveDropdown(null), color: '#374151' },
-                              { icon: <QrCode size={15} />, label: 'Download QR Code', action: () => setActiveDropdown(null), color: '#374151' },
-                              null,
-                              { icon: <Trash2 size={15} />, label: 'Delete Member', action: () => setActiveDropdown(null), color: '#e11d48', danger: true },
-                            ].map((item, i) =>
-                              item === null ? (
-                                <div key={i} style={{ height: 1, background: '#f1f5f9', margin: '6px 0' }} />
-                              ) : (
-                                <button key={i} onClick={item.action} style={{
-                                  width: '100%', textAlign: 'left', padding: '9px 16px',
-                                  display: 'flex', alignItems: 'center', gap: 12,
-                                  fontSize: 13, fontWeight: 600, color: item.color,
-                                  background: 'none', border: 'none', cursor: 'pointer',
-                                  transition: 'background 0.15s',
-                                }}
-                                  onMouseEnter={e => (e.currentTarget as HTMLElement).style.background = (item as any).danger ? '#fff1f2' : '#f8fafc'}
-                                  onMouseLeave={e => (e.currentTarget as HTMLElement).style.background = 'transparent'}
-                                >
-                                  <span style={{ color: (item as any).danger ? '#e11d48' : '#94a3b8', display: 'flex' }}>{item.icon}</span>
-                                  {item.label}
-                                </button>
-                              )
-                            )}
-                          </div>
-                        </>
-                      )}
-                    </td>
                   </tr>
                 );
               })
