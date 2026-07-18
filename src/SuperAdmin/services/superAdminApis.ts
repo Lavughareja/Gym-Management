@@ -106,3 +106,22 @@ export const saDeleteFaqApi = (id: string) =>
 
 export const fetchPublicFaqsApi = () => AxiosInstance.get("/faq");
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Blog management
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const saFetchBlogsApi = () => AxiosInstance.get("/blogs?all=true");
+
+export const saCreateBlogApi = (data: { title: string; content: string; author?: string; imageUrl?: string; isPublished?: boolean }) =>
+  AxiosInstance.post("/blogs", data);
+
+export const saUpdateBlogApi = (id: string, data: object) =>
+  AxiosInstance.put(`/blogs/${id}`, data);
+
+export const saDeleteBlogApi = (id: string) =>
+  AxiosInstance.delete(`/blogs/${id}`);
+
+export const fetchPublicBlogsApi = () => AxiosInstance.get("/blogs");
+
+export const fetchBlogBySlugApi = (slug: string) => AxiosInstance.get(`/blogs/slug/${slug}`);
+

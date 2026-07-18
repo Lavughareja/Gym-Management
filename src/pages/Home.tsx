@@ -12,7 +12,7 @@ import {
   MessageCircle, Calendar, Video, FileSpreadsheet, Server,
   CheckCircle2, XCircle, Star, ChevronLeft, ChevronRight,
   Plus, Minus, ArrowRight, Play, TrendingUp, Activity,
-  Send, Monitor, UserCog, Bell, ShieldCheck
+  Send, Monitor, UserCog, Bell, ShieldCheck, BookOpen
 } from 'lucide-react';
 
 /* ===================== DATA ===================== */
@@ -239,6 +239,12 @@ const resourcesLinks = [
     icon: <MessageSquare style={{ width: 18, height: 18 }} />,
     title: 'FAQ',
     desc: 'Common questions answered quickly',
+  },
+  {
+    href: '/?page=blogs',
+    icon: <BookOpen style={{ width: 18, height: 18 }} />,
+    title: 'Blog',
+    desc: 'Tips, updates, and gym management strategies',
   },
 ];
 

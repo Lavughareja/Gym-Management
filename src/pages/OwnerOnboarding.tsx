@@ -1,8 +1,27 @@
 import React, { useState } from "react";
 import { useAppDispatch } from "../utils/reduxHooks";
 import { registerOwnerAction } from "../redux/actions/authActions";
+import { createOrderAction, verifySignatureAction } from "../redux/actions/paymentActions";
 import { Check, Loader, Lock, Mail, Smartphone, Globe, Eye, EyeOff } from "lucide-react";
 import type { PlanType } from "../utils/constant";
+
+declare global {
+  interface Window {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    Razorpay: any;
+  }
+}
+
+const loadRazorpayScript = (): Promise<boolean> =>
+  new Promise((resolve) => {
+    if (document.getElementById("razorpay-script")) { resolve(true); return; }
+    const script = document.createElement("script");
+    script.id  = "razorpay-script";
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload  = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
 
 interface Props {
   onSuccess: (gymName: string, ownerName: string) => void;
@@ -67,30 +86,99 @@ export const OwnerOnboarding: React.FC<Props> = ({ onSuccess, onBack }) => {
     setStep(3);
   };
 
-  const handleStartTrial = async (plan: PlanType) => {
+  const handleStartTrial = async (plan: PlanType, price: number) => {
     setLoading(true);
     setError(null);
     
-    // Call the registration action
-    const result = await dispatch(
-      registerOwnerAction({
-        fullName,
-        email,
-        mobileNo: phone,
-        password,
-        gymName,
-        plan,
-        paymentToken: "free_trial", // Indicator for backend
-        dateOfBirth: "2000-01-01", // Default/Dummy if not requested in form
-      })
+    // 1. Create order
+    const orderResult = await dispatch(
+      createOrderAction({ email, plan })
     );
 
-    if (registerOwnerAction.fulfilled.match(result)) {
-      onSuccess(gymName, fullName);
-    } else {
-      setError("Failed to register. Please try again.");
+    if (!createOrderAction.fulfilled.match(orderResult)) {
+      setError((orderResult.payload as string) || "Failed to initialize payment. Please try again.");
       setLoading(false);
+      return;
     }
+
+    const orderId  = orderResult.payload?.order?.orderId;
+    const currency = orderResult.payload?.order?.currency ?? "INR";
+    const isMock   = orderResult.payload?.isMock === true;
+
+    const verifyAndProceed = async (rzpOrderId: string, rzpPaymentId?: string, rzpSignature?: string) => {
+      const verifyResult = await dispatch(
+        verifySignatureAction({
+          razorpayOrderId:   rzpOrderId,
+          razorpayPaymentId: rzpPaymentId ?? "",
+          razorpaySignature: rzpSignature ?? "",
+        })
+      );
+
+      if (verifySignatureAction.fulfilled.match(verifyResult)) {
+        const token = verifyResult.payload?.paymentToken as string;
+        
+        // Now register the owner!
+        const regResult = await dispatch(
+          registerOwnerAction({
+            fullName,
+            email,
+            mobileNo: phone,
+            password,
+            gymName,
+            plan,
+            paymentToken: token,
+            dateOfBirth: "2000-01-01",
+          })
+        );
+        if (registerOwnerAction.fulfilled.match(regResult)) {
+          onSuccess(gymName, fullName);
+        } else {
+          setError("Failed to register account after payment. Please contact support.");
+          setLoading(false);
+        }
+      } else {
+        setError("Payment verification failed.");
+        setLoading(false);
+      }
+    };
+
+    if (isMock) {
+      await verifyAndProceed(orderId);
+      return;
+    }
+
+    const loaded = await loadRazorpayScript();
+    if (!loaded) {
+      setError("Razorpay SDK failed to load. Check your internet connection.");
+      setLoading(false);
+      return;
+    }
+
+    const rzpOptions = {
+      key: import.meta.env.VITE_RAZORPAY_KEY_ID ?? "",
+      amount: price * 100,
+      currency,
+      name: "Trainix Gym",
+      description: `${plan} Plan Membership`,
+      order_id: orderId,
+      prefill: { email, name: fullName, contact: phone },
+      theme: { color: "#6366f1" },
+      handler: async (response: any) => {
+        await verifyAndProceed(
+          response.razorpay_order_id,
+          response.razorpay_payment_id,
+          response.razorpay_signature
+        );
+      },
+      modal: {
+        ondismiss: () => {
+          setLoading(false);
+        },
+      },
+    };
+
+    const rzp = new window.Razorpay(rzpOptions);
+    rzp.open();
   };
 
   const plans = [
@@ -141,7 +229,7 @@ export const OwnerOnboarding: React.FC<Props> = ({ onSuccess, onBack }) => {
             <form onSubmit={handleStep1Submit} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
               <div style={{ textAlign: "center", marginBottom: 12 }}>
                 <h2 style={{ fontSize: "1.75rem", fontWeight: 700, color: "var(--text-primary)" }}>Create your account</h2>
-                <p style={{ color: "var(--text-secondary)", marginTop: 8 }}>Start your 7-day free trial — no credit card needed</p>
+                <p style={{ color: "var(--text-secondary)", marginTop: 8 }}>Join Trainix today and manage your gym seamlessly</p>
               </div>
 
               <div>
@@ -322,7 +410,7 @@ export const OwnerOnboarding: React.FC<Props> = ({ onSuccess, onBack }) => {
             <div>
               <div style={{ textAlign: "center", marginBottom: 32 }}>
                 <h2 style={{ fontSize: "1.75rem", fontWeight: 700, color: "var(--text-primary)" }}>Select Your Plan</h2>
-                <p style={{ color: "var(--text-secondary)", marginTop: 8 }}>Choose a plan to start your 7-day free trial. You can upgrade later.</p>
+                <p style={{ color: "var(--text-secondary)", marginTop: 8 }}>Choose a plan to continue. You can upgrade or downgrade later.</p>
               </div>
 
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: 24 }}>
@@ -335,16 +423,16 @@ export const OwnerOnboarding: React.FC<Props> = ({ onSuccess, onBack }) => {
                       <span style={{ color: "var(--text-secondary)" }}>/mo</span>
                     </div>
                     <ul style={{ listStyle: "none", padding: 0, margin: "0 0 24px 0", gap: 12, display: "flex", flexDirection: "column", flex: 1 }}>
-                      <li style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.85rem" }}><Check size={16} color="var(--primary)" /> 7-Day Free Trial</li>
+                      <li style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.85rem" }}><Check size={16} color="var(--primary)" /> No setup fees</li>
                       <li style={{ display: "flex", alignItems: "center", gap: 8, fontSize: "0.85rem" }}><Check size={16} color="var(--primary)" /> Full Access</li>
                     </ul>
                     <button
                       className="btn-blue"
                       style={{ width: "100%", justifyContent: "center", marginTop: "auto" }}
-                      onClick={() => handleStartTrial(p.apiPlan)}
+                      onClick={() => handleStartTrial(p.apiPlan, p.price)}
                       disabled={loading}
                     >
-                      {loading ? <Loader size={16} style={{ animation: "spin 1s linear infinite" }} /> : "Start Trial"}
+                      {loading ? <Loader size={16} style={{ animation: "spin 1s linear infinite" }} /> : "Pay Now"}
                     </button>
                   </div>
                 ))}

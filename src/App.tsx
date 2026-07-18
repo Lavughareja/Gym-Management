@@ -37,6 +37,8 @@ const AnalyticsReports = lazy(() => import("./pages/features/AnalyticsReports").
 const PlatformScreenshots = lazy(() => import("./pages/PlatformScreenshots").then(m => ({ default: m.PlatformScreenshots })));
 const PlatformIntegrations = lazy(() => import("./pages/PlatformIntegrationsPage").then(m => ({ default: m.PlatformIntegrations })));
 const PlatformTestimonials = lazy(() => import("./pages/PlatformTestimonialsPage").then(m => ({ default: m.PlatformTestimonials })));
+const BlogList = lazy(() => import("./pages/BlogList").then(m => ({ default: m.BlogList })));
+const BlogDetail = lazy(() => import("./pages/BlogDetail").then(m => ({ default: m.BlogDetail })));
 
 
 
@@ -51,7 +53,7 @@ const PageLoader = () => (
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared types
 // ─────────────────────────────────────────────────────────────────────────────
-export type AppMode = "public" | "register" | "dashboard" | "login" | "manager-setup" | "trainer-setup" | "member-setup" | "reset-password" | "super-admin" | "feature-detail" | "screenshots" | "integrations" | "testimonials" | "owner-onboarding";
+export type AppMode = "public" | "register" | "dashboard" | "login" | "manager-setup" | "trainer-setup" | "member-setup" | "reset-password" | "super-admin" | "feature-detail" | "screenshots" | "integrations" | "testimonials" | "owner-onboarding" | "blogs" | "blog-detail";
 
 export interface DashboardUser {
   ownerName: string;
@@ -91,6 +93,12 @@ function App() {
     }
     if (searchParams.has("page") && searchParams.get("page") === "testimonials") {
       return "testimonials";
+    }
+    if (searchParams.has("page") && searchParams.get("page") === "blogs") {
+      return "blogs";
+    }
+    if (searchParams.has("page") && searchParams.get("page") === "blog-detail") {
+      return "blog-detail";
     }
     return "public";
   });
@@ -132,6 +140,10 @@ function App() {
       setMode("integrations");
     } else if (search.has("page") && search.get("page") === "testimonials") {
       setMode("testimonials");
+    } else if (search.has("page") && search.get("page") === "blogs") {
+      setMode("blogs");
+    } else if (search.has("page") && search.get("page") === "blog-detail") {
+      setMode("blog-detail");
     }
 
     // Handle logo click → go home
@@ -148,6 +160,12 @@ function App() {
         setFeatureId(null);
       } else if (s.has("page") && s.get("page") === "testimonials") {
         setMode("testimonials");
+        setFeatureId(null);
+      } else if (s.has("page") && s.get("page") === "blogs") {
+        setMode("blogs");
+        setFeatureId(null);
+      } else if (s.has("page") && s.get("page") === "blog-detail") {
+        setMode("blog-detail");
         setFeatureId(null);
       } else if (window.location.pathname === "/owner-onboarding") {
         setMode("owner-onboarding");
@@ -323,6 +341,14 @@ function App() {
           <Suspense fallback={<PageLoader />}>
             <PlatformTestimonials onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
           </Suspense>
+        )}
+
+        {mode === "blogs" && (
+          <BlogList onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
+        )}
+
+        {mode === "blog-detail" && (
+          <BlogDetail onBack={() => { setMode("blogs"); window.history.pushState({}, "", "/?page=blogs"); }} />
         )}
 
       </Suspense>

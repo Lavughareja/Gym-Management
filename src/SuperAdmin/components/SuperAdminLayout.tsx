@@ -16,7 +16,7 @@ import { saLogout } from "../redux/slices/superAdminSlice";
 // SuperAdminLayout — Sidebar + topbar shell for all super admin pages
 // ─────────────────────────────────────────────────────────────────────────────
 
-type NavTab = "dashboard" | "gyms" | "workout-library" | "faq";
+type NavTab = "dashboard" | "gyms" | "workout-library" | "faq" | "blogs";
 
 interface SuperAdminLayoutProps {
   children: (tab: NavTab) => React.ReactNode;
@@ -27,6 +27,7 @@ const NAV_ITEMS: { id: NavTab; label: string; icon: React.ReactNode }[] = [
   { id: "gyms",            label: "All Gyms",          icon: <Dumbbell size={20} /> },
   { id: "workout-library", label: "Workout Videos",   icon: <BookOpen size={20} /> },
   { id: "faq",             label: "FAQ Management",   icon: <MessageSquare size={20} /> },
+  { id: "blogs",           label: "Blog Management",  icon: <BookOpen size={20} /> },
 ];
 
 const SuperAdminLayout: React.FC<SuperAdminLayoutProps> = ({ children }) => {

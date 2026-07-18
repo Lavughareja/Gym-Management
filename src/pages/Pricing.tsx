@@ -141,7 +141,10 @@ export const Pricing: React.FC<PricingProps> = ({ onPaymentVerified }) => {
       createOrderAction({ email: ownerEmail, plan: selectedPlan.apiPlan })
     );
 
-    if (!createOrderAction.fulfilled.match(orderResult)) return; // error snackbar already shown
+    if (!createOrderAction.fulfilled.match(orderResult)) {
+      setEmailError((orderResult.payload as string) || "Failed to initialize payment. Please try again.");
+      return;
+    }
 
     const orderId  = orderResult.payload?.order?.orderId;
     const currency = orderResult.payload?.order?.currency ?? "INR";
