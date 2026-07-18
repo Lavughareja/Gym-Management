@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Navbar, Footer } from './Home';
 import { Star, Play, Quote, TrendingUp, Users, ShieldCheck, Heart } from 'lucide-react';
-import './PlatformTestimonials.css';
+import './PlatformTestimonialsPage.css';
 
 const LOGOS = ['GoldsGym', 'AnytimeFit', 'CrossFit', 'Equinox', 'F45', 'Barry\'s', 'SnapFitness', 'Crunch'];
 
@@ -164,3 +164,5 @@ export const PlatformTestimonials: React.FC<{ onBack: () => void }> = ({ onBack 
     </div>
   );
 };
+
+export default PlatformTestimonials;

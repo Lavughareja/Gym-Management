@@ -5,16 +5,12 @@ import "./App.css";
 import type { PlanType } from "./utils/constant";
 
 // ── Lazy load pages ─────────────────────────────────────────────────────────
-const Home         = lazy(() => import("./pages/Home").then((m)     => ({ default: m.Home })));
-const Features     = lazy(() => import("./pages/Features").then((m) => ({ default: m.Features })));
-const Pricing      = lazy(() => import("./pages/Pricing").then((m)  => ({ default: m.Pricing })));
-const About        = lazy(() => import("./pages/About").then((m)    => ({ default: m.About })));
-const Contact      = lazy(() => import("./pages/Contact").then((m)  => ({ default: m.Contact })));
-const RegisterOwner = lazy(() => import("./pages/RegisterOwner"));
-const GymDashboard  = lazy(() => import("./pages/GymDashboard"));
-const Login         = lazy(() => import("./pages/Login").then((m) => ({ default: m.Login })));
-const ManagerSetup  = lazy(() => import("./pages/ManagerSetup").then((m) => ({ default: m.ManagerSetup })));
-const MemberSetup   = lazy(() => import("./pages/MemberSetup").then((m) => ({ default: m.MemberSetup })));
+const Home = lazy(() => import("./pages/Home").then((m) => ({ default: m.Home })));
+const OwnerOnboarding = lazy(() => import("./pages/OwnerOnboarding"));
+const GymDashboard = lazy(() => import("./pages/GymDashboard"));
+const Login = lazy(() => import("./pages/Login").then((m) => ({ default: m.Login })));
+const ManagerSetup = lazy(() => import("./pages/ManagerSetup").then((m) => ({ default: m.ManagerSetup })));
+const MemberSetup = lazy(() => import("./pages/MemberSetup").then((m) => ({ default: m.MemberSetup })));
 const MemberDashboard = lazy(() => import("./pages/MemberDashboard").then((m) => ({ default: m.MemberDashboard })));
 const ResetPassword = lazy(() => import("./pages/ResetPassword").then((m) => ({ default: m.ResetPassword })));
 const SuperAdminRoutes = lazy(() => import("./SuperAdmin/routes/SuperAdminRoutes"));
@@ -39,8 +35,9 @@ const InvoicesBilling = lazy(() => import("./pages/features/InvoicesBilling").th
 const ExpenseTracking = lazy(() => import("./pages/features/ExpenseTracking").then(m => ({ default: m.ExpenseTracking })));
 const AnalyticsReports = lazy(() => import("./pages/features/AnalyticsReports").then(m => ({ default: m.AnalyticsReports })));
 const PlatformScreenshots = lazy(() => import("./pages/PlatformScreenshots").then(m => ({ default: m.PlatformScreenshots })));
-const PlatformIntegrations = lazy(() => import("./pages/PlatformIntegrations").then(m => ({ default: m.PlatformIntegrations })));
-const PlatformTestimonials = lazy(() => import("./pages/PlatformTestimonials").then(m => ({ default: m.PlatformTestimonials })));
+const PlatformIntegrations = lazy(() => import("./pages/PlatformIntegrationsPage").then(m => ({ default: m.PlatformIntegrations })));
+const PlatformTestimonials = lazy(() => import("./pages/PlatformTestimonialsPage").then(m => ({ default: m.PlatformTestimonials })));
+
 
 
 // ── Shared page-level loading fallback ──────────────────────────────────────
@@ -54,18 +51,18 @@ const PageLoader = () => (
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared types
 // ─────────────────────────────────────────────────────────────────────────────
-export type AppMode = "public" | "register" | "dashboard" | "login" | "manager-setup" | "trainer-setup" | "member-setup" | "reset-password" | "super-admin" | "feature-detail" | "screenshots" | "integrations" | "testimonials";
+export type AppMode = "public" | "register" | "dashboard" | "login" | "manager-setup" | "trainer-setup" | "member-setup" | "reset-password" | "super-admin" | "feature-detail" | "screenshots" | "integrations" | "testimonials" | "owner-onboarding";
 
 export interface DashboardUser {
-  ownerName:    string;
-  email:        string;
-  role:         "admin" | "superadmin" | "gymmanager" | "trainer" | "member";
+  ownerName: string;
+  email: string;
+  role: "admin" | "superadmin" | "gymmanager" | "trainer" | "member";
   canAddMember?: boolean;
 }
 
 export interface PaymentVerifiedPayload {
-  plan:         PlanType;
-  email:        string;
+  plan: PlanType;
+  email: string;
   paymentToken: string;
 }
 
@@ -121,6 +118,8 @@ function App() {
       setMode("login");
     } else if (path === "/reset-password") {
       setMode("reset-password");
+    } else if (path === "/owner-onboarding") {
+      setMode("owner-onboarding");
     }
 
     const search = new URLSearchParams(window.location.search);
@@ -150,6 +149,9 @@ function App() {
       } else if (s.has("page") && s.get("page") === "testimonials") {
         setMode("testimonials");
         setFeatureId(null);
+      } else if (window.location.pathname === "/owner-onboarding") {
+        setMode("owner-onboarding");
+        setFeatureId(null);
       } else if (window.location.pathname === "/") {
         setMode("public");
         setFeatureId(null);
@@ -166,9 +168,9 @@ function App() {
 
   const handleRegistrationSuccess = (gymName: string, ownerName: string) => {
     const newUser: DashboardUser = {
-      ownerName:  ownerName  || "Gym Owner",
-      email:      paymentPayload?.email || "",
-      role:       "admin",
+      ownerName: ownerName || "Gym Owner",
+      email: paymentPayload?.email || "",
+      role: "admin",
       canAddMember: true
     };
     setDashUser(newUser);
@@ -183,9 +185,9 @@ function App() {
     // For now we set dummy dashboard user details if not provided,
     // in real app, these should come from user profile API.
     const newUser: DashboardUser = {
-      ownerName:    userPayload?.fullName || "User",
-      email:        userPayload?.email || "",
-      role:         userPayload?.role || "member",
+      ownerName: userPayload?.fullName || "User",
+      email: userPayload?.email || "",
+      role: userPayload?.role || "member",
       canAddMember: userPayload?.canAddMember || false
     };
     setDashUser(newUser);
@@ -207,9 +209,9 @@ function App() {
       <Suspense fallback={<PageLoader />}>
 
         {mode === "login" && (
-          <Login 
+          <Login
             onSuccess={handleLoginSuccess}
-            onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} 
+            onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }}
           />
         )}
 
@@ -228,15 +230,12 @@ function App() {
           <MemberSetup onSuccess={handleLoginSuccess} />
         )}
 
-        {mode === "register" && paymentPayload && (
-          <RegisterOwner
-            plan={paymentPayload.plan}
-            email={paymentPayload.email}
-            paymentToken={paymentPayload.paymentToken}
+        {mode === "owner-onboarding" && (
+          <OwnerOnboarding
             onSuccess={handleRegistrationSuccess}
             onBack={() => {
-              setPaymentPayload(null);
               setMode("public");
+              window.history.pushState({}, "", "/");
             }}
           />
         )}

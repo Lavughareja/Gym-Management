@@ -17,13 +17,13 @@ import {
 
 /* ===================== DATA ===================== */
 const navLinks = [
-  { name: 'Features', href: '#features' },
-  { name: 'Screenshots', href: '#screenshots' },
-  { name: 'Pricing', href: '#pricing' },
-  { name: 'Integrations', href: '#integrations' },
-  { name: 'Testimonials', href: '#testimonials' },
-  { name: 'FAQ', href: '#faq' },
-  { name: 'Contact', href: '#contact' },
+  { name: 'Features', href: '/#features' },
+  { name: 'Screenshots', href: '/#screenshots' },
+  { name: 'Pricing', href: '/#pricing' },
+  { name: 'Integrations', href: '/#integrations' },
+  { name: 'Testimonials', href: '/#testimonials' },
+  { name: 'FAQ', href: '/#faq' },
+  { name: 'Contact', href: '/#contact' },
 ];
 
 const features = [
@@ -211,8 +211,8 @@ const featuresMenu = {
 };
 
 const primaryLinks = [
-  { name: 'Pricing', href: '#pricing' },
-  { name: 'Contact', href: '#contact' },
+  { name: 'Pricing', href: '/#pricing' },
+  { name: 'Contact', href: '/#contact' },
 ];
 
 const resourcesLinks = [
@@ -235,7 +235,7 @@ const resourcesLinks = [
     desc: 'What gym owners say about Trainix',
   },
   {
-    href: '#faq',
+    href: '/#faq',
     icon: <MessageSquare style={{ width: 18, height: 18 }} />,
     title: 'FAQ',
     desc: 'Common questions answered quickly',
@@ -398,7 +398,7 @@ export const Navbar: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
           {/* Actions */}
           <div className="gc-navbar-actions">
             <button className="gc-btn-ghost" onClick={onLogin}>Login</button>
-            <button className="gc-btn-primary" onClick={onLogin}>
+            <button className="gc-btn-primary" onClick={() => { window.history.pushState({}, '', '/owner-onboarding'); window.dispatchEvent(new PopStateEvent('popstate')); }}>
               Get Started <ArrowRight />
             </button>
           </div>
@@ -429,8 +429,8 @@ const Hero: React.FC = () => {
               Manage members, trainers, attendance, billing, biometric devices, branches, reports, WhatsApp notifications and much more from one powerful cloud platform.
             </p>
             <div className="gc-hero-btns">
-              <button className="gc-hero-btn-main">
-                Start Free Demo <ArrowRight style={{ width: 18, height: 18 }} />
+              <button className="gc-hero-btn-main" onClick={() => { window.history.pushState({}, '', '/owner-onboarding'); window.dispatchEvent(new PopStateEvent('popstate')); }}>
+                Start Free Trial <ArrowRight style={{ width: 18, height: 18 }} />
               </button>
               <button className="gc-hero-btn-sec">
                 <Play style={{ width: 18, height: 18, color: 'var(--gc-primary)' }} /> Watch Video
@@ -743,7 +743,10 @@ const Pricing: React.FC = () => {
                   <li key={j}><CheckCircle2 /> {f}</li>
                 ))}
               </ul>
-              <button className={`gc-pricing-cta ${p.isPopular ? 'gc-pricing-cta-primary' : 'gc-pricing-cta-dark'}`}>
+              <button 
+                className={`gc-pricing-cta ${p.isPopular ? 'gc-pricing-cta-primary' : 'gc-pricing-cta-dark'}`}
+                onClick={() => { window.history.pushState({}, '', '/owner-onboarding'); window.dispatchEvent(new PopStateEvent('popstate')); }}
+              >
                 Start Free Trial
               </button>
             </div>

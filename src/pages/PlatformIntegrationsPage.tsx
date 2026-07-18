@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Navbar, Footer } from './Home';
 import { ArrowRight, CheckCircle2, Cloud, Fingerprint, Calendar, MessageCircle, Video, CreditCard, Mail, Database, Globe } from 'lucide-react';
-import './PlatformIntegrations.css';
+import './PlatformIntegrationsPage.css';
 
 const INTEGRATIONS = [
   { id: 'whatsapp', name: 'WhatsApp', desc: 'Automate payment reminders, check-in alerts, and birthday wishes directly to members\' phones.', icon: <MessageCircle />, color: '#25D366', category: 'Communication' },
@@ -157,3 +157,5 @@ export const PlatformIntegrations: React.FC<{ onBack: () => void }> = ({ onBack 
     </div>
   );
 };
+
+export default PlatformIntegrations;

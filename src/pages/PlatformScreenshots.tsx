@@ -155,3 +155,5 @@ export const PlatformScreenshots: React.FC<{ onBack: () => void }> = ({ onBack }
     </div>
   );
 };
+
+export default PlatformScreenshots;
