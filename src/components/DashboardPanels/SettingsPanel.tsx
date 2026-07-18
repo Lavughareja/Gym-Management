@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Plus, X, Laptop, ShieldCheck, Wifi, MapPin, Loader } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../utils/reduxHooks";
 import { fetchDevicesAction, addDeviceAction, deleteDeviceAction } from "../../redux/actions/deviceActions";
+import { getGymInvoiceSettingsApi, updateGymInvoiceSettingsApi } from "../../services/apis/invoiceApis";
+import { showSnackbar } from "../../redux/slices/snackbarSlice";
 
 interface Props {
   gymName: string;
@@ -21,9 +23,41 @@ const SettingsPanel: React.FC<Props> = ({ gymName }) => {
   const [newDevice, setNewDevice] = useState({ name: "", serialNumber: "", ipAddress: "", provider: "Essl" });
   const [addingDevice, setAddingDevice] = useState(false);
 
+  const [invoiceSettings, setInvoiceSettings] = useState({ address: "", phone: "", gstNumber: "", invoiceTerms: "" });
+  const [savingInvoice, setSavingInvoice] = useState(false);
+
   useEffect(() => {
     dispatch(fetchDevicesAction());
+    fetchInvoiceSettings();
   }, [dispatch]);
+
+  const fetchInvoiceSettings = async () => {
+    try {
+      const res = await getGymInvoiceSettingsApi();
+      if (res.data.settings) {
+        setInvoiceSettings({
+          address: res.data.settings.address || "",
+          phone: res.data.settings.phone || "",
+          gstNumber: res.data.settings.gstNumber || "",
+          invoiceTerms: res.data.settings.invoiceTerms || ""
+        });
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleSaveInvoiceSettings = async () => {
+    setSavingInvoice(true);
+    try {
+      await updateGymInvoiceSettingsApi(invoiceSettings);
+      dispatch(showSnackbar({ message: "Invoice settings updated successfully", type: "success" }));
+    } catch (err: any) {
+      dispatch(showSnackbar({ message: err?.response?.data?.message || "Failed to update settings", type: "error" }));
+    } finally {
+      setSavingInvoice(false);
+    }
+  };
 
   const handleAddDevice = async () => {
     if (!newDevice.name || !newDevice.serialNumber || !newDevice.ipAddress) return;
@@ -117,6 +151,60 @@ const SettingsPanel: React.FC<Props> = ({ gymName }) => {
                 </label>
               </div>
             ))}
+          </div>
+        </div>
+
+        <div className="gym-card">
+          <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text-primary)", marginBottom: 20 }}>Invoice Details</h3>
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            <div>
+              <label className="form-label">Gym Address</label>
+              <textarea 
+                value={invoiceSettings.address} 
+                onChange={e => setInvoiceSettings({ ...invoiceSettings, address: e.target.value })} 
+                placeholder="Enter gym's physical address" 
+                className="form-input" 
+                style={{ resize: "vertical", minHeight: 60 }} 
+              />
+            </div>
+            <div>
+              <label className="form-label">Contact Phone</label>
+              <input 
+                type="text" 
+                value={invoiceSettings.phone} 
+                onChange={e => setInvoiceSettings({ ...invoiceSettings, phone: e.target.value })} 
+                placeholder="Contact number for invoices" 
+                className="form-input" 
+              />
+            </div>
+            <div>
+              <label className="form-label">GST / Tax Number (Optional)</label>
+              <input 
+                type="text" 
+                value={invoiceSettings.gstNumber} 
+                onChange={e => setInvoiceSettings({ ...invoiceSettings, gstNumber: e.target.value })} 
+                placeholder="e.g., 22AAAAA0000A1Z5" 
+                className="form-input" 
+              />
+            </div>
+            <div>
+              <label className="form-label">Terms and Conditions (Optional)</label>
+              <textarea 
+                value={invoiceSettings.invoiceTerms} 
+                onChange={e => setInvoiceSettings({ ...invoiceSettings, invoiceTerms: e.target.value })} 
+                placeholder="Any T&C printed at the bottom of the invoice" 
+                className="form-input" 
+                style={{ resize: "vertical", minHeight: 60 }} 
+              />
+            </div>
+            <button 
+              className="btn-blue" 
+              style={{ marginTop: 8, justifyContent: "center" }}
+              disabled={savingInvoice}
+              onClick={handleSaveInvoiceSettings}
+            >
+              {savingInvoice ? <Loader size={16} style={{ animation: "spin 1s linear infinite" }} /> : "Save Invoice Settings"}
+            </button>
           </div>
         </div>
       </div>

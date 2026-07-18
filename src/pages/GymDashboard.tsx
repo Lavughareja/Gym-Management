@@ -24,6 +24,7 @@ import { fetchManagersAction } from "../redux/actions/managerActions";
 import { fetchPlansAction } from "../redux/actions/planActions";
 import CrmPanel from "../components/DashboardPanels/CrmPanel";
 import TrialMembersPanel from "../components/DashboardPanels/TrialMembers/TrialMembersPanel.tsx";
+import ExpenseTrackerPanel from "../components/DashboardPanels/ExpenseTrackerPanel";
 
 interface GymDashboardProps {
   onLogout?: () => void;
@@ -90,6 +91,7 @@ const GymDashboard: React.FC<GymDashboardProps> = ({ onLogout }) => {
     { id: "pt", label: "PT Management", icon: UserCheck },
     { id: "events", label: "Announcements", icon: Bell },
     { id: "plans", label: "Plans", icon: ClipboardList },
+    { id: "expenses", label: "Expense Tracker", icon: Activity, hide: userObj?.role !== "admin" && userObj?.role !== "owner" },
     { id: "attendance", label: "Attendance", icon: Users },
     { id: "settings", label: "Settings", icon: Settings, hide: userObj?.role === "trainer" },
   ];
@@ -213,6 +215,7 @@ const GymDashboard: React.FC<GymDashboardProps> = ({ onLogout }) => {
         {activeTab === "pt" && <PtManagementPanel role={userObj?.role || "admin"} userId={userObj?._id} />}
         {activeTab === "events" && ((userObj?.role === "admin" || userObj?.role === "owner") ? <AnnouncementsPanel /> : <EventsViewPanel />)}
         {activeTab === "plans" && <PlansPanel gymName={userObj?.gymId?.name || "Your Gym"} />}
+        {activeTab === "expenses" && <ExpenseTrackerPanel />}
         {activeTab === "attendance" && <AttendancePanel />}
         {activeTab === "settings" && <SettingsPanel gymName={userObj?.gymId?.name || "Your Gym"} />}
       </main>

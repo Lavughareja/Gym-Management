@@ -24,6 +24,7 @@ import BMICalculator from "../components/BMICalculator/BMICalculator";
 import CaloriesCalculator from "../components/CaloriesCalculator/CaloriesCalculator";
 import WaterReminder from "../components/WaterReminder/WaterReminder";
 import EventsViewPanel from "../components/DashboardPanels/EventsViewPanel";
+import MemberPlanInvoicesPanel from "../components/DashboardPanels/MemberPlanInvoicesPanel";
 
 const DEFAULT_WORKOUTS = [
   { _id: "def_chest_1", name: "Bench Press", bodyPart: "Chest" },
@@ -61,7 +62,7 @@ interface Props {
   gymName?: string;
 }
 
-type Tab = "overview" | "health_monitor" | "workouts" | "reports" | "plans" | "diet" | "library" | "pt" | "challenges" | "events";
+type Tab = "overview" | "health_monitor" | "workouts" | "reports" | "plans" | "diet" | "library" | "pt" | "challenges" | "events" | "my_plan";
 
 export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName = "Trainix Gym" }) => {
   const dispatch = useAppDispatch();
@@ -1268,6 +1269,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
 
   const navItems: { id: Tab; label: string; icon: React.FC<{ size?: number }> }[] = [
     { id: "overview",  label: "Overview",   icon: LayoutDashboard as any },
+    { id: "my_plan",   label: "My Plan & Invoices", icon: CreditCard as any },
     { id: "health_monitor", label: "Health Monitor", icon: ClipboardList as any },
     { id: "workouts",  label: "Workouts",   icon: Dumbbell as any },
     { id: "library",   label: "Workout Video",    icon: BookOpen as any },
@@ -2225,12 +2227,13 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
     </div>
   );
 
-  const panels: Record<Tab, React.ReactNode> = {
+  const panels: Record<string, React.ReactNode> = {
     overview: OverviewPanel,
     health_monitor: HealthMonitorPanel,
     workouts: WorkoutsPanel,
     reports: ReportsPanel,
     plans: PlansPanel,
+    my_plan: <MemberPlanInvoicesPanel profile={profile} gymName={gymName} />,
     diet: DietPanel,
     library: <WorkoutLibraryPage />,
     pt: PersonalTrainerPanel,
