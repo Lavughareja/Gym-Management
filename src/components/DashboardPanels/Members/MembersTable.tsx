@@ -5,6 +5,7 @@ interface MembersTableProps {
   members: any[];
   onAddMember: () => void;
   onManage?: (action: 'freeze' | 'transfer' | 'upgrade', member: any) => void;
+  onResendInvite?: (email: string) => void;
 }
 
 const StatusBadge = ({ status }: { status: string }) => {
@@ -40,7 +41,16 @@ const PaymentBadge = ({ status }: { status: string }) => {
   );
 };
 
-export const MembersTable: React.FC<MembersTableProps> = ({ members, onAddMember, onManage }) => {
+export const MembersTable: React.FC<MembersTableProps> = ({ members, onAddMember, onManage, onResendInvite }) => {
+  const [resending, setResending] = useState<Record<string, boolean>>({});
+
+  const handleResend = async (email: string) => {
+    if (!onResendInvite) return;
+    setResending(prev => ({ ...prev, [email]: true }));
+    await onResendInvite(email);
+    setResending(prev => ({ ...prev, [email]: false }));
+  };
+
   return (
     <div style={{ width: '100%' }}>
 
@@ -49,7 +59,7 @@ export const MembersTable: React.FC<MembersTableProps> = ({ members, onAddMember
         <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 960 }}>
           <thead>
             <tr style={{ background: '#f8fafc', borderBottom: '1px solid #f1f5f9' }}>
-              {['Member', 'Contact', 'Plan Details', 'Status', 'Payment', 'Today'].map((h, i) => (
+              {['Member', 'Contact', 'Plan Details', 'Status', 'Payment', 'Today', 'Actions'].map((h, i) => (
                 <th key={i} style={{ padding: '14px 16px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em', whiteSpace: 'nowrap', width: 'auto' }}>{h}</th>
               ))}
             </tr>
@@ -123,6 +133,19 @@ export const MembersTable: React.FC<MembersTableProps> = ({ members, onAddMember
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 11, fontWeight: 700, color: '#16a34a', background: '#f0fdf4', padding: '4px 10px', borderRadius: 8, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                         <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#22c55e', display: 'inline-block' }}></span> Present
                       </span>
+                    </td>
+
+                    {/* Actions */}
+                    <td style={{ padding: '14px 16px', whiteSpace: 'nowrap' }}>
+                      {status.toLowerCase() === 'inactive' && onResendInvite && (
+                        <button 
+                          onClick={() => handleResend(m.email)}
+                          disabled={resending[m.email]}
+                          style={{ padding: '6px 12px', background: '#eff6ff', color: '#1d4ed8', border: 'none', borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, opacity: resending[m.email] ? 0.7 : 1 }}
+                        >
+                          <Repeat size={12} /> {resending[m.email] ? 'Sending...' : 'Resend Invite'}
+                        </button>
+                      )}
                     </td>
 
                   </tr>

@@ -15,6 +15,10 @@ export const addMemberApi = async (data: { fullName: string; email: string; mobi
   return response;
 };
 
+export const resendMemberInvitationApi = async (data: { email: string }) => {
+  return await AxiosInstance.post(apiRoutes.resendMemberInvitation, data);
+};
+
 export const getMembersApi = async () => {
   return await AxiosInstance.get(apiRoutes.getMembers);
 };

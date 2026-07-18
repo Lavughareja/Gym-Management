@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { useAppSelector } from "../../utils/reduxHooks";
+import { useAppSelector, useAppDispatch } from "../../utils/reduxHooks";
 import { Users, UserCheck, AlertTriangle, Clock, UserPlus, Snowflake, Fingerprint, Receipt, Download, Upload, ArrowUpCircle, Repeat } from 'lucide-react';
 import { MembersTable } from './Members/MembersTable';
 import { MembersFilter } from './Members/MembersFilter';
 import { AddMemberModal } from './Members/AddMemberModal';
 import { MembershipManagementModals } from './Members/MembershipManagementModals';
+import { resendMemberInvitationAction } from '../../redux/actions/memberActions';
 
 interface Props {
   role: string;
@@ -14,6 +15,7 @@ interface Props {
 }
 
 const MembersPanel: React.FC<Props> = ({ role, canAddMember, showAddMember, setShowAddMember }) => {
+  const dispatch = useAppDispatch();
   const { members: rawMembers, loading } = useAppSelector((state) => state.member);
   const members: any[] = Array.isArray(rawMembers) ? rawMembers : [];
   const [searchTerm, setSearchTerm] = useState("");
@@ -130,6 +132,7 @@ const MembersPanel: React.FC<Props> = ({ role, canAddMember, showAddMember, setS
             setManageAction(action);
             setManageMember(member);
           }}
+          onResendInvite={(email) => dispatch(resendMemberInvitationAction(email))}
         />
       </div>
 

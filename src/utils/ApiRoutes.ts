@@ -35,6 +35,7 @@ export const apiRoutes = {
   addMember: "/members",
   getMembers: "/members",
   memberSetup: "/members/setup",
+  resendMemberInvitation: "/members/resend-invitation",
   memberStreak: "/members/streak",
 
   // ── Workouts ──────────────────────────────────────────────────────────────

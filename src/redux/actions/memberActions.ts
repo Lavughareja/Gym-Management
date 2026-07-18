@@ -1,5 +1,5 @@
 import type { AppDispatch } from "../store";
-import { getMembersApi, addMemberApi, bulkImportMembersApi } from "../../services/apis/memberApis";
+import { getMembersApi, addMemberApi, bulkImportMembersApi, resendMemberInvitationApi } from "../../services/apis/memberApis";
 import { fetchMembersStart, fetchMembersSuccess, fetchMembersFailure } from "../slices/memberSlice";
 import { showSnackbar } from "../slices/snackbarSlice";
 
@@ -49,6 +49,17 @@ export const bulkImportMembersAction = (formData: FormData) => async (dispatch: 
     return true;
   } catch (error: any) {
     dispatch(showSnackbar({ message: error?.response?.data?.message || "Failed to import members", type: "error" }));
+    return false;
+  }
+};
+
+export const resendMemberInvitationAction = (email: string) => async (dispatch: AppDispatch) => {
+  try {
+    const res = await resendMemberInvitationApi({ email });
+    dispatch(showSnackbar({ message: res.data?.message || "Invitation sent successfully!", type: "success" }));
+    return true;
+  } catch (error: any) {
+    dispatch(showSnackbar({ message: error?.response?.data?.message || "Failed to send invitation", type: "error" }));
     return false;
   }
 };
