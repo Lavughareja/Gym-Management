@@ -6,7 +6,8 @@ import {
   LogOut, 
   ChevronLeft, 
   ChevronRight,
-  BookOpen
+  BookOpen,
+  MessageSquare
 } from "lucide-react";
 import type { AppDispatch } from "../../redux/store";
 import { saLogout } from "../redux/slices/superAdminSlice";
@@ -15,7 +16,7 @@ import { saLogout } from "../redux/slices/superAdminSlice";
 // SuperAdminLayout — Sidebar + topbar shell for all super admin pages
 // ─────────────────────────────────────────────────────────────────────────────
 
-type NavTab = "dashboard" | "gyms" | "workout-library";
+type NavTab = "dashboard" | "gyms" | "workout-library" | "faq";
 
 interface SuperAdminLayoutProps {
   children: (tab: NavTab) => React.ReactNode;
@@ -25,6 +26,7 @@ const NAV_ITEMS: { id: NavTab; label: string; icon: React.ReactNode }[] = [
   { id: "dashboard",       label: "Dashboard",        icon: <LayoutDashboard size={20} /> },
   { id: "gyms",            label: "All Gyms",          icon: <Dumbbell size={20} /> },
   { id: "workout-library", label: "Workout Videos",   icon: <BookOpen size={20} /> },
+  { id: "faq",             label: "FAQ Management",   icon: <MessageSquare size={20} /> },
 ];
 
 const SuperAdminLayout: React.FC<SuperAdminLayoutProps> = ({ children }) => {

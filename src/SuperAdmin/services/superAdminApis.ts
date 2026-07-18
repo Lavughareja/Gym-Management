@@ -89,3 +89,20 @@ export const saUpdateVideoApi = (videoId: string, data: object) =>
 export const saDeleteVideoApi = (videoId: string) =>
   AxiosInstance.delete(`/superadmin/workout-videos/${videoId}`);
 
+// ─────────────────────────────────────────────────────────────────────────────
+// FAQ management
+// ─────────────────────────────────────────────────────────────────────────────
+
+export const saFetchFaqsApi = () => AxiosInstance.get("/faq/sa");
+
+export const saCreateFaqApi = (data: { question: string; answer: string; isActive?: boolean }) =>
+  AxiosInstance.post("/faq/sa", data);
+
+export const saUpdateFaqApi = (id: string, data: object) =>
+  AxiosInstance.put(`/faq/sa/${id}`, data);
+
+export const saDeleteFaqApi = (id: string) =>
+  AxiosInstance.delete(`/faq/sa/${id}`);
+
+export const fetchPublicFaqsApi = () => AxiosInstance.get("/faq");
+

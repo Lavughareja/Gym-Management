@@ -33,6 +33,14 @@ const WorkoutTiming = lazy(() => import("./pages/features/WorkoutTiming").then(m
 const DailyChallenges = lazy(() => import("./pages/features/DailyChallenges").then(m => ({ default: m.DailyChallenges })));
 const AIDietGeneration = lazy(() => import("./pages/features/AIDietGeneration").then(m => ({ default: m.AIDietGeneration })));
 const BMIMacroReports = lazy(() => import("./pages/features/BMIMacroReports").then(m => ({ default: m.BMIMacroReports })));
+const WorkoutPlans = lazy(() => import("./pages/features/WorkoutPlans").then(m => ({ default: m.WorkoutPlans })));
+const PaymentTracking = lazy(() => import("./pages/features/PaymentTracking").then(m => ({ default: m.PaymentTracking })));
+const InvoicesBilling = lazy(() => import("./pages/features/InvoicesBilling").then(m => ({ default: m.InvoicesBilling })));
+const ExpenseTracking = lazy(() => import("./pages/features/ExpenseTracking").then(m => ({ default: m.ExpenseTracking })));
+const AnalyticsReports = lazy(() => import("./pages/features/AnalyticsReports").then(m => ({ default: m.AnalyticsReports })));
+const PlatformScreenshots = lazy(() => import("./pages/PlatformScreenshots").then(m => ({ default: m.PlatformScreenshots })));
+const PlatformIntegrations = lazy(() => import("./pages/PlatformIntegrations").then(m => ({ default: m.PlatformIntegrations })));
+const PlatformTestimonials = lazy(() => import("./pages/PlatformTestimonials").then(m => ({ default: m.PlatformTestimonials })));
 
 
 // ── Shared page-level loading fallback ──────────────────────────────────────
@@ -46,7 +54,7 @@ const PageLoader = () => (
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared types
 // ─────────────────────────────────────────────────────────────────────────────
-export type AppMode = "public" | "register" | "dashboard" | "login" | "manager-setup" | "trainer-setup" | "member-setup" | "reset-password" | "super-admin" | "feature-detail";
+export type AppMode = "public" | "register" | "dashboard" | "login" | "manager-setup" | "trainer-setup" | "member-setup" | "reset-password" | "super-admin" | "feature-detail" | "screenshots" | "integrations" | "testimonials";
 
 export interface DashboardUser {
   ownerName:    string;
@@ -77,6 +85,15 @@ function App() {
     const searchParams = new URLSearchParams(window.location.search);
     if (searchParams.has("feature")) {
       return "feature-detail";
+    }
+    if (searchParams.has("page") && searchParams.get("page") === "screenshots") {
+      return "screenshots";
+    }
+    if (searchParams.has("page") && searchParams.get("page") === "integrations") {
+      return "integrations";
+    }
+    if (searchParams.has("page") && searchParams.get("page") === "testimonials") {
+      return "testimonials";
     }
     return "public";
   });
@@ -110,6 +127,12 @@ function App() {
     if (search.has("feature")) {
       setFeatureId(search.get("feature"));
       setMode("feature-detail");
+    } else if (search.has("page") && search.get("page") === "screenshots") {
+      setMode("screenshots");
+    } else if (search.has("page") && search.get("page") === "integrations") {
+      setMode("integrations");
+    } else if (search.has("page") && search.get("page") === "testimonials") {
+      setMode("testimonials");
     }
 
     // Handle logo click → go home
@@ -118,6 +141,15 @@ function App() {
       if (s.has("feature")) {
         setFeatureId(s.get("feature"));
         setMode("feature-detail");
+      } else if (s.has("page") && s.get("page") === "screenshots") {
+        setMode("screenshots");
+        setFeatureId(null);
+      } else if (s.has("page") && s.get("page") === "integrations") {
+        setMode("integrations");
+        setFeatureId(null);
+      } else if (s.has("page") && s.get("page") === "testimonials") {
+        setMode("testimonials");
+        setFeatureId(null);
       } else if (window.location.pathname === "/") {
         setMode("public");
         setFeatureId(null);
@@ -260,9 +292,37 @@ function App() {
               <AIDietGeneration onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
             ) : featureId === 'bmi-macro-reports' ? (
               <BMIMacroReports onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
+            ) : featureId === 'workout-plans' ? (
+              <WorkoutPlans onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
+            ) : featureId === 'payment-tracking' ? (
+              <PaymentTracking onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
+            ) : featureId === 'invoices-billing' ? (
+              <InvoicesBilling onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
+            ) : featureId === 'expense-tracking' ? (
+              <ExpenseTracking onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
+            ) : featureId === 'analytics-reports' ? (
+              <AnalyticsReports onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
             ) : (
               <FeatureDetail featureId={featureId} onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
             )}
+          </Suspense>
+        )}
+
+        {mode === "screenshots" && (
+          <Suspense fallback={<PageLoader />}>
+            <PlatformScreenshots onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
+          </Suspense>
+        )}
+
+        {mode === "integrations" && (
+          <Suspense fallback={<PageLoader />}>
+            <PlatformIntegrations onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
+          </Suspense>
+        )}
+
+        {mode === "testimonials" && (
+          <Suspense fallback={<PageLoader />}>
+            <PlatformTestimonials onBack={() => { setMode("public"); window.history.pushState({}, "", "/"); }} />
           </Suspense>
         )}
 

@@ -1,0 +1,519 @@
+/* PlatformIntegrations.css */
+
+.pi-page {
+  background-color: #fafafa;
+  color: #1e293b;
+  min-height: 100vh;
+  font-family: 'Inter', system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Force Navbar to adapt to light theme for this page if needed, 
+   but assuming Navbar has its own styles, we might leave it alone or style it slightly */
+.pi-page .gc-navbar {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(12px) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+.pi-page .gc-navbar a, .pi-page .gc-nav-more-btn, .pi-page .gc-navbar-logo-text {
+  color: #0f172a !important;
+}
+
+/* Buttons */
+.pi-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  text-decoration: none;
+}
+
+.pi-btn-primary {
+  background: #0f172a;
+  color: white;
+  box-shadow: 0 4px 15px rgba(15, 23, 42, 0.15);
+}
+.pi-btn-primary:hover {
+  transform: translateY(-2px);
+  background: #1e293b;
+  box-shadow: 0 8px 25px rgba(15, 23, 42, 0.2);
+}
+
+.pi-btn-secondary {
+  background: white;
+  color: #0f172a;
+  border: 1px solid #e2e8f0;
+}
+.pi-btn-secondary:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+/* Hero Section */
+.pi-hero {
+  position: relative;
+  padding: 160px 0 100px;
+  overflow: hidden;
+}
+
+.pi-hero-bg-pattern {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+  background-size: 24px 24px;
+  opacity: 0.4;
+  z-index: 0;
+}
+
+.pi-hero-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 60px;
+}
+
+.pi-hero-content {
+  flex: 1;
+  max-width: 600px;
+}
+
+.pi-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+  padding: 6px 16px;
+  border-radius: 100px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 24px;
+}
+.pi-chip-dot {
+  width: 8px;
+  height: 8px;
+  background: #3b82f6;
+  border-radius: 50%;
+}
+
+.pi-title {
+  font-size: 3.5rem;
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 24px;
+  color: #0f172a;
+  letter-spacing: -1px;
+}
+
+.pi-text-gradient {
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.pi-subtitle {
+  font-size: 1.125rem;
+  color: #64748b;
+  line-height: 1.6;
+  margin-bottom: 40px;
+}
+
+.pi-hero-actions {
+  display: flex;
+  gap: 16px;
+}
+
+/* Visual Graphic */
+.pi-hero-visual {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  height: 400px;
+}
+
+.pi-connection-graphic {
+  position: relative;
+  width: 300px;
+  height: 300px;
+}
+
+.pi-center-node {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100px;
+  height: 100px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.25rem;
+  color: #0f172a;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  border: 4px solid #f8fafc;
+}
+
+.pi-orbit {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px dashed #cbd5e1;
+  border-radius: 50%;
+  animation: spin linear infinite;
+}
+
+.pi-orbit-1 { width: 180px; height: 180px; animation-duration: 20s; }
+.pi-orbit-2 { width: 260px; height: 260px; animation-duration: 30s; animation-direction: reverse; }
+.pi-orbit-3 { width: 340px; height: 340px; animation-duration: 40s; }
+
+@keyframes spin {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.pi-node {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  z-index: 11;
+  animation: counter-spin linear infinite;
+}
+
+@keyframes counter-spin {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+/* Positioning nodes on orbits */
+.pi-node-1 { top: 10%; left: 10%; animation-duration: 20s; }
+.pi-node-2 { bottom: 10%; right: 10%; animation-duration: 20s; }
+.pi-node-3 { top: 5%; right: 20%; animation-duration: 30s; }
+.pi-node-4 { bottom: 0%; left: 20%; animation-duration: 30s; }
+
+/* Adding hover stop to orbit animation would be tricky without JS or complex CSS, but this is fine */
+
+/* Grid Section */
+.pi-grid-section {
+  padding: 80px 0;
+  background: white;
+}
+
+.pi-section-header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.pi-section-header h2 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 16px;
+}
+
+.pi-section-header p {
+  font-size: 1.125rem;
+  color: #64748b;
+}
+
+.pi-filter-bar {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 48px;
+}
+
+.pi-filter-btn {
+  background: white;
+  border: 1px solid #e2e8f0;
+  color: #475569;
+  padding: 8px 20px;
+  border-radius: 100px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pi-filter-btn:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+.pi-filter-btn-active {
+  background: #0f172a;
+  color: white;
+  border-color: #0f172a;
+}
+.pi-filter-btn-active:hover {
+  background: #1e293b;
+  border-color: #1e293b;
+}
+
+.pi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.pi-card {
+  background: white;
+  border: 1px solid #f1f5f9;
+  padding: 32px;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.pi-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border-color: #e2e8f0;
+}
+
+.pi-card-icon-wrap {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  transition: transform 0.3s ease;
+}
+.pi-card:hover .pi-card-icon-wrap {
+  transform: scale(1.1);
+}
+
+.pi-card-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 12px;
+}
+
+.pi-card-desc {
+  color: #64748b;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.pi-card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  text-decoration: none;
+  transition: gap 0.2s;
+}
+.pi-card:hover .pi-card-link {
+  gap: 10px;
+}
+
+/* Feature Highlight */
+.pi-highlight {
+  padding: 80px 0;
+  background: #f8fafc;
+  border-top: 1px solid #f1f5f9;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.pi-highlight-box {
+  background: white;
+  border-radius: 24px;
+  padding: 60px;
+  display: flex;
+  align-items: center;
+  gap: 60px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+}
+
+.pi-highlight-content {
+  flex: 1;
+}
+
+.pi-highlight-content h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 16px;
+}
+
+.pi-highlight-content p {
+  font-size: 1.125rem;
+  color: #64748b;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.pi-highlight-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.pi-highlight-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.0625rem;
+  color: #334155;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.pi-highlight-image {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.pi-scanner-mockup {
+  width: 250px;
+  height: 350px;
+  background: #1e293b;
+  border-radius: 24px;
+  padding: 20px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  border: 8px solid #0f172a;
+  position: relative;
+}
+
+.pi-scanner-screen {
+  background: #0b0f19;
+  border-radius: 12px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.pi-scan-icon {
+  margin-bottom: 16px;
+  filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.5));
+}
+
+.pi-scan-text {
+  color: #10B981;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.pi-scan-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #10B981;
+  box-shadow: 0 0 10px 2px rgba(16, 185, 129, 0.5);
+  animation: scanning 2s infinite alternate ease-in-out;
+}
+
+@keyframes scanning {
+  0% { top: 20%; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 80%; opacity: 0; }
+}
+
+/* API CTA */
+.pi-api-cta {
+  padding: 100px 0;
+  background: #0f172a;
+  text-align: center;
+}
+
+.pi-api-content {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.pi-api-icon {
+  color: #3b82f6;
+  margin-bottom: 24px;
+}
+
+.pi-api-content h2 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 16px;
+}
+
+.pi-api-content p {
+  font-size: 1.125rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 32px;
+}
+
+.pi-api-code {
+  background: #1e293b;
+  padding: 24px;
+  border-radius: 12px;
+  text-align: left;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.pi-api-code code {
+  color: #e2e8f0;
+  font-size: 0.9375rem;
+  line-height: 1.8;
+}
+
+.code-method {
+  color: #10B981;
+  font-weight: 700;
+}
+
+.code-header {
+  color: #8b5cf6;
+}
+
+@media (max-width: 991px) {
+  .pi-hero-inner {
+    flex-direction: column;
+    text-align: center;
+  }
+  .pi-hero-actions {
+    justify-content: center;
+  }
+  .pi-highlight-box {
+    flex-direction: column;
+    padding: 40px 24px;
+  }
+  .pi-title {
+    font-size: 2.5rem;
+  }
+}

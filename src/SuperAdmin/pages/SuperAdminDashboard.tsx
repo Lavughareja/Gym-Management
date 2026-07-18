@@ -21,6 +21,7 @@ import SuperAdminLayout from "../components/SuperAdminLayout";
 import StatsCard from "../components/StatsCard";
 import GymTable from "../components/GymTable";
 import WorkoutLibrary from "./WorkoutLibrary";
+import FaqManagement from "./FaqManagement";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SuperAdminDashboard — Main dashboard page for the super admin portal
@@ -241,6 +242,11 @@ const SuperAdminDashboard: React.FC = () => {
           {/* ─── WORKOUT LIBRARY TAB ────────────────────────────────────── */}
           {activeTab === "workout-library" && (
             <WorkoutLibrary />
+          )}
+
+          {/* ─── FAQ MANAGEMENT TAB ────────────────────────────────────── */}
+          {activeTab === "faq" && (
+            <FaqManagement />
           )}
         </>
       )}

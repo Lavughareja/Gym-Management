@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../components/landing/landing.css';
+import { fetchPublicFaqsApi } from '../SuperAdmin/services/superAdminApis';
 
 // Icons
 import {
@@ -216,19 +217,19 @@ const primaryLinks = [
 
 const resourcesLinks = [
   {
-    href: '#screenshots',
+    href: '/?page=screenshots',
     icon: <Monitor style={{ width: 18, height: 18 }} />,
     title: 'Screenshots',
     desc: 'See every screen of the platform in detail',
   },
   {
-    href: '#integrations',
+    href: '/?page=integrations',
     icon: <Cloud style={{ width: 18, height: 18 }} />,
     title: 'Integrations',
     desc: 'WhatsApp, Zoom, Stripe, Biometrics & more',
   },
   {
-    href: '#testimonials',
+    href: '/?page=testimonials',
     icon: <Star style={{ width: 18, height: 18 }} />,
     title: 'Testimonials',
     desc: 'What gym owners say about Trainix',
@@ -795,6 +796,22 @@ const Testimonials: React.FC = () => {
 // FAQ
 const FAQ: React.FC = () => {
   const [open, setOpen] = useState<number | null>(0);
+  const [fetchedFaqs, setFetchedFaqs] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetchPublicFaqsApi()
+      .then(res => {
+        if (res.data?.success && res.data.faqs?.length > 0) {
+          setFetchedFaqs(res.data.faqs.map((f: any) => ({ q: f.question, a: f.answer })));
+        } else {
+          setFetchedFaqs(faqs);
+        }
+      })
+      .catch(() => setFetchedFaqs(faqs));
+  }, []);
+
+  const displayFaqs = fetchedFaqs.length > 0 ? fetchedFaqs : faqs;
+
   return (
     <section className="gc-section gc-section-gray" id="faq">
       <div className="gc-container">
@@ -803,7 +820,7 @@ const FAQ: React.FC = () => {
           <p className="gc-section-subtitle">Got questions? We've got answers.</p>
         </div>
         <div className="gc-faq-list">
-          {faqs.map((f, i) => (
+          {displayFaqs.map((f, i) => (
             <div className="gc-faq-item" key={i}>
               <button className="gc-faq-question" onClick={() => setOpen(open === i ? null : i)}>
                 <span className="gc-faq-question-text">{f.q}</span>
