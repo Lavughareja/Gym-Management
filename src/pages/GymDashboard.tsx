@@ -23,6 +23,7 @@ import { fetchTrainersAction } from "../redux/actions/trainerActions";
 import { fetchManagersAction } from "../redux/actions/managerActions";
 import { fetchPlansAction } from "../redux/actions/planActions";
 import CrmPanel from "../components/DashboardPanels/CrmPanel";
+import TrialMembersPanel from "../components/DashboardPanels/TrialMembers/TrialMembersPanel.tsx";
 
 interface GymDashboardProps {
   onLogout?: () => void;
@@ -79,6 +80,7 @@ const GymDashboard: React.FC<GymDashboardProps> = ({ onLogout }) => {
   const navItems = [
     { id: "overview", label: "Overview", icon: LayoutDashboard },
     { id: "crm", label: "CRM (Leads)", icon: Activity, hide: userObj?.role !== "admin" && userObj?.role !== "owner" },
+    { id: "trial_members", label: "Trial Members", icon: Users, hide: userObj?.role !== "admin" && userObj?.role !== "owner" },
     { id: "members", label: "Members", icon: Users },
     { id: "bmi", label: "BMI & Diet", icon: Activity },
     { id: "trainers", label: "Trainers", icon: Dumbbell, hide: userObj?.role === "trainer" },
@@ -185,6 +187,9 @@ const GymDashboard: React.FC<GymDashboardProps> = ({ onLogout }) => {
             role={userObj?.role || "admin"}
             gymName={userObj?.gymId?.name || "Your Gym"}
           />
+        )}
+        {activeTab === "trial_members" && (
+          <TrialMembersPanel />
         )}
         {activeTab === "members" && (
           <MembersPanel

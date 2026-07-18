@@ -35,6 +35,7 @@ const OverviewPanel: React.FC<Props> = ({
     pendingLeadsCount: 0,
     chartData: []
   });
+  const [expiringTrials, setExpiringTrials] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -50,7 +51,28 @@ const OverviewPanel: React.FC<Props> = ({
         console.error("Error fetching dashboard overview:", error);
       }
     };
+
+    const fetchExpiringTrials = async () => {
+      try {
+        const response = await AxiosInstance.get('/trials');
+        if (response.data && response.data.trials) {
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          const expiring = response.data.trials.filter((t: any) => {
+            if (t.status !== 'active') return false;
+            const end = new Date(t.endDate);
+            end.setHours(0, 0, 0, 0);
+            return end.getTime() === today.getTime();
+          });
+          setExpiringTrials(expiring);
+        }
+      } catch (error) {
+        console.error("Error fetching trials:", error);
+      }
+    };
+
     fetchDashboardData();
+    fetchExpiringTrials();
   }, []);
 
   const stats = [
@@ -69,6 +91,24 @@ const OverviewPanel: React.FC<Props> = ({
         <h2 className="page-title">Welcome back, {ownerName.split(" ")[0]} 👋</h2>
         <p className="page-subtitle">Here's what's happening at {gymName} today.</p>
       </div>
+
+      {expiringTrials.length > 0 && (
+        <div style={{ background: '#fffbeb', border: '1px solid #fef3c7', borderRadius: 12, padding: '16px 20px', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 12 }}>
+          <AlertTriangle size={24} color="#d97706" />
+          <div style={{ flex: 1 }}>
+            <h4 style={{ margin: 0, color: '#92400e', fontSize: 16 }}>{expiringTrials.length} Trial(s) Expiring Today!</h4>
+            <p style={{ margin: '4px 0 0', color: '#b45309', fontSize: 14 }}>
+              {expiringTrials.map(t => t.name).join(', ')}. Reach out to convert them to members!
+            </p>
+          </div>
+          <button 
+            onClick={() => setActiveTab('trial_members')}
+            style={{ padding: '8px 16px', background: '#d97706', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 600, cursor: 'pointer' }}
+          >
+            View Trials
+          </button>
+        </div>
+      )}
 
       <div className="stats-grid">
         {stats.map((s, i) => (
