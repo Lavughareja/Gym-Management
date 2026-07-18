@@ -50,7 +50,7 @@ export const MemberSetup: React.FC<Props> = ({ onSuccess }) => {
       dispatch(showSnackbar({ message: response.data.message || "Setup successful!", type: "success" }));
       
       // Auto login success
-      onSuccess({ role: response.data.role });
+      onSuccess(response.data);
     } catch (error: any) {
       const message = error?.response?.data?.message || "Setup failed. Please try again.";
       dispatch(showSnackbar({ message, type: "error" }));

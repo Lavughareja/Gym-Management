@@ -36,11 +36,13 @@ const GymDashboard: React.FC<GymDashboardProps> = ({ onLogout }) => {
 
   const localUserStr = localStorage.getItem("dashUser");
   const localUser = localUserStr ? JSON.parse(localUserStr) : null;
-  const userObj = (user as any) || (localUser ? {
-    name: localUser.ownerName,
-    role: localUser.role,
-    canAddMember: localUser.canAddMember,
-  } : {});
+  const userObj = {
+    name: (user as any)?.fullName || localUser?.ownerName,
+    role: (user as any)?.role || localUser?.role,
+    canAddMember: (user as any)?.canAddMember || localUser?.canAddMember,
+    _id: (user as any)?._id || localUser?._id,
+    gymId: (user as any)?.gymId || localUser?.gymId,
+  };
 
   const [activeTab, setActiveTab] = useState("overview");
   const [isDarkMode, setIsDarkMode] = useState(() => localStorage.getItem("theme") === "dark");
