@@ -1,317 +1,309 @@
 import React, { useState } from 'react';
-import { X, User, HeartPulse, Lock, CheckCircle2, ChevronRight, UserPlus, CreditCard, Activity } from 'lucide-react';
+import { X, Loader2 } from 'lucide-react';
+import { useAppDispatch } from '../../../utils/reduxHooks';
+import { addMemberAction } from '../../../redux/actions/memberActions';
 
 interface Props {
   onClose: () => void;
   onSave: (data: any) => void;
 }
 
-export const AddMemberModal: React.FC<Props> = ({ onClose, onSave }) => {
-  const [activeTab, setActiveTab] = useState(0);
+const inputStyle: React.CSSProperties = {
+  width: '100%',
+  padding: '12px 16px',
+  border: '1.5px solid #e2e8f0',
+  borderRadius: 10,
+  fontSize: 15,
+  color: '#1e293b',
+  background: '#fff',
+  outline: 'none',
+  fontFamily: 'inherit',
+  boxSizing: 'border-box',
+};
 
-  const tabs = [
-    { label: "Personal Info", icon: User },
-    { label: "Membership", icon: CreditCard },
-    { label: "Trainer", icon: UserPlus },
-    { label: "Health", icon: HeartPulse },
-    { label: "Login Details", icon: Lock },
-  ];
+const labelStyle: React.CSSProperties = {
+  display: 'block',
+  fontSize: 14,
+  fontWeight: 700,
+  color: '#1e293b',
+  marginBottom: 8,
+};
+
+export const AddMemberModal: React.FC<Props> = ({ onClose, onSave }) => {
+  const dispatch = useAppDispatch();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const [form, setForm] = useState({
+    fullName: '',
+    email: '',
+    mobileNo: '',
+    dateOfBirth: '',
+    secondaryPhone: '',
+    emergencyNumber: '',
+    bloodGroup: '',
+    durationMonths: '',
+    startDate: '',
+    amountPaid: '',
+    extraDays: '',
+  });
+
+  const set = (key: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
+    setForm(f => ({ ...f, [key]: e.target.value }));
+
+  // Auto-calculate end date from startDate + durationMonths + extraDays
+  const calcEndDate = (): string => {
+    if (!form.startDate || !form.durationMonths) return '';
+    const d = new Date(form.startDate);
+    d.setMonth(d.getMonth() + Number(form.durationMonths));
+    if (form.extraDays) d.setDate(d.getDate() + Number(form.extraDays));
+    return d.toISOString().split('T')[0];
+  };
+  const endDate = calcEndDate();
+
+  const handleSubmit = async () => {
+    setError('');
+    if (!form.fullName.trim()) { setError('Full Name is required.'); return; }
+    if (!form.email.trim()) { setError('Email is required.'); return; }
+    if (!form.mobileNo.trim()) { setError('Mobile number is required.'); return; }
+
+    setLoading(true);
+    try {
+      const payload: any = {
+        fullName: form.fullName.trim(),
+        email: form.email.trim(),
+        mobileNo: form.mobileNo.trim(),
+      };
+      if (form.dateOfBirth) payload.dateOfBirth = form.dateOfBirth;
+      if (form.secondaryPhone.trim()) payload.secondaryPhone = form.secondaryPhone.trim();
+      if (form.emergencyNumber.trim()) payload.emergencyNumber = form.emergencyNumber.trim();
+      if (form.bloodGroup) payload.bloodGroup = form.bloodGroup;
+      if (form.durationMonths) payload.durationMonths = Number(form.durationMonths);
+      if (form.extraDays) payload.extraDays = Number(form.extraDays);
+      if (form.startDate) payload.startDate = form.startDate;
+      if (form.amountPaid) payload.amountPaid = Number(form.amountPaid);
+
+      const success = await dispatch(addMemberAction(payload));
+      if (success) onSave(payload);
+    } catch {
+      setError('Failed to add member. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[1000] flex items-center justify-center p-4 sm:p-6 animate-in fade-in">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col overflow-hidden animate-in zoom-in-95">
-        
+    <div style={{
+      position: 'fixed', inset: 0,
+      background: 'rgba(0,0,0,0.45)',
+      zIndex: 1000,
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      padding: 16,
+    }}>
+      <div style={{
+        background: '#fff',
+        borderRadius: 18,
+        width: '100%',
+        maxWidth: 520,
+        maxHeight: '90vh',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+        boxShadow: '0 8px 40px rgba(0,0,0,0.18)',
+      }}>
         {/* Header */}
-        <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-          <div>
-            <h2 className="text-xl font-bold text-gray-900">Add New Member</h2>
-            <p className="text-sm text-gray-500 mt-1">Complete all sections to register a new member to the gym.</p>
-          </div>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-            <X size={24} />
+        <div style={{ padding: '24px 28px 0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h2 style={{ fontSize: 20, fontWeight: 800, color: '#0f172a', margin: 0 }}>Add New Member</h2>
+          <button
+            onClick={onClose}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', padding: 4, display: 'flex', alignItems: 'center' }}
+          >
+            <X size={22} />
           </button>
         </div>
 
-        <div className="flex flex-1 overflow-hidden">
-          {/* Sidebar Navigation */}
-          <div className="w-64 bg-gray-50/50 border-r border-gray-100 p-4 overflow-y-auto hidden md:block">
-            <div className="space-y-1">
-              {tabs.map((t, i) => (
-                <button 
-                  key={i} 
-                  onClick={() => setActiveTab(i)}
-                  className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold transition-all ${activeTab === i ? 'bg-white text-[#4f46e5] shadow-sm border border-gray-100' : 'text-gray-500 hover:bg-gray-100/80 hover:text-gray-700'}`}
-                >
-                  <div className="flex items-center gap-3">
-                    <t.icon size={18} className={activeTab === i ? 'text-[#4f46e5]' : 'text-gray-400'} />
-                    {t.label}
-                  </div>
-                  {activeTab === i && <ChevronRight size={16} />}
-                </button>
-              ))}
+        {/* Scrollable body */}
+        <div style={{ flex: 1, overflowY: 'auto', padding: '20px 28px' }}>
+
+          {/* Full Name */}
+          <div style={{ marginBottom: 18 }}>
+            <label style={labelStyle}>Full Name</label>
+            <input
+              style={inputStyle}
+              placeholder="Member Name"
+              value={form.fullName}
+              onChange={set('fullName')}
+            />
+          </div>
+
+          {/* Email */}
+          <div style={{ marginBottom: 18 }}>
+            <label style={labelStyle}>Email Address</label>
+            <input
+              style={inputStyle}
+              type="email"
+              placeholder="member@example.com"
+              value={form.email}
+              onChange={set('email')}
+            />
+          </div>
+
+          {/* Mobile */}
+          <div style={{ marginBottom: 18 }}>
+            <label style={labelStyle}>Mobile Number</label>
+            <input
+              style={inputStyle}
+              type="tel"
+              placeholder="9876543210"
+              value={form.mobileNo}
+              onChange={set('mobileNo')}
+            />
+          </div>
+
+          {/* Date of Birth */}
+          <div style={{ marginBottom: 18 }}>
+            <label style={labelStyle}>Date of Birth</label>
+            <input
+              style={inputStyle}
+              type="date"
+              value={form.dateOfBirth}
+              onChange={set('dateOfBirth')}
+            />
+          </div>
+
+          {/* Blood Group */}
+          <div style={{ marginBottom: 18 }}>
+            <label style={labelStyle}>Blood Group</label>
+            <select style={inputStyle} value={form.bloodGroup} onChange={set('bloodGroup')}>
+              <option value="">Select Blood Group</option>
+              {['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'].map(g => <option key={g} value={g}>{g}</option>)}
+            </select>
+          </div>
+
+          {/* Emergency Contact */}
+          <div style={{ marginBottom: 18 }}>
+            <label style={labelStyle}>Emergency Contact</label>
+            <input
+              style={inputStyle}
+              type="tel"
+              placeholder="Emergency number (optional)"
+              value={form.emergencyNumber}
+              onChange={set('emergencyNumber')}
+            />
+          </div>
+
+          {/* Duration */}
+          <div style={{ marginBottom: 18 }}>
+            <label style={labelStyle}>Membership Duration (Months)</label>
+            <input
+              style={inputStyle}
+              type="number"
+              min="1"
+              placeholder="e.g. 1, 3, 6, 12"
+              value={form.durationMonths}
+              onChange={set('durationMonths')}
+            />
+          </div>
+
+          {/* Start Date + Extra Days in one row */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 18 }}>
+            <div>
+              <label style={labelStyle}>Start Date</label>
+              <input
+                style={inputStyle}
+                type="date"
+                value={form.startDate}
+                onChange={set('startDate')}
+              />
             </div>
-            
-            <div className="mt-8 px-4">
-              <div className="p-4 bg-blue-50 border border-blue-100 rounded-xl">
-                <div className="flex items-start gap-3">
-                  <CheckCircle2 size={20} className="text-blue-500 shrink-0" />
-                  <p className="text-xs text-blue-800 font-medium leading-relaxed">Ensure email and phone number are correct for WhatsApp automation and receipts.</p>
-                </div>
-              </div>
+            <div>
+              <label style={labelStyle}>Extra Days</label>
+              <input
+                style={inputStyle}
+                type="number"
+                min="0"
+                placeholder="0"
+                value={form.extraDays}
+                onChange={set('extraDays')}
+              />
             </div>
           </div>
 
-          {/* Form Content */}
-          <div className="flex-1 p-6 md:p-8 overflow-y-auto bg-white">
-            
-            {activeTab === 0 && (
-              <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
-                <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2"><User size={20} className="text-[#4f46e5]" /> Personal Information</h3>
-                
-                <div className="flex items-center gap-6 mb-8">
-                  <div className="w-24 h-24 rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 flex items-center justify-center cursor-pointer hover:border-[#4f46e5] hover:bg-[#4f46e5]/5 transition-all text-gray-400 flex-col gap-1">
-                    <UserPlus size={24} />
-                    <span className="text-[10px] font-bold uppercase tracking-wider">Upload</span>
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-bold text-gray-700 mb-1">Profile Photo</h4>
-                    <p className="text-xs text-gray-500">JPG, PNG or GIF. Max size of 5MB.</p>
-                  </div>
-                </div>
+          {/* Auto-calculated End Date */}
+          {endDate && (
+            <div style={{ marginBottom: 18 }}>
+              <label style={labelStyle}>End Date (Auto Calculated)</label>
+              <input
+                style={{ ...inputStyle, background: '#f0fdf4', border: '1.5px solid #bbf7d0', color: '#15803d', fontWeight: 700, cursor: 'not-allowed' }}
+                type="date"
+                value={endDate}
+                readOnly
+              />
+            </div>
+          )}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">First Name *</label>
-                    <input type="text" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#4f46e5] focus:ring-2 focus:ring-[#4f46e5]/20 outline-none transition-all text-sm bg-gray-50 focus:bg-white" placeholder="John" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Last Name</label>
-                    <input type="text" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#4f46e5] focus:ring-2 focus:ring-[#4f46e5]/20 outline-none transition-all text-sm bg-gray-50 focus:bg-white" placeholder="Doe" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Gender</label>
-                    <select className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#4f46e5] focus:ring-2 focus:ring-[#4f46e5]/20 outline-none transition-all text-sm bg-gray-50 focus:bg-white appearance-none">
-                      <option>Male</option>
-                      <option>Female</option>
-                      <option>Other</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Date of Birth</label>
-                    <input type="date" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#4f46e5] focus:ring-2 focus:ring-[#4f46e5]/20 outline-none transition-all text-sm bg-gray-50 focus:bg-white" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Blood Group</label>
-                    <select className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#4f46e5] focus:ring-2 focus:ring-[#4f46e5]/20 outline-none transition-all text-sm bg-gray-50 focus:bg-white appearance-none">
-                      <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
-                      <option>O+</option><option>O-</option><option>AB+</option><option>AB-</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Email Address *</label>
-                    <input type="email" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#4f46e5] focus:ring-2 focus:ring-[#4f46e5]/20 outline-none transition-all text-sm bg-gray-50 focus:bg-white" placeholder="john@example.com" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Phone Number *</label>
-                    <input type="tel" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#4f46e5] focus:ring-2 focus:ring-[#4f46e5]/20 outline-none transition-all text-sm bg-gray-50 focus:bg-white" placeholder="+1 (555) 000-0000" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Emergency Contact</label>
-                    <input type="tel" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#4f46e5] focus:ring-2 focus:ring-[#4f46e5]/20 outline-none transition-all text-sm bg-gray-50 focus:bg-white" placeholder="+1 (555) 111-1111" />
-                  </div>
-                  <div className="md:col-span-2">
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Address</label>
-                    <input type="text" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#4f46e5] focus:ring-2 focus:ring-[#4f46e5]/20 outline-none transition-all text-sm bg-gray-50 focus:bg-white" placeholder="123 Fitness Street" />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 1 && (
-              <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
-                <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2"><CreditCard size={20} className="text-[#4f46e5]" /> Membership Details</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="md:col-span-2">
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Membership Plan *</label>
-                    <select className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#4f46e5] focus:ring-2 focus:ring-[#4f46e5]/20 outline-none transition-all text-sm bg-gray-50 focus:bg-white appearance-none">
-                      <option>Select a plan...</option>
-                      <option>Pro Monthly ($49.99)</option>
-                      <option>Elite Quarterly ($129.99)</option>
-                      <option>Ultimate Annual ($499.99)</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Joining Date</label>
-                    <input type="date" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#4f46e5] focus:ring-2 focus:ring-[#4f46e5]/20 outline-none transition-all text-sm bg-gray-50 focus:bg-white" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Start Date</label>
-                    <input type="date" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#4f46e5] focus:ring-2 focus:ring-[#4f46e5]/20 outline-none transition-all text-sm bg-gray-50 focus:bg-white" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Membership Fee</label>
-                    <input type="number" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#4f46e5] focus:ring-2 focus:ring-[#4f46e5]/20 outline-none transition-all text-sm bg-gray-50 focus:bg-white" placeholder="0.00" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Discount Amount</label>
-                    <input type="number" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#4f46e5] focus:ring-2 focus:ring-[#4f46e5]/20 outline-none transition-all text-sm bg-gray-50 focus:bg-white" placeholder="0.00" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Final Amount</label>
-                    <div className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-100 text-gray-900 font-bold text-sm">$0.00</div>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Payment Method</label>
-                    <select className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#4f46e5] focus:ring-2 focus:ring-[#4f46e5]/20 outline-none transition-all text-sm bg-gray-50 focus:bg-white appearance-none">
-                      <option>Cash</option>
-                      <option>Credit Card</option>
-                      <option>Bank Transfer</option>
-                      <option>UPI / Online</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Payment Status</label>
-                    <select className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#4f46e5] focus:ring-2 focus:ring-[#4f46e5]/20 outline-none transition-all text-sm bg-gray-50 focus:bg-white appearance-none">
-                      <option>Paid</option>
-                      <option>Pending</option>
-                      <option>Partial</option>
-                    </select>
-                  </div>
-                  <div className="flex items-center gap-3 pt-6">
-                    <input type="checkbox" className="w-5 h-5 rounded border-gray-300 text-[#4f46e5] focus:ring-[#4f46e5]" defaultChecked />
-                    <label className="text-sm font-semibold text-gray-700">Auto Renew Membership</label>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 2 && (
-              <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
-                <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2"><UserPlus size={20} className="text-[#4f46e5]" /> Trainer Information</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="md:col-span-2">
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Assigned Trainer</label>
-                    <select className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#4f46e5] focus:ring-2 focus:ring-[#4f46e5]/20 outline-none transition-all text-sm bg-gray-50 focus:bg-white appearance-none">
-                      <option>None</option>
-                      <option>Mike Johnson</option>
-                      <option>Sarah Williams</option>
-                    </select>
-                  </div>
-                  <div className="flex items-center gap-3 pt-2 md:col-span-2">
-                    <input type="checkbox" className="w-5 h-5 rounded border-gray-300 text-[#4f46e5] focus:ring-[#4f46e5]" />
-                    <label className="text-sm font-semibold text-gray-700">Enroll in Personal Training (PT)</label>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Workout Batch</label>
-                    <select className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#4f46e5] focus:ring-2 focus:ring-[#4f46e5]/20 outline-none transition-all text-sm bg-gray-50 focus:bg-white appearance-none">
-                      <option>Morning (6AM - 10AM)</option>
-                      <option>Afternoon (12PM - 4PM)</option>
-                      <option>Evening (5PM - 10PM)</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Preferred Workout Time</label>
-                    <input type="time" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#4f46e5] focus:ring-2 focus:ring-[#4f46e5]/20 outline-none transition-all text-sm bg-gray-50 focus:bg-white" />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 3 && (
-              <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
-                <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2"><HeartPulse size={20} className="text-[#4f46e5]" /> Health Information</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Height (cm)</label>
-                    <input type="number" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#4f46e5] focus:ring-2 focus:ring-[#4f46e5]/20 outline-none transition-all text-sm bg-gray-50 focus:bg-white" placeholder="175" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Weight (kg)</label>
-                    <input type="number" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#4f46e5] focus:ring-2 focus:ring-[#4f46e5]/20 outline-none transition-all text-sm bg-gray-50 focus:bg-white" placeholder="70" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Target Goal</label>
-                    <select className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#4f46e5] focus:ring-2 focus:ring-[#4f46e5]/20 outline-none transition-all text-sm bg-gray-50 focus:bg-white appearance-none">
-                      <option>Weight Loss</option>
-                      <option>Muscle Gain</option>
-                      <option>Maintain Fitness</option>
-                      <option>Athletic Performance</option>
-                    </select>
-                  </div>
-                  <div className="md:col-span-3">
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Medical Conditions (If any)</label>
-                    <textarea rows={3} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#4f46e5] focus:ring-2 focus:ring-[#4f46e5]/20 outline-none transition-all text-sm bg-gray-50 focus:bg-white" placeholder="Asthma, Joint pain, etc." />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 4 && (
-              <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
-                <h3 className="text-lg font-bold text-gray-900 mb-6 flex items-center gap-2"><Lock size={20} className="text-[#4f46e5]" /> Login Details</h3>
-                <div className="p-5 bg-[#4f46e5]/5 border border-[#4f46e5]/10 rounded-xl mb-6">
-                  <p className="text-sm text-[#4f46e5] font-medium leading-relaxed">
-                    By default, the member's email address will be used as their username. You can assign a custom password below, or auto-generate one and email it to them.
-                  </p>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Username</label>
-                    <input type="text" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-100 text-gray-500 text-sm outline-none" value="john@example.com" disabled />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Password</label>
-                    <div className="flex gap-2">
-                      <input type="password" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#4f46e5] focus:ring-2 focus:ring-[#4f46e5]/20 outline-none transition-all text-sm bg-gray-50 focus:bg-white" placeholder="••••••••" />
-                      <button className="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold uppercase tracking-wider rounded-xl transition-colors whitespace-nowrap">
-                        Generate
-                      </button>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 pt-4 md:col-span-2">
-                    <input type="checkbox" className="w-5 h-5 rounded border-gray-300 text-[#4f46e5] focus:ring-[#4f46e5]" defaultChecked />
-                    <label className="text-sm font-semibold text-gray-700">Send Welcome Email with App Download Link & Login Details</label>
-                  </div>
-                </div>
-              </div>
-            )}
-
+          {/* Amount Paid */}
+          <div style={{ marginBottom: 8 }}>
+            <label style={labelStyle}>Amount Paid (₹)</label>
+            <input
+              style={inputStyle}
+              type="number"
+              min="0"
+              placeholder="0"
+              value={form.amountPaid}
+              onChange={set('amountPaid')}
+            />
           </div>
+
+          {/* Error */}
+          {error && (
+            <div style={{ marginTop: 12, padding: '10px 14px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, color: '#dc2626', fontSize: 13, fontWeight: 500 }}>
+              {error}
+            </div>
+          )}
         </div>
 
-        {/* Footer */}
-        <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex items-center justify-between">
-          <div className="text-sm text-gray-500 hidden md:block">
-            Step <span className="font-bold text-gray-900">{activeTab + 1}</span> of {tabs.length}
-          </div>
-          <div className="flex items-center gap-3 w-full md:w-auto">
-            {activeTab > 0 && (
-              <button 
-                onClick={() => setActiveTab(activeTab - 1)}
-                className="flex-1 md:flex-none px-6 py-2.5 border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-100 transition-colors"
-              >
-                Previous
-              </button>
-            )}
-            
-            {activeTab < tabs.length - 1 ? (
-              <button 
-                onClick={() => setActiveTab(activeTab + 1)}
-                className="flex-1 md:flex-none px-6 py-2.5 bg-[#4f46e5] text-white font-semibold rounded-xl hover:bg-[#4338ca] shadow-md shadow-[#4f46e5]/20 transition-colors"
-              >
-                Next Step
-              </button>
-            ) : (
-              <div className="flex items-center gap-3 flex-1 md:flex-none">
-                <button onClick={onClose} className="hidden md:block px-6 py-2.5 bg-white border border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-colors">Cancel</button>
-                <button onClick={() => onSave({})} className="flex-1 md:flex-none px-6 py-2.5 bg-[#4f46e5] text-white font-semibold rounded-xl hover:bg-[#4338ca] shadow-md shadow-[#4f46e5]/20 transition-colors whitespace-nowrap">
-                  Save Member
-                </button>
-              </div>
-            )}
-          </div>
+        {/* Footer buttons */}
+        <div style={{ padding: '16px 28px 24px', display: 'flex', gap: 12 }}>
+          <button
+            onClick={handleSubmit}
+            disabled={loading}
+            style={{
+              flex: 1,
+              padding: '13px 0',
+              background: loading ? '#93c5fd' : '#2563eb',
+              color: '#fff',
+              border: 'none',
+              borderRadius: 10,
+              fontSize: 15,
+              fontWeight: 700,
+              cursor: loading ? 'not-allowed' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+            }}
+          >
+            {loading && <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />}
+            {loading ? 'Adding...' : 'Add Member'}
+          </button>
+          <button
+            onClick={onClose}
+            style={{
+              flex: 1,
+              padding: '13px 0',
+              background: '#fff',
+              color: '#2563eb',
+              border: '1.5px solid #2563eb',
+              borderRadius: 10,
+              fontSize: 15,
+              fontWeight: 700,
+              cursor: 'pointer',
+            }}
+          >
+            Cancel
+          </button>
         </div>
-
       </div>
     </div>
   );

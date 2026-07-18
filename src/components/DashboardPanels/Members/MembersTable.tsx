@@ -10,11 +10,11 @@ interface MembersTableProps {
 const StatusBadge = ({ status }: { status: string }) => {
   const s = (status || 'active').toLowerCase();
   const map: Record<string, { bg: string; color: string; label: string }> = {
-    active:         { bg: '#dcfce7', color: '#16a34a', label: 'Active' },
-    'expiring soon':{ bg: '#ffedd5', color: '#ea580c', label: 'Expiring' },
-    expired:        { bg: '#fee2e2', color: '#dc2626', label: 'Expired' },
-    inactive:       { bg: '#fee2e2', color: '#dc2626', label: 'Expired' },
-    frozen:         { bg: '#f1f5f9', color: '#475569', label: 'Frozen' },
+    active: { bg: '#dcfce7', color: '#16a34a', label: 'Active' },
+    'expiring soon': { bg: '#ffedd5', color: '#ea580c', label: 'Expiring' },
+    expired: { bg: '#fee2e2', color: '#dc2626', label: 'Expired' },
+    inactive: { bg: '#fee2e2', color: '#dc2626', label: 'Expired' },
+    frozen: { bg: '#f1f5f9', color: '#475569', label: 'Frozen' },
   };
   const style = map[s] || map.frozen;
   return (
@@ -27,7 +27,7 @@ const StatusBadge = ({ status }: { status: string }) => {
 const PaymentBadge = ({ status }: { status: string }) => {
   const s = (status || 'paid').toLowerCase();
   const map: Record<string, { bg: string; color: string; border: string }> = {
-    paid:    { bg: '#f0fdf4', color: '#16a34a', border: '#bbf7d0' },
+    paid: { bg: '#f0fdf4', color: '#16a34a', border: '#bbf7d0' },
     pending: { bg: '#fefce8', color: '#ca8a04', border: '#fef08a' },
     overdue: { bg: '#fff1f2', color: '#e11d48', border: '#fecdd3' },
     partial: { bg: '#eff6ff', color: '#2563eb', border: '#bfdbfe' },
@@ -53,7 +53,7 @@ export const MembersTable: React.FC<MembersTableProps> = ({ members, onViewMembe
   };
 
   return (
-    <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px rgba(0,0,0,0.04)', border: '1px solid #f1f5f9', overflow: 'visible', position: 'relative' }}>
+    <div style={{ width: '100%' }}>
 
       {/* Bulk action bar */}
       {selectedIds.length > 0 && (
@@ -71,7 +71,7 @@ export const MembersTable: React.FC<MembersTableProps> = ({ members, onViewMembe
         </div>
       )}
 
-      <div style={{ overflowX: 'auto', paddingBottom: 64 }}>
+      <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 960 }}>
           <thead>
             <tr style={{ background: '#f8fafc', borderBottom: '1px solid #f1f5f9' }}>
@@ -101,14 +101,14 @@ export const MembersTable: React.FC<MembersTableProps> = ({ members, onViewMembe
               members.map((m, idx) => {
                 const rowId = m._id || m.id || String(idx);
                 const initials = m.name ? m.name.substring(0, 2).toUpperCase() : 'M';
-                const avatarBg = ['#ede9fe','#dbeafe','#dcfce7','#fef3c7','#fce7f3'][idx % 5];
-                const avatarColor = ['#7c3aed','#2563eb','#16a34a','#d97706','#db2777'][idx % 5];
+                const avatarBg = ['#ede9fe', '#dbeafe', '#dcfce7', '#fef3c7', '#fce7f3'][idx % 5];
+                const avatarColor = ['#7c3aed', '#2563eb', '#16a34a', '#d97706', '#db2777'][idx % 5];
                 const isSelected = selectedIds.includes(rowId);
                 const status = m.status || (m.planEndDate && new Date(m.planEndDate) >= new Date() ? 'Active' : 'Expired');
 
                 return (
                   <tr key={rowId} style={{ borderBottom: '1px solid #f8fafc', background: isSelected ? 'rgba(79,70,229,0.02)' : '#fff', transition: 'background 0.15s' }}
-                    onMouseEnter={e => { if (!isSelected)(e.currentTarget as HTMLElement).style.background = '#f8fafc'; }}
+                    onMouseEnter={e => { if (!isSelected) (e.currentTarget as HTMLElement).style.background = '#f8fafc'; }}
                     onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = isSelected ? 'rgba(79,70,229,0.02)' : '#fff'; }}
                   >
                     {/* Checkbox */}
@@ -217,7 +217,7 @@ export const MembersTable: React.FC<MembersTableProps> = ({ members, onViewMembe
       </div>
 
       {/* Pagination */}
-      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '14px 24px', borderTop: '1px solid #f1f5f9', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderRadius: '0 0 16px 16px', zIndex: 10 }}>
+      <div style={{ padding: '14px 24px', borderTop: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <span style={{ fontSize: 13, color: '#64748b', fontWeight: 500 }}>
           Showing <strong style={{ color: '#0f172a' }}>{members.length > 0 ? 1 : 0}</strong> – <strong style={{ color: '#0f172a' }}>{Math.min(members.length, 10)}</strong> of <strong style={{ color: '#0f172a' }}>{members.length}</strong> members
         </span>

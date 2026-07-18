@@ -1,60 +1,93 @@
-import React from 'react';
-import { Search, Filter, RefreshCw } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Search, RefreshCw, ChevronDown } from 'lucide-react';
 
 interface MembersFilterProps {
   searchTerm: string;
   setSearchTerm: (s: string) => void;
 }
 
+const statusOptions = [
+  { label: 'All Statuses', value: '' },
+  { label: 'Active', value: 'active' },
+  { label: 'Expiring Soon', value: 'expiring' },
+  { label: 'Expired', value: 'expired' },
+  { label: 'Frozen', value: 'frozen' },
+];
+
 export const MembersFilter: React.FC<MembersFilterProps> = ({ searchTerm, setSearchTerm }) => {
+  const [isStatusOpen, setIsStatusOpen] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState(statusOptions[0]);
+  const statusRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (statusRef.current && !statusRef.current.contains(event.target as Node)) {
+        setIsStatusOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   return (
-    <div className="bg-white rounded-xl shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-gray-100 p-5 mb-6">
+    <div className="w-full">
       <div className="flex flex-col md:flex-row gap-4 items-end">
         {/* Search */}
         <div className="flex-1 w-full">
-          <label className="block text-[11px] font-bold text-gray-400 mb-2 uppercase tracking-wider">Search Members</label>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+          <label className="block text-[13px] font-medium text-slate-700 mb-1.5">Search Members</label>
+          <div className="relative h-[38px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} strokeWidth={2} />
             <input
               type="text"
               placeholder="Search by ID, Name, Phone, or Email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 focus:border-[#4f46e5] focus:ring-2 focus:ring-[#4f46e5]/20 outline-none transition-all text-sm bg-gray-50/50"
+              className="w-full h-full pr-3 rounded-lg border border-slate-200 focus:border-slate-300 outline-none transition-all text-[13px] text-slate-700 bg-white placeholder:text-slate-400"
+              style={{ paddingLeft: '34px' }}
             />
           </div>
         </div>
 
-        {/* Status Filter */}
-        <div className="w-full md:w-44">
-          <label className="block text-[11px] font-bold text-gray-400 mb-2 uppercase tracking-wider">Status</label>
-          <select className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-[#4f46e5] focus:ring-2 focus:ring-[#4f46e5]/20 outline-none transition-all text-sm bg-gray-50/50">
-            <option value="">All Statuses</option>
-            <option value="active">Active</option>
-            <option value="expiring">Expiring Soon</option>
-            <option value="expired">Expired</option>
-            <option value="frozen">Frozen</option>
-          </select>
-        </div>
-
-        {/* Payment Filter */}
-        <div className="w-full md:w-44">
-          <label className="block text-[11px] font-bold text-gray-400 mb-2 uppercase tracking-wider">Payment</label>
-          <select className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-[#4f46e5] focus:ring-2 focus:ring-[#4f46e5]/20 outline-none transition-all text-sm bg-gray-50/50">
-            <option value="">All Payments</option>
-            <option value="paid">Paid</option>
-            <option value="pending">Pending</option>
-            <option value="overdue">Overdue</option>
-          </select>
+        {/* Custom Status Dropdown */}
+        <div className="w-full md:w-[170px]" ref={statusRef}>
+          <label className="block text-[13px] font-medium text-slate-700 mb-1.5">Status</label>
+          <div className="relative h-[38px]">
+            <button
+              type="button"
+              onClick={() => setIsStatusOpen(!isStatusOpen)}
+              className={`w-full h-full pl-3 pr-8 rounded-lg border ${isStatusOpen ? 'border-slate-300' : 'border-slate-200 hover:border-slate-300'} outline-none transition-all text-[13px] text-slate-700 bg-white flex items-center justify-between cursor-pointer`}
+            >
+              <span className="truncate">{selectedStatus.label}</span>
+              <ChevronDown className={`absolute right-3 text-slate-400 transition-transform duration-200 ${isStatusOpen ? 'rotate-180' : ''}`} size={15} strokeWidth={2} />
+            </button>
+            
+            {isStatusOpen && (
+              <div className="absolute top-[calc(100%+6px)] left-0 w-full bg-white border border-slate-200 rounded-lg shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] py-1.5 z-50 overflow-hidden">
+                {statusOptions.map((option) => (
+                  <div
+                    key={option.value}
+                    onClick={() => {
+                      setSelectedStatus(option);
+                      setIsStatusOpen(false);
+                    }}
+                    className={`px-3 py-2 text-[13px] cursor-pointer transition-colors flex items-center ${
+                      selectedStatus.value === option.value
+                        ? 'bg-slate-100 font-semibold text-slate-900'
+                        : 'text-slate-700 hover:bg-slate-50'
+                    }`}
+                  >
+                    {option.label}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-2">
-          <button className="h-[42px] px-4 flex items-center justify-center gap-2 bg-white border border-gray-200 hover:bg-gray-50 hover:text-[#4f46e5] text-gray-700 rounded-lg text-sm font-medium transition-colors whitespace-nowrap">
-            <Filter size={16} /> Advanced Filters
-          </button>
-          <button className="h-[42px] w-[42px] flex items-center justify-center bg-white border border-gray-200 hover:bg-gray-50 text-gray-400 hover:text-red-500 rounded-lg transition-colors" title="Reset Filters">
-            <RefreshCw size={16} />
+        <div className="flex items-center h-[38px]">
+          <button className="h-full w-[38px] flex items-center justify-center bg-white border border-slate-200 hover:bg-slate-50 text-slate-400 hover:text-[#4f46e5] rounded-lg transition-colors cursor-pointer" title="Reset Filters">
+            <RefreshCw size={15} strokeWidth={2} />
           </button>
         </div>
       </div>

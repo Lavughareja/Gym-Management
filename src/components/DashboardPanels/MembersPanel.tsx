@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useAppDispatch, useAppSelector } from "../../utils/reduxHooks";
+import { useAppSelector } from "../../utils/reduxHooks";
 import { Users, UserCheck, AlertTriangle, Clock, UserPlus, Snowflake, Fingerprint, Receipt, Download, Upload } from 'lucide-react';
 import { MembersTable } from './Members/MembersTable';
 import { MembersFilter } from './Members/MembersFilter';
@@ -14,86 +14,118 @@ interface Props {
 }
 
 const MembersPanel: React.FC<Props> = ({ role, canAddMember, showAddMember, setShowAddMember }) => {
-  const { members, loading } = useAppSelector((state) => state.member);
+  const { members: rawMembers, loading } = useAppSelector((state) => state.member);
+  const members: any[] = Array.isArray(rawMembers) ? rawMembers : [];
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedMember, setSelectedMember] = useState<any>(null);
 
+  // ── Real calculations from member data ──────────────────────────────────────
+  const now = new Date();
+  const sevenDaysLater = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  const totalMembers    = members.length;
+  const activeMembers   = members.filter((m) => m.status === 'Active' || (!m.status && m.planEndDate && new Date(m.planEndDate) >= now)).length;
+  const expiredMembers  = members.filter((m) => m.status === 'Inactive' || (m.planEndDate && new Date(m.planEndDate) < now)).length;
+  const expiringMembers = members.filter((m) => {
+    if (!m.planEndDate) return false;
+    const end = new Date(m.planEndDate);
+    return end >= now && end <= sevenDaysLater;
+  }).length;
+  const newThisMonth    = members.filter((m) => {
+    const created = m.createdAt ? new Date(m.createdAt) : null;
+    return created && created >= startOfMonth;
+  }).length;
+  const frozenMembers   = members.filter((m) => m.status === 'Frozen' || m.status === 'frozen').length;
+  const pendingPayments = members.filter((m) => m.paymentStatus === 'Pending' || m.paymentStatus === 'pending' || m.paymentStatus === 'Partial').length;
+
   const stats = [
-    { label: "Total Members", value: members.length.toString(), icon: Users, color: "text-blue-600", bg: "bg-blue-50 border-blue-100", trend: "+12%" },
-    { label: "Active Members", value: members.filter((m: any) => m.status === 'Active' || !m.status).length.toString(), icon: UserCheck, color: "text-green-600", bg: "bg-green-50 border-green-100", trend: "+5%" },
-    { label: "Expired", value: members.filter((m: any) => m.status === 'Inactive').length.toString(), icon: AlertTriangle, color: "text-red-600", bg: "bg-red-50 border-red-100", trend: "-2%" },
-    { label: "Expiring Soon", value: "14", icon: Clock, color: "text-orange-600", bg: "bg-orange-50 border-orange-100", trend: "+1%" },
-    { label: "New This Month", value: "28", icon: UserPlus, color: "text-purple-600", bg: "bg-purple-50 border-purple-100", trend: "+24%" },
-    { label: "Frozen Members", value: "5", icon: Snowflake, color: "text-gray-600", bg: "bg-gray-100 border-gray-200", trend: "0%" },
-    { label: "Today's Attendance", value: "85", icon: Fingerprint, color: "text-cyan-600", bg: "bg-cyan-50 border-cyan-100", trend: "+18%" },
-    { label: "Pending Payments", value: "12", icon: Receipt, color: "text-yellow-600", bg: "bg-yellow-50 border-yellow-100", trend: "-5%" },
+    { label: "Total Members",      value: totalMembers,    icon: Users,        iconColor: '#2563eb', iconBg: '#eff6ff', iconBorder: '#bfdbfe', trend: null },
+    { label: "Active Members",     value: activeMembers,   icon: UserCheck,    iconColor: '#16a34a', iconBg: '#f0fdf4', iconBorder: '#bbf7d0', trend: null },
+    { label: "Expired",            value: expiredMembers,  icon: AlertTriangle,iconColor: '#dc2626', iconBg: '#fff1f2', iconBorder: '#fecdd3', trend: null },
+    { label: "Expiring Soon",      value: expiringMembers, icon: Clock,        iconColor: '#ea580c', iconBg: '#fff7ed', iconBorder: '#fed7aa', trend: null },
+    { label: "New This Month",     value: newThisMonth,    icon: UserPlus,     iconColor: '#7c3aed', iconBg: '#f5f3ff', iconBorder: '#ddd6fe', trend: null },
   ];
 
+  const filteredMembers = members.filter((m: any) =>
+    !searchTerm ||
+    m.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    m.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    m.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    m.mobileNo?.includes(searchTerm)
+  );
+
   return (
-    <div className="p-6 md:p-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+    <div style={{ padding: '28px 32px', minHeight: '100%', fontFamily: 'inherit' }}>
+
+      {/* ── Header ── */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16, marginBottom: 28 }}>
         <div>
-          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Member Management</h1>
-          <p className="text-sm font-medium text-gray-500 mt-1">Manage all gym members from one centralized dashboard.</p>
+          <h1 style={{ fontSize: 26, fontWeight: 800, color: '#0f172a', margin: '0 0 4px', letterSpacing: '-0.4px' }}>Member Management</h1>
+          <p style={{ fontSize: 13, color: '#64748b', margin: 0, fontWeight: 500 }}>Manage all gym members from one centralized dashboard.</p>
         </div>
-        
+
         {(canAddMember || role === "admin" || role === "superadmin" || role === "owner") && (
-          <div className="flex items-center gap-3">
-            <button className="px-4 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl text-sm font-semibold hover:bg-gray-50 transition-colors shadow-[0_2px_10px_rgba(0,0,0,0.02)] hidden md:flex items-center gap-2">
-              <Download size={16} /> Template
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <button style={{ padding: '9px 16px', background: '#fff', border: '1px solid #e2e8f0', color: '#475569', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 7, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+              <Download size={14} /> Template
             </button>
-            <button className="px-4 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl text-sm font-semibold hover:bg-gray-50 transition-colors shadow-[0_2px_10px_rgba(0,0,0,0.02)] hidden md:flex items-center gap-2">
-              <Upload size={16} /> Import
+            <button style={{ padding: '9px 16px', background: '#fff', border: '1px solid #e2e8f0', color: '#475569', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 7, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+              <Upload size={14} /> Import
             </button>
-            <button onClick={() => setShowAddMember(true)} className="px-5 py-2.5 bg-[#4f46e5] text-white rounded-xl text-sm font-bold hover:bg-[#4338ca] transition-all shadow-lg shadow-[#4f46e5]/25 flex items-center gap-2">
-              <UserPlus size={18} /> Add Member
+            <button
+              onClick={() => setShowAddMember(true)}
+              style={{ padding: '9px 20px', background: '#4f46e5', border: 'none', color: '#fff', borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, boxShadow: '0 4px 14px rgba(79,70,229,0.3)' }}
+            >
+              <UserPlus size={16} /> Add Member
             </button>
           </div>
         )}
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      {/* ── Stats Grid – 5 cols ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14, marginBottom: 24 }}>
         {stats.map((s, i) => (
-          <div key={i} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.03)] transition-transform hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] duration-300">
-            <div className="flex justify-between items-start mb-4">
-              <div className={`w-12 h-12 rounded-xl border ${s.bg} ${s.color} flex items-center justify-center shadow-sm`}>
-                <s.icon size={22} strokeWidth={2.5} />
+          <div
+            key={i}
+            style={{ background: '#fff', borderRadius: 12, padding: '14px 16px', border: '1px solid #f1f5f9', boxShadow: '0 1px 8px rgba(0,0,0,0.05)', minWidth: 0 }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+              <div style={{ width: 38, height: 38, borderRadius: 10, background: s.iconBg, border: `1.5px solid ${s.iconBorder}`, color: s.iconColor, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <s.icon size={18} strokeWidth={2.5} />
               </div>
-              <span className={`text-[10px] font-bold ${s.trend.startsWith('+') ? 'text-green-700 bg-green-100' : s.trend.startsWith('-') ? 'text-red-700 bg-red-100' : 'text-gray-600 bg-gray-100'} px-2 py-1 rounded-md tracking-wide`}>
-                {s.trend}
-              </span>
             </div>
-            <p className="text-3xl font-extrabold text-gray-900 tracking-tight">{s.value}</p>
-            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mt-1.5">{s.label}</p>
+            <p style={{ fontSize: 26, fontWeight: 800, color: '#0f172a', margin: '0 0 4px', lineHeight: 1, letterSpacing: '-0.5px' }}>
+              {loading ? '—' : s.value}
+            </p>
+            <p style={{ fontSize: 10, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.07em', margin: 0 }}>{s.label}</p>
           </div>
         ))}
       </div>
 
-      <MembersFilter searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-
-      <MembersTable 
-        members={members.filter((m: any) => 
-          !searchTerm || 
-          m.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-          m.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          m.mobileNo?.includes(searchTerm)
-        )} 
-        onViewMember={setSelectedMember} 
-        onAddMember={() => setShowAddMember(true)}
-      />
+      {/* ── Table & Filter Card ── */}
+      <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 12px rgba(0,0,0,0.04)', border: '1px solid #f1f5f9', overflow: 'hidden', width: '100%' }}>
+        <div style={{ padding: '20px' }}>
+          <MembersFilter searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+        </div>
+        <MembersTable
+          members={filteredMembers}
+          onViewMember={setSelectedMember}
+          onAddMember={() => setShowAddMember(true)}
+        />
+      </div>
 
       {showAddMember && (
-        <AddMemberModal 
-          onClose={() => setShowAddMember(false)} 
-          onSave={() => setShowAddMember(false)} 
+        <AddMemberModal
+          onClose={() => setShowAddMember(false)}
+          onSave={() => setShowAddMember(false)}
         />
       )}
 
       {selectedMember && (
-        <MemberDetails 
-          member={selectedMember} 
-          onClose={() => setSelectedMember(null)} 
+        <MemberDetails
+          member={selectedMember}
+          onClose={() => setSelectedMember(null)}
         />
       )}
     </div>
