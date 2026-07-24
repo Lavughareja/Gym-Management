@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../utils/reduxHooks";
 import { registerOwnerAction } from "../redux/actions/authActions";
 import { createOrderAction, verifySignatureAction } from "../redux/actions/paymentActions";
@@ -23,12 +24,8 @@ const loadRazorpayScript = (): Promise<boolean> =>
     document.body.appendChild(script);
   });
 
-interface Props {
-  onSuccess: (gymName: string, ownerName: string) => void;
-  onBack: () => void;
-}
-
-export const OwnerOnboarding: React.FC<Props> = ({ onSuccess, onBack }) => {
+export const OwnerOnboarding: React.FC = () => {
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [loading, setLoading] = useState(false);
@@ -131,7 +128,18 @@ export const OwnerOnboarding: React.FC<Props> = ({ onSuccess, onBack }) => {
           })
         );
         if (registerOwnerAction.fulfilled.match(regResult)) {
-          onSuccess(gymName, fullName);
+          // Save dashUser for ProtectedRoute
+          const regPayload = (regResult.payload as any);
+          const dashUser = {
+            ownerName: fullName || "Owner",
+            email,
+            role: "admin",
+            canAddMember: true,
+            _id: regPayload?._id || regPayload?.user?._id,
+            gymId: regPayload?.gymId || regPayload?.user?.gymId,
+          };
+          localStorage.setItem("dashUser", JSON.stringify(dashUser));
+          navigate("/dashboard/overview", { replace: true });
         } else {
           setError("Failed to register account after payment. Please contact support.");
           setLoading(false);
@@ -191,7 +199,7 @@ export const OwnerOnboarding: React.FC<Props> = ({ onSuccess, onBack }) => {
     <div className="page-container" style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "#f8fafc" }}>
       {/* Header / Brand */}
       <div style={{ padding: "20px 40px", display: "flex", alignItems: "center", justifyContent: "space-between", background: "white", borderBottom: "1px solid var(--border)" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }} onClick={onBack}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }} onClick={() => navigate("/")}>
           <img src="/logo.png" alt="Trainix" style={{ width: 32, height: 32 }} />
           <span style={{ fontSize: "1.25rem", fontWeight: 700 }}>Trainix</span>
         </div>
@@ -328,7 +336,7 @@ export const OwnerOnboarding: React.FC<Props> = ({ onSuccess, onBack }) => {
                 By continuing, you agree to our <a href="#" style={{ color: "var(--primary)" }}>Terms of Service</a> and <a href="#" style={{ color: "var(--primary)" }}>Privacy Policy</a>
               </p>
               <p style={{ textAlign: "center", fontSize: "0.9rem", color: "var(--text-secondary)", marginTop: 8 }}>
-                Already have an account? <span onClick={onBack} style={{ color: "var(--primary)", cursor: "pointer", fontWeight: 600 }}>Sign in</span>
+                Already have an account? <span onClick={() => navigate("/login")} style={{ color: "var(--primary)", cursor: "pointer", fontWeight: 600 }}>Sign in</span>
               </p>
             </form>
           )}

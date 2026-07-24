@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { LogOut, Settings, Sun, Moon, Dumbbell, Users, ClipboardList, Activity, LayoutDashboard, UserCog, UserCheck, Menu, Bell } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../utils/reduxHooks";
 import { logoutAction } from "../redux/actions/authActions";
 
@@ -26,12 +26,46 @@ import CrmPanel from "../components/DashboardPanels/CrmPanel";
 import TrialMembersPanel from "../components/DashboardPanels/TrialMembers/TrialMembersPanel.tsx";
 import ExpenseTrackerPanel from "../components/DashboardPanels/ExpenseTrackerPanel";
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Route Map — maps URL segments to panel IDs
+// ─────────────────────────────────────────────────────────────────────────────
+
+const PANEL_ROUTE_MAP: Record<string, string> = {
+  overview: "/dashboard/overview",
+  crm: "/dashboard/crm",
+  trial_members: "/dashboard/trial-members",
+  members: "/dashboard/members",
+  bmi: "/dashboard/bmi",
+  trainers: "/dashboard/trainers",
+  managers: "/dashboard/managers",
+  pt: "/dashboard/pt",
+  events: "/dashboard/announcements",
+  plans: "/dashboard/plans",
+  expenses: "/dashboard/expenses",
+  attendance: "/dashboard/attendance",
+  settings: "/dashboard/settings",
+};
+
+/** Derive the active panel id from the current pathname */
+function getPanelFromPath(pathname: string): string {
+  const seg = pathname.replace("/dashboard/", "").replace("/dashboard", "");
+  const found = Object.entries(PANEL_ROUTE_MAP).find(([, path]) =>
+    path === `/dashboard/${seg}` || path === pathname
+  );
+  return found ? found[0] : "overview";
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GymDashboard
+// ─────────────────────────────────────────────────────────────────────────────
+
 interface GymDashboardProps {
   onLogout?: () => void;
 }
 
 const GymDashboard: React.FC<GymDashboardProps> = ({ onLogout }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
 
@@ -45,7 +79,9 @@ const GymDashboard: React.FC<GymDashboardProps> = ({ onLogout }) => {
     gymId: (user as any)?.gymId || localUser?.gymId,
   };
 
-  const [activeTab, setActiveTab] = useState("overview");
+  // Derive active panel from URL — always in sync
+  const activeTab = getPanelFromPath(location.pathname);
+
   const [isDarkMode, setIsDarkMode] = useState(() => localStorage.getItem("theme") === "dark");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -60,6 +96,13 @@ const GymDashboard: React.FC<GymDashboardProps> = ({ onLogout }) => {
     dispatch(fetchPlansAction());
   }, [dispatch]);
 
+  // If at exactly /dashboard, redirect to /dashboard/overview
+  useEffect(() => {
+    if (location.pathname === "/dashboard" || location.pathname === "/dashboard/") {
+      navigate("/dashboard/overview", { replace: true });
+    }
+  }, [location.pathname, navigate]);
+
   // Theme logic
   useEffect(() => {
     if (isDarkMode) {
@@ -73,11 +116,19 @@ const GymDashboard: React.FC<GymDashboardProps> = ({ onLogout }) => {
 
   const handleLogout = async () => {
     await dispatch(logoutAction());
+    localStorage.removeItem("dashUser");
     if (onLogout) {
       onLogout();
     } else {
-      navigate("/login");
+      navigate("/login", { replace: true });
     }
+  };
+
+  /** Navigate to a panel by id */
+  const goToPanel = (panelId: string) => {
+    const path = PANEL_ROUTE_MAP[panelId] || "/dashboard/overview";
+    navigate(path);
+    setSidebarOpen(false);
   };
 
   const navItems = [
@@ -117,7 +168,7 @@ const GymDashboard: React.FC<GymDashboardProps> = ({ onLogout }) => {
               <li key={item.id}>
                 <a
                   className={`sidebar-menu-item ${activeTab === item.id ? "active" : ""}`}
-                  onClick={() => { setActiveTab(item.id); setSidebarOpen(false); }}
+                  onClick={() => goToPanel(item.id)}
                   style={{ cursor: "pointer" }}
                 >
                   <item.icon size={20} />
@@ -181,7 +232,7 @@ const GymDashboard: React.FC<GymDashboardProps> = ({ onLogout }) => {
             gymName={userObj?.gymId?.name || userObj?.name + "'s Gym" || "Your Gym"}
             role={userObj?.role || "admin"}
             canAddMember={!!userObj?.canAddMember}
-            setActiveTab={setActiveTab}
+            setActiveTab={(id: string) => goToPanel(id)}
             setShowAddMember={setShowAddMember}
             setShowAddTrainer={setShowAddTrainer}
           />

@@ -1,28 +1,39 @@
 import React, { useEffect } from 'react';
 import { CheckCircle2, ArrowRight } from 'lucide-react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { featuresData } from '../data/featuresData';
 import { Navbar, Footer } from './Home';
 
+// ─────────────────────────────────────────────────────────────────────────────
+// FeatureDetail — reads featureId from URL params
+// ─────────────────────────────────────────────────────────────────────────────
+
 export interface FeatureDetailProps {
-  featureId: string;
-  onBack: () => void;
+  /** Optional fallback prop — if not provided, reads from useParams */
+  featureId?: string;
+  onBack?: () => void;
 }
 
-export const FeatureDetail: React.FC<FeatureDetailProps> = ({ featureId, onBack }) => {
+export const FeatureDetail: React.FC<FeatureDetailProps> = ({ featureId: propFeatureId, onBack }) => {
+  const navigate = useNavigate();
+  const params = useParams<{ featureId: string }>();
+  const featureId = propFeatureId || params.featureId || '';
   const feature = featuresData[featureId];
+
+  const handleBack = onBack || (() => navigate(-1));
 
   useEffect(() => {
     if (!feature) {
-      onBack();
+      handleBack();
     }
     window.scrollTo(0, 0);
-  }, [feature, onBack]);
+  }, [feature]);
 
   if (!feature) return null;
 
   return (
     <>
-      <Navbar onLogin={() => {}} />
+      <Navbar onLogin={() => navigate('/login')} />
 
       <section className="gc-hero" style={{ minHeight: '100vh', paddingTop: '180px', paddingBottom: '120px', display: 'flex', alignItems: 'center' }}>
         <div className="gc-hero-glow"></div>

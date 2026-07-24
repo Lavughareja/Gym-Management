@@ -1,17 +1,24 @@
 import React, { useState, useEffect } from "react";
-import { Dumbbell, Loader, Lock, Calendar } from "lucide-react";
+import { Loader, Lock } from "lucide-react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { managerSetupApi } from "../services/apis/authApis";
 import { AUTH_TOKEN_KEY } from "../utils/constant";
 import { useAppDispatch } from "../utils/reduxHooks";
 import { showSnackbar } from "../redux/slices/snackbarSlice";
 
+// ─────────────────────────────────────────────────────────────────────────────
+// ManagerSetup / TrainerSetup Page
+// ─────────────────────────────────────────────────────────────────────────────
+
 interface Props {
-  onSuccess: (user: any) => void;
   role?: "Manager" | "Trainer";
 }
 
-export const ManagerSetup: React.FC<Props> = ({ onSuccess, role = "Manager" }) => {
+export const ManagerSetup: React.FC<Props> = ({ role = "Manager" }) => {
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const [searchParams] = useSearchParams();
+
   const [token, setToken] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -19,15 +26,13 @@ export const ManagerSetup: React.FC<Props> = ({ onSuccess, role = "Manager" }) =
   const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
-    // Extract token from URL
-    const params = new URLSearchParams(window.location.search);
-    const t = params.get("token");
+    const t = searchParams.get("token");
     if (t) {
       setToken(t);
     } else {
       setErrorMsg("Invalid or missing invitation token.");
     }
-  }, []);
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,9 +54,21 @@ export const ManagerSetup: React.FC<Props> = ({ onSuccess, role = "Manager" }) =
         localStorage.setItem(AUTH_TOKEN_KEY, jwtToken);
       }
       dispatch(showSnackbar({ message: response.data.message || "Setup successful!", type: "success" }));
-      
-      // Auto login success
-      onSuccess(response.data);
+
+      // Save dashUser for ProtectedRoute
+      const userData = response.data?.user || response.data;
+      const dashUser = {
+        ownerName: userData?.fullName || "User",
+        email: userData?.email || "",
+        role: userData?.role || (role === "Trainer" ? "trainer" : "gymmanager"),
+        canAddMember: userData?.canAddMember || false,
+        _id: userData?._id,
+        gymId: userData?.gymId,
+      };
+      localStorage.setItem("dashUser", JSON.stringify(dashUser));
+
+      // Navigate to staff dashboard
+      navigate("/dashboard/overview", { replace: true });
     } catch (error: any) {
       const message = error?.response?.data?.message || "Setup failed. Please try again.";
       dispatch(showSnackbar({ message, type: "error" }));
@@ -64,8 +81,8 @@ export const ManagerSetup: React.FC<Props> = ({ onSuccess, role = "Manager" }) =
     return (
       <div className="page-container" style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg-secondary)" }}>
         <div className="gym-card" style={{ maxWidth: 420, width: "100%", padding: "40px", textAlign: "center" }}>
-           <h2 className="page-title" style={{ color: "var(--danger)" }}>Error</h2>
-           <p className="page-subtitle">{errorMsg}</p>
+          <h2 className="page-title" style={{ color: "var(--danger)" }}>Error</h2>
+          <p className="page-subtitle">{errorMsg}</p>
         </div>
       </div>
     );
@@ -118,7 +135,6 @@ export const ManagerSetup: React.FC<Props> = ({ onSuccess, role = "Manager" }) =
             </div>
           </div>
 
-
           <button
             type="submit"
             className="btn-blue"
@@ -132,3 +148,5 @@ export const ManagerSetup: React.FC<Props> = ({ onSuccess, role = "Manager" }) =
     </div>
   );
 };
+
+export default ManagerSetup;

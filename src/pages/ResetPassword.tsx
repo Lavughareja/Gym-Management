@@ -1,13 +1,17 @@
 import React, { useState } from "react";
-import { Dumbbell, Lock, Eye, EyeOff, CheckCircle, Loader } from "lucide-react";
+import { Lock, Eye, EyeOff, CheckCircle, Loader } from "lucide-react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { resetPasswordApi } from "../services/apis/authApis";
 
-interface Props {
-  token: string;
-  onGoToLogin: () => void;
-}
+// ─────────────────────────────────────────────────────────────────────────────
+// ResetPassword Page
+// ─────────────────────────────────────────────────────────────────────────────
 
-export const ResetPassword: React.FC<Props> = ({ token, onGoToLogin }) => {
+const ResetPassword: React.FC = () => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get("token") || "";
+
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showNew, setShowNew] = useState(false);
@@ -54,7 +58,11 @@ export const ResetPassword: React.FC<Props> = ({ token, onGoToLogin }) => {
             <CheckCircle size={48} style={{ color: "var(--primary)", margin: "0 auto 16px", display: "block" }} />
             <h2 className="page-title" style={{ fontSize: "1.5rem", marginBottom: 8 }}>Password Reset!</h2>
             <p className="page-subtitle" style={{ marginBottom: 24 }}>Your password has been changed successfully. You can now sign in with your new password.</p>
-            <button className="btn-blue" style={{ width: "100%", justifyContent: "center", padding: "12px" }} onClick={onGoToLogin}>
+            <button
+              className="btn-blue"
+              style={{ width: "100%", justifyContent: "center", padding: "12px" }}
+              onClick={() => navigate("/login")}
+            >
               Back to Login
             </button>
           </div>
@@ -125,3 +133,6 @@ export const ResetPassword: React.FC<Props> = ({ token, onGoToLogin }) => {
 };
 
 export default ResetPassword;
+
+// Named export kept for backward compat
+export { ResetPassword };

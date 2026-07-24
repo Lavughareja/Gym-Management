@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { LogOut, Activity, Dumbbell, BarChart3, Clock, Play, Square, Loader, Menu, X, Moon, Sun, LayoutDashboard, CreditCard, ChevronRight, CheckCircle2, User, KeyRound, Sparkles, ShoppingCart, FileText, Target, ClipboardList, TrendingUp, ShieldCheck, PenLine, Eye, Trash2, BookOpen, UserCheck, Calendar, Salad, Ruler, ChevronDown, ChevronUp, Flame, Upload, Download, CheckCircle, Bell } from "lucide-react";
+import { LogOut, Activity, Dumbbell, BarChart3, Clock, Play, Square, Loader, Menu, X, Moon, Sun, LayoutDashboard, CreditCard, ChevronRight, CheckCircle2, User, Sparkles, ShoppingCart, FileText, Target, ClipboardList, ShieldCheck, PenLine, Eye, Trash2, BookOpen, UserCheck, Calendar, Salad, Ruler, ChevronDown, ChevronUp, Flame, Upload, Download, CheckCircle, Bell } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
 import UserProfileModal from "../components/UserProfileModal/UserProfileModal";
 import PurchaseAICreditsModal from "../components/PurchaseAICreditsModal/PurchaseAICreditsModal";
 import ConfirmationModal from "../components/ConfirmationModal/ConfirmationModal";
@@ -56,25 +57,104 @@ export const genericDietPlan = [
   { dayNumber: 7, calories: 2800, protein: 160, carbs: 345, fats: 70, morningSnack: "150g Oats + 1 Scoop Whey", breakfast: "Paneer Sandwich + Banana", lunch: "Rice + Chole + Salad", eveningSnack: "Apple + Walnuts", preWorkout: "Banana + Peanut Butter", postWorkout: "1 Scoop Whey + 200g Rice", dinner: "Dal + 2 Roti + Paneer", bedtimeSnack: "250ml Milk" },
 ];
 
-interface Props {
-  userName: string;
-  onLogout: () => void;
-  gymName?: string;
+// ── Route map for member panels ───────────────────────────────────────────────
+const MEMBER_PANEL_ROUTES: Record<string, string> = {
+  overview:       "/member/overview",
+  my_plan:        "/member/plan-invoices",
+  health_monitor: "/member/health-monitor",
+  workouts:       "/member/workouts",
+  library:        "/member/workout-video",
+  reports:        "/member/reports",
+  diet:           "/member/diet",
+  plans:          "/member/plans",
+  challenges:     "/member/challenges",
+  events:         "/member/announcements",
+  pt:             "/member/personal-trainer",
+};
+
+function getMemberPanelFromPath(pathname: string): string {
+  const seg = pathname.replace("/member/", "").split("/")[0];
+  const map: Record<string, string> = {
+    overview:           "overview",
+    "plan-invoices":    "my_plan",
+    "health-monitor":   "health_monitor",
+    workouts:           "workouts",
+    "workout-video":    "library",
+    reports:            "reports",
+    diet:               "diet",
+    plans:              "plans",
+    challenges:         "challenges",
+    announcements:      "events",
+    "personal-trainer": "pt",
+  };
+  return map[seg] || "overview";
 }
 
 type Tab = "overview" | "health_monitor" | "workouts" | "reports" | "plans" | "diet" | "library" | "pt" | "challenges" | "events" | "my_plan";
 
-export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName = "Trainix Gym" }) => {
+export const MemberDashboard: React.FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
   const ptState = useAppSelector((s) => s.pt);
-  const [activeTab, setActiveTab] = useState<Tab>("overview");
+
+  // Read user info from localStorage
+  const localUserStr = localStorage.getItem("dashUser");
+  const localUser = localUserStr ? JSON.parse(localUserStr) : null;
+  const userName = (user as any)?.fullName || localUser?.ownerName || "Member";
+  const gymName = localUser?.gymId?.name || "Trainix Gym";
+
+  // Derive active tab from URL
+  const activeTab = getMemberPanelFromPath(location.pathname);
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarDietExpanded, setSidebarDietExpanded] = useState(false);
   const [sidebarHealthExpanded, setSidebarHealthExpanded] = useState(false);
   const [healthMonitorSection, setHealthMonitorSection] = useState<"bmi" | "calories" | "water" | "health_kit">("bmi");
   const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains("dark-theme"));
   const [showChangePassword, setShowChangePassword] = useState(false);
+
+  // Redirect /member root to /member/overview and handle subroutes
+  useEffect(() => {
+    if (location.pathname === "/member" || location.pathname === "/member/") {
+      navigate("/member/overview", { replace: true });
+      return;
+    }
+
+    const parts = location.pathname.split("/");
+    if (parts.length > 3) {
+      const subPath = parts[3];
+      if (activeTab === "health_monitor") {
+        if (subPath === "bmi") setHealthMonitorSection("bmi");
+        else if (subPath === "calories") setHealthMonitorSection("calories");
+        else if (subPath === "water-reminder") setHealthMonitorSection("water");
+        else if (subPath === "health-kit") setHealthMonitorSection("health_kit");
+        setSidebarHealthExpanded(true);
+      } else if (activeTab === "diet") {
+        if (subPath === "normal") setExpandedMainSections({ normalDiet: true, aiDiet: false });
+        else if (subPath === "premium") setExpandedMainSections({ normalDiet: false, aiDiet: true });
+        setSidebarDietExpanded(true);
+      }
+    }
+  }, [location.pathname, activeTab, navigate]);
+
+  /** Navigate to a member panel by id */
+  const goToPanel = (id: string, subId?: string) => {
+    let path = MEMBER_PANEL_ROUTES[id] || "/member/overview";
+    if (subId) {
+      path = `${path}/${subId}`;
+    }
+    navigate(path);
+    setSidebarOpen(false);
+  };
+
+  const handleLogout = async () => {
+    const { logoutAction } = await import("../redux/actions/authActions");
+    await dispatch(logoutAction());
+    localStorage.removeItem("dashUser");
+    navigate("/login", { replace: true });
+  };
 
   // Daily Log / Overview state
   const [attendance, setAttendance] = useState<any[]>([]);
@@ -317,40 +397,6 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
       setLatestBmiPhoto(bmiRes.data.report || null);
     } catch (err) {
       console.error(err);
-    } finally {
-      setLoadingDiet(false);
-    }
-  };
-
-
-
-  const handleLoadSamplePlan = async () => {
-    try {
-      setLoadingDiet(true);
-      const dummyDays = Array.from({ length: 7 }).map((_, i) => ({
-        dayNumber: i + 1,
-        calories: 2200 + i * 10,
-        protein: 150,
-        carbs: 200,
-        fats: 60,
-        water: 3,
-        morningSnack: "1 apple, handful of almonds",
-        breakfast: "3 scrambled eggs, 2 slices of whole wheat toast",
-        lunch: "Grilled chicken breast, quinoa, steamed broccoli",
-        eveningSnack: "Protein shake, 1 banana",
-        dinner: "Salmon, sweet potato, asparagus",
-        bedtimeSnack: "Cottage cheese, berries"
-      }));
-
-      await createManualDietPlanApi({
-        days: dummyDays,
-        planType: "MANUAL"
-      });
-      
-      dispatch(showSnackbar({ message: "Sample diet plan loaded!", type: "success" }));
-      fetchDietData();
-    } catch (error) {
-      dispatch(showSnackbar({ message: "Failed to load sample plan", type: "error" }));
     } finally {
       setLoadingDiet(false);
     }
@@ -1314,7 +1360,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
                   <li key={id} style={{ display: "flex", flexDirection: "column" }}>
                     <a
                       className={`sidebar-menu-item ${activeTab === id ? "active" : ""}`}
-                      onClick={() => setSidebarHealthExpanded(!sidebarHealthExpanded)}
+                      onClick={() => { setSidebarHealthExpanded(!sidebarHealthExpanded); }}
                       style={{ justifyContent: "space-between", cursor: "pointer" }}
                     >
                       <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
@@ -1326,10 +1372,10 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
                     {sidebarHealthExpanded && (
                       <div style={{ display: "flex", flexDirection: "column", paddingLeft: "42px", gap: "4px", marginTop: "4px", marginBottom: "8px" }}>
                         {[
-                          { key: "bmi", label: "BMI" },
-                          { key: "calories", label: "Calories" },
-                          { key: "water", label: "Water Reminder" },
-                          { key: "health_kit", label: "Health Kit" }
+                          { key: "bmi", label: "BMI", path: "bmi" },
+                          { key: "calories", label: "Calories", path: "calories" },
+                          { key: "water", label: "Water Reminder", path: "water-reminder" },
+                          { key: "health_kit", label: "Health Kit", path: "health-kit" }
                         ].map(sub => (
                           <a
                             key={sub.key}
@@ -1344,9 +1390,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
                               transition: "all 0.2s"
                             }}
                             onClick={() => {
-                              setActiveTab("health_monitor");
-                              setHealthMonitorSection(sub.key as any);
-                              setSidebarOpen(false);
+                              goToPanel("health_monitor", sub.path);
                             }}
                             onMouseOver={(e) => e.currentTarget.style.color = "var(--primary)"}
                             onMouseOut={(e) => e.currentTarget.style.color = activeTab === "health_monitor" && healthMonitorSection === sub.key ? "var(--primary)" : "var(--text-secondary)"}
@@ -1388,9 +1432,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
                             transition: "all 0.2s"
                           }}
                           onClick={() => {
-                            setActiveTab("diet");
-                            setExpandedMainSections({ normalDiet: true, aiDiet: false });
-                            setSidebarOpen(false);
+                            goToPanel("diet", "normal");
                           }}
                           onMouseOver={(e) => e.currentTarget.style.color = "var(--primary)"}
                           onMouseOut={(e) => e.currentTarget.style.color = activeTab === "diet" && expandedMainSections.normalDiet ? "var(--primary)" : "var(--text-secondary)"}
@@ -1409,9 +1451,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
                             transition: "all 0.2s"
                           }}
                           onClick={() => {
-                            setActiveTab("diet");
-                            setExpandedMainSections({ normalDiet: false, aiDiet: true });
-                            setSidebarOpen(false);
+                            goToPanel("diet", "premium");
                           }}
                           onMouseOver={(e) => e.currentTarget.style.color = "var(--primary)"}
                           onMouseOut={(e) => e.currentTarget.style.color = activeTab === "diet" && expandedMainSections.aiDiet ? "var(--primary)" : "var(--text-secondary)"}
@@ -1428,7 +1468,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
                 <li key={id}>
                   <a
                     className={`sidebar-menu-item ${activeTab === id ? "active" : ""}`}
-                    onClick={() => { setActiveTab(id); setSidebarOpen(false); }}
+                    onClick={() => goToPanel(id)}
                     style={{ cursor: "pointer" }}
                   >
                     <Icon size={20} />
@@ -1472,7 +1512,7 @@ export const MemberDashboard: React.FC<Props> = ({ userName, onLogout, gymName =
               </div>
             </div>
             <button
-              onClick={onLogout}
+              onClick={handleLogout}
               title="Logout"
               style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", padding: 4, borderRadius: 6, transition: "color 0.15s" }}
             >

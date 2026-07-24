@@ -1,15 +1,16 @@
 import React, { useState } from "react";
-import { ArrowLeft, Dumbbell, Loader, Mail, Lock, Eye, EyeOff, X, CheckCircle } from "lucide-react";
+import { ArrowLeft, Loader, Mail, Lock, Eye, EyeOff, X, CheckCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../utils/reduxHooks";
 import { loginAction } from "../redux/actions/authActions";
 import { forgotPasswordApi } from "../services/apis/authApis";
 
-interface Props {
-  onSuccess: (user: any) => void;
-  onBack: () => void;
-}
+// ─────────────────────────────────────────────────────────────────────────────
+// Login Page
+// ─────────────────────────────────────────────────────────────────────────────
 
-export const Login: React.FC<Props> = ({ onSuccess, onBack }) => {
+const Login: React.FC = () => {
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -32,7 +33,26 @@ export const Login: React.FC<Props> = ({ onSuccess, onBack }) => {
     setLoading(false);
 
     if (loginAction.fulfilled.match(action)) {
-      onSuccess(action.payload);
+      const payload = action.payload as any;
+      const role: string = payload?.role || "";
+
+      // Save to localStorage for ProtectedRoute
+      const dashUser = {
+        ownerName: payload?.fullName || "User",
+        email: payload?.email || email,
+        role,
+        canAddMember: payload?.canAddMember || false,
+        _id: payload?._id,
+        gymId: payload?.gymId,
+      };
+      localStorage.setItem("dashUser", JSON.stringify(dashUser));
+
+      // Navigate based on role
+      if (role === "member") {
+        navigate("/member/overview", { replace: true });
+      } else {
+        navigate("/dashboard/overview", { replace: true });
+      }
     }
   };
 
@@ -54,7 +74,7 @@ export const Login: React.FC<Props> = ({ onSuccess, onBack }) => {
     <div className="page-container" style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg-secondary)" }}>
       {/* Back Button */}
       <button
-        onClick={onBack}
+        onClick={() => navigate("/")}
         className="btn-blue-outline"
         style={{ position: "absolute", top: 24, left: 24, padding: "8px 16px" }}
       >
@@ -194,3 +214,8 @@ export const Login: React.FC<Props> = ({ onSuccess, onBack }) => {
     </div>
   );
 };
+
+export default Login;
+
+// Named export kept for backward compatibility with any lazy imports
+export { Login };
