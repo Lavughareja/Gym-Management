@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import '../components/landing/landing.css';
 import { fetchPublicFaqsApi } from '../SuperAdmin/services/superAdminApis';
 
@@ -249,6 +250,7 @@ const resourcesLinks = [
 ];
 
 export const Navbar: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
+  const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
   const [featuresOpen, setFeaturesOpen] = useState(false);
   const [resourcesOpen, setResourcesOpen] = useState(false);
@@ -292,7 +294,7 @@ export const Navbar: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
           {/* Logo */}
           <div
             className="gc-navbar-logo"
-            onClick={() => { window.history.pushState({}, '', '/'); window.dispatchEvent(new PopStateEvent('popstate')); }}
+            onClick={() => navigate('/')}
             style={{ cursor: 'pointer' }}
           >
             <div className="gc-navbar-logo-icon">
@@ -320,7 +322,7 @@ export const Navbar: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
                       <div className="gc-mega-column">
                         <p className="gc-mega-label">MANAGEMENT & STAFF</p>
                         {featuresMenu.management.map(l => (
-                          <a key={l.title} href={`/?feature=${l.title.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-')}`} className="gc-mega-item" onClick={() => setFeaturesOpen(false)}>
+                          <Link key={l.title} to={`/features/${l.title.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-')}`} className="gc-mega-item" onClick={() => setFeaturesOpen(false)}>
                             <span className="gc-mega-icon">{l.icon}</span>
                             <span className="gc-mega-text">
                               <span className="gc-mega-title">
@@ -328,13 +330,13 @@ export const Navbar: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
                               </span>
                               <span className="gc-mega-desc">{l.desc}</span>
                             </span>
-                          </a>
+                          </Link>
                         ))}
                       </div>
                       <div className="gc-mega-column">
                         <p className="gc-mega-label">OPERATIONS & TRACKING</p>
                         {featuresMenu.operations.map(l => (
-                          <a key={l.title} href={`/?feature=${l.title.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-')}`} className="gc-mega-item" onClick={() => setFeaturesOpen(false)}>
+                          <Link key={l.title} to={`/features/${l.title.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-')}`} className="gc-mega-item" onClick={() => setFeaturesOpen(false)}>
                             <span className="gc-mega-icon">{l.icon}</span>
                             <span className="gc-mega-text">
                               <span className="gc-mega-title">
@@ -342,13 +344,13 @@ export const Navbar: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
                               </span>
                               <span className="gc-mega-desc">{l.desc}</span>
                             </span>
-                          </a>
+                          </Link>
                         ))}
                       </div>
                       <div className="gc-mega-column">
                         <p className="gc-mega-label">BILLING & ANALYTICS</p>
                         {featuresMenu.billing.map(l => (
-                          <a key={l.title} href={`/?feature=${l.title.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-')}`} className="gc-mega-item" onClick={() => setFeaturesOpen(false)}>
+                          <Link key={l.title} to={`/features/${l.title.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-')}`} className="gc-mega-item" onClick={() => setFeaturesOpen(false)}>
                             <span className="gc-mega-icon">{l.icon}</span>
                             <span className="gc-mega-text">
                               <span className="gc-mega-title">
@@ -356,7 +358,7 @@ export const Navbar: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
                               </span>
                               <span className="gc-mega-desc">{l.desc}</span>
                             </span>
-                          </a>
+                          </Link>
                         ))}
                       </div>
                     </div>
@@ -404,7 +406,7 @@ export const Navbar: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
           {/* Actions */}
           <div className="gc-navbar-actions">
             <button className="gc-btn-ghost" onClick={onLogin}>Login</button>
-            <button className="gc-btn-primary" onClick={() => { window.history.pushState({}, '', '/owner-onboarding'); window.dispatchEvent(new PopStateEvent('popstate')); }}>
+            <button className="gc-btn-primary" onClick={() => navigate('/owner-onboarding')}>
               Get Started <ArrowRight />
             </button>
           </div>
@@ -416,6 +418,7 @@ export const Navbar: React.FC<{ onLogin: () => void }> = ({ onLogin }) => {
 
 // Hero
 const Hero: React.FC = () => {
+  const navigate = useNavigate();
   const bars = [35, 60, 45, 80, 65, 90, 55, 75, 50, 85];
   return (
     <section className="gc-hero">
@@ -435,7 +438,7 @@ const Hero: React.FC = () => {
               Manage members, trainers, attendance, billing, biometric devices, branches, reports, WhatsApp notifications and much more from one powerful cloud platform.
             </p>
             <div className="gc-hero-btns">
-              <button className="gc-hero-btn-main" onClick={() => { window.history.pushState({}, '', '/owner-onboarding'); window.dispatchEvent(new PopStateEvent('popstate')); }}>
+              <button className="gc-hero-btn-main" onClick={() => navigate('/owner-onboarding')}>
                 Start Free Trial <ArrowRight style={{ width: 18, height: 18 }} />
               </button>
               <button className="gc-hero-btn-sec">
@@ -717,7 +720,8 @@ const Integrations: React.FC = () => (
 
 // Pricing
 const Pricing: React.FC = () => {
-  const [yearly, setYearly] = useState(true);
+  const navigate = useNavigate();
+  const [yearly, setYearly] = useState(false);
   return (
     <section className="gc-section gc-section-white" id="pricing">
       <div className="gc-container">
@@ -751,7 +755,7 @@ const Pricing: React.FC = () => {
               </ul>
               <button 
                 className={`gc-pricing-cta ${p.isPopular ? 'gc-pricing-cta-primary' : 'gc-pricing-cta-dark'}`}
-                onClick={() => { window.history.pushState({}, '', '/owner-onboarding'); window.dispatchEvent(new PopStateEvent('popstate')); }}
+                onClick={() => navigate('/owner-onboarding')}
               >
                 Start Free Trial
               </button>
@@ -958,9 +962,10 @@ export const Footer: React.FC = () => (
 
 /* ===================== MAIN HOME PAGE ===================== */
 export const Home: React.FC = () => {
+  const navigate = useNavigate();
   return (
     <div className="gc-landing">
-      <Navbar onLogin={() => { window.location.href = '/login'; }} />
+      <Navbar onLogin={() => navigate('/login')} />
       <Hero />
       <Trust />
       <Features />
