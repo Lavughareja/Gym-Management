@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { X, User, Activity, CreditCard, Calendar, Dumbbell, Salad, Camera, FileText, FileSignature, StickyNote, History, Edit, Repeat, FileSpreadsheet, QrCode } from 'lucide-react';
+import { X, User, Activity, CreditCard, Calendar, Dumbbell, Salad, Camera, FileSignature, StickyNote, History, Edit, Repeat, FileSpreadsheet, QrCode } from 'lucide-react';
 
 interface Props {
   member: any;
   onClose: () => void;
-  onManage?: (action: 'freeze' | 'transfer' | 'upgrade', member: any) => void;
 }
 
 export const MemberDetails: React.FC<Props> = ({ member, onClose }) => {

@@ -44,13 +44,15 @@ const MemberPlanInvoicesPanel: React.FC<InvoicePanelProps> = ({ profile, gymName
     const startDate = profile.planStartDate ? new Date(profile.planStartDate).toLocaleDateString('en-GB') : "—";
     const endDate = profile.planEndDate ? new Date(profile.planEndDate).toLocaleDateString('en-GB') : "—";
 
+    const gymNameToShow = profile?.gymId?.name || gymName;
+
     const htmlContent = `
       <div style="font-family: Arial, sans-serif; padding: 40px; color: #333; max-width: 750px; margin: auto;">
 
         <!-- Header -->
         <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #2563eb; padding-bottom: 20px; margin-bottom: 30px;">
           <div>
-            <h1 style="margin: 0; color: #2563eb; font-size: 30px; font-weight: 900; letter-spacing: 1px;">${gymName}</h1>
+            <h1 style="margin: 0; color: #2563eb; font-size: 30px; font-weight: 900; letter-spacing: 1px;">${gymNameToShow}</h1>
             <p style="margin: 6px 0 0; font-size: 13px; color: #888;">Gym Membership Receipt</p>
           </div>
           <div style="text-align: right;">
@@ -91,7 +93,7 @@ const MemberPlanInvoicesPanel: React.FC<InvoicePanelProps> = ({ profile, gymName
 
         <!-- Footer -->
         <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e2e8f0; text-align: center;">
-          <p style="margin: 0; font-size: 13px; color: #94a3b8;">Thank you for being a valued member of <strong style="color: #2563eb;">${gymName}</strong>!</p>
+          <p style="margin: 0; font-size: 13px; color: #94a3b8;">Thank you for being a valued member of <strong style="color: #2563eb;">${gymNameToShow}</strong>!</p>
           <p style="margin: 6px 0 0; font-size: 11px; color: #cbd5e1;">This is a system-generated receipt.</p>
         </div>
       </div>
@@ -109,15 +111,15 @@ const MemberPlanInvoicesPanel: React.FC<InvoicePanelProps> = ({ profile, gymName
     dispatch(showSnackbar({ message: "Receipt downloading...", type: "info" }));
   };
 
-  // ── Download from invoice data ───────────────────────────────────────────────
   const handleDownloadInvoice = (invoice: any) => {
     const gym = invoice.gymId;
+    const gymNameToShow = gym?.name || gymName;
 
     const htmlContent = `
       <div style="font-family: Arial, sans-serif; padding: 40px; color: #333; max-width: 800px; margin: auto;">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #eee; padding-bottom: 20px; margin-bottom: 30px;">
           <div>
-            <h1 style="margin: 0; color: #2563eb; font-size: 28px;">${gymName}</h1>
+            <h1 style="margin: 0; color: #2563eb; font-size: 28px;">${gymNameToShow}</h1>
             <p style="margin: 5px 0 0; font-size: 14px; color: #666;">${gym?.address || ''}</p>
             <p style="margin: 5px 0 0; font-size: 14px; color: #666;">${gym?.phone || ''} | ${gym?.email || ''}</p>
             ${gym?.gstNumber ? `<p style="margin: 5px 0 0; font-size: 14px; color: #666; font-weight: bold;">GSTIN: ${gym.gstNumber}</p>` : ''}

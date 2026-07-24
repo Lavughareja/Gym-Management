@@ -40,6 +40,11 @@ const AnnouncementsPanel = () => {
       return;
     }
 
+    if (message.length > 2000) {
+      dispatch(showSnackbar({ message: 'Message cannot exceed 2000 characters', type: 'error' }));
+      return;
+    }
+
     try {
       await createEventMessageApi({
         title,
@@ -69,7 +74,7 @@ const AnnouncementsPanel = () => {
           <Plus size={18} style={{ marginRight: 8 }} /> Create Announcement
         </button>
       </header>
-
+ 
       {showForm && (
         <div className="gym-card" style={{ marginBottom: 24, border: '1px solid var(--primary)' }}>
           <h3 style={{ fontSize: '1.2rem', fontWeight: 600, marginBottom: 16 }}>New Announcement</h3>
@@ -94,8 +99,17 @@ const AnnouncementsPanel = () => {
                 placeholder="Type the message that will be sent via WhatsApp..." 
                 value={message} 
                 onChange={(e) => setMessage(e.target.value)} 
+                maxLength={2000}
                 required 
               />
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4, fontSize: '0.85rem' }}>
+                <span style={{ color: message.length >= 2000 ? '#ef4444' : 'var(--text-muted)' }}>
+                  {message.length} / 2000 characters
+                </span>
+                {message.length >= 2000 && (
+                  <span style={{ color: '#ef4444' }}>Maximum length reached</span>
+                )}
+              </div>
             </div>
 
             <div style={{ display: 'flex', gap: 24, marginBottom: 24, flexWrap: 'wrap' }}>

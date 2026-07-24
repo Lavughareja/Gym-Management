@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { MoreVertical, FileText, QrCode, Trash2, Edit, Repeat, Eye, PauseCircle, UserCheck, Users, Plus, ArrowUpCircle, Snowflake } from 'lucide-react';
+import { Repeat, Eye, Users, Plus } from 'lucide-react';
 
 interface MembersTableProps {
   members: any[];
   onAddMember: () => void;
-  onManage?: (action: 'freeze' | 'transfer' | 'upgrade', member: any) => void;
+  onViewMember?: (member: any) => void;
   onResendInvite?: (email: string) => void;
 }
 
@@ -41,7 +41,7 @@ const PaymentBadge = ({ status }: { status: string }) => {
   );
 };
 
-export const MembersTable: React.FC<MembersTableProps> = ({ members, onAddMember, onManage, onResendInvite }) => {
+export const MembersTable: React.FC<MembersTableProps> = ({ members, onAddMember, onViewMember, onResendInvite }) => {
   const [resending, setResending] = useState<Record<string, boolean>>({});
 
   const handleResend = async (email: string) => {
@@ -84,7 +84,6 @@ export const MembersTable: React.FC<MembersTableProps> = ({ members, onAddMember
                 const initials = m.name ? m.name.substring(0, 2).toUpperCase() : 'M';
                 const avatarBg = ['#ede9fe', '#dbeafe', '#dcfce7', '#fef3c7', '#fce7f3'][idx % 5];
                 const avatarColor = ['#7c3aed', '#2563eb', '#16a34a', '#d97706', '#db2777'][idx % 5];
-                const isSelected = false;
                 const status = m.status || (m.planEndDate && new Date(m.planEndDate) >= new Date() ? 'Active' : 'Expired');
 
                 return (
@@ -137,15 +136,26 @@ export const MembersTable: React.FC<MembersTableProps> = ({ members, onAddMember
 
                     {/* Actions */}
                     <td style={{ padding: '14px 16px', whiteSpace: 'nowrap' }}>
-                      {status.toLowerCase() === 'inactive' && onResendInvite && (
-                        <button 
-                          onClick={() => handleResend(m.email)}
-                          disabled={resending[m.email]}
-                          style={{ padding: '6px 12px', background: '#eff6ff', color: '#1d4ed8', border: 'none', borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, opacity: resending[m.email] ? 0.7 : 1 }}
-                        >
-                          <Repeat size={12} /> {resending[m.email] ? 'Sending...' : 'Resend Invite'}
-                        </button>
-                      )}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        {onViewMember && (
+                          <button 
+                            onClick={() => onViewMember(m)}
+                            style={{ padding: '6px', background: '#f1f5f9', color: '#475569', border: 'none', borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                            title="View Details"
+                          >
+                            <Eye size={14} />
+                          </button>
+                        )}
+                        {status.toLowerCase() === 'inactive' && onResendInvite && (
+                          <button 
+                            onClick={() => handleResend(m.email)}
+                            disabled={resending[m.email]}
+                            style={{ padding: '6px 12px', background: '#eff6ff', color: '#1d4ed8', border: 'none', borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, opacity: resending[m.email] ? 0.7 : 1 }}
+                          >
+                            <Repeat size={12} /> {resending[m.email] ? 'Sending...' : 'Resend Invite'}
+                          </button>
+                        )}
+                      </div>
                     </td>
 
                   </tr>
