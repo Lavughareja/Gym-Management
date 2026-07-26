@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Repeat, Eye, Users, Plus } from 'lucide-react';
+import { Repeat, Users, Plus } from 'lucide-react';
 
 interface MembersTableProps {
   members: any[];
@@ -59,7 +59,7 @@ export const MembersTable: React.FC<MembersTableProps> = ({ members, onAddMember
         <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 960 }}>
           <thead>
             <tr style={{ background: '#f8fafc', borderBottom: '1px solid #f1f5f9' }}>
-              {['Member', 'Contact', 'Plan Details', 'Status', 'Payment', 'Today', 'Actions'].map((h, i) => (
+              {['Member', 'Contact', 'Plan Details', 'Status', 'Payment', 'Today'].map((h, i) => (
                 <th key={i} style={{ padding: '14px 16px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em', whiteSpace: 'nowrap', width: 'auto' }}>{h}</th>
               ))}
             </tr>
@@ -67,7 +67,7 @@ export const MembersTable: React.FC<MembersTableProps> = ({ members, onAddMember
           <tbody>
             {members.length === 0 ? (
               <tr>
-                <td colSpan={7} style={{ padding: 64, textAlign: 'center' }}>
+                <td colSpan={6} style={{ padding: 64, textAlign: 'center' }}>
                   <div style={{ width: 64, height: 64, borderRadius: 18, background: 'rgba(79,70,229,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px', color: '#4f46e5' }}>
                     <Users size={32} />
                   </div>
@@ -134,29 +134,7 @@ export const MembersTable: React.FC<MembersTableProps> = ({ members, onAddMember
                       </span>
                     </td>
 
-                    {/* Actions */}
-                    <td style={{ padding: '14px 16px', whiteSpace: 'nowrap' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        {onViewMember && (
-                          <button 
-                            onClick={() => onViewMember(m)}
-                            style={{ padding: '6px', background: '#f1f5f9', color: '#475569', border: 'none', borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-                            title="View Details"
-                          >
-                            <Eye size={14} />
-                          </button>
-                        )}
-                        {status.toLowerCase() === 'inactive' && onResendInvite && (
-                          <button 
-                            onClick={() => handleResend(m.email)}
-                            disabled={resending[m.email]}
-                            style={{ padding: '6px 12px', background: '#eff6ff', color: '#1d4ed8', border: 'none', borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, opacity: resending[m.email] ? 0.7 : 1 }}
-                          >
-                            <Repeat size={12} /> {resending[m.email] ? 'Sending...' : 'Resend Invite'}
-                          </button>
-                        )}
-                      </div>
-                    </td>
+
 
                   </tr>
                 );
