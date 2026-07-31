@@ -49,26 +49,12 @@ export const ManagerSetup: React.FC<Props> = ({ role = "Manager" }) => {
     setLoading(true);
     try {
       const response = await managerSetupApi({ token, password, confirmPassword });
-      const jwtToken = response.data.token;
-      if (jwtToken) {
-        localStorage.setItem(AUTH_TOKEN_KEY, jwtToken);
-      }
-      dispatch(showSnackbar({ message: response.data.message || "Setup successful!", type: "success" }));
+      
+      dispatch(showSnackbar({ message: response.data.message || "Setup successful! Please login with your credentials.", type: "success" }));
 
-      // Save dashUser for ProtectedRoute
-      const userData = response.data?.user || response.data;
-      const dashUser = {
-        ownerName: userData?.fullName || "User",
-        email: userData?.email || "",
-        role: userData?.role || (role === "Trainer" ? "trainer" : "gymmanager"),
-        canAddMember: userData?.canAddMember || false,
-        _id: userData?._id,
-        gymId: userData?.gymId,
-      };
-      localStorage.setItem("dashUser", JSON.stringify(dashUser));
-
-      // Navigate to staff dashboard
-      navigate("/dashboard/overview", { replace: true });
+      // Navigate to login so they can log in with their new credentials,
+      // without forcefully logging out the current session (if owner is testing).
+      navigate("/login", { replace: true });
     } catch (error: any) {
       const message = error?.response?.data?.message || "Setup failed. Please try again.";
       dispatch(showSnackbar({ message, type: "error" }));

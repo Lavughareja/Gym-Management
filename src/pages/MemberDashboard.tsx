@@ -2302,7 +2302,7 @@ export const MemberDashboard: React.FC = () => {
         {/* Mobile header */}
         <header className="mobile-header">
           <button className="menu-toggle-btn" onClick={() => setSidebarOpen(true)} aria-label="Open menu">
-            <Menu />
+            <Menu size={28} color="var(--text-primary)" />
           </button>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <img src="/logo.png" alt="Logo" style={{ width: 32, height: 32, objectFit: "contain", borderRadius: 8 }} />
