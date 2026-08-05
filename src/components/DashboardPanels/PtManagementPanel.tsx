@@ -396,10 +396,22 @@ const MemberDetailView: React.FC<{
 
       {/* Date Picker */}
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 24, flexWrap: "wrap" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 14px", background: "var(--bg-hover)", borderRadius: 10, border: "1.5px solid var(--border-color)" }}>
+        <div 
+          onClick={() => {
+            try {
+              (document.getElementById('web-date-input-panel') as HTMLInputElement)?.showPicker?.();
+            } catch (e) {}
+          }}
+          style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 14px", background: "var(--bg-hover)", borderRadius: 10, border: "1.5px solid var(--border-color)", cursor: "pointer" }}
+        >
           <Calendar size={16} color="var(--text-muted)" />
-          <input type="date" value={date} onChange={e => setDate(e.target.value)}
-            style={{ border: "none", background: "none", color: "var(--text-primary)", fontSize: 14, fontWeight: 600, cursor: "pointer" }} />
+          <input 
+            id="web-date-input-panel"
+            type="date" 
+            value={date} 
+            onChange={e => setDate(e.target.value)}
+            style={{ border: "none", background: "none", color: "var(--text-primary)", fontSize: 14, fontWeight: 600, cursor: "pointer" }} 
+          />
         </div>
         {loading && <Loader size={18} className="spin" color="var(--text-muted)" />}
       </div>
