@@ -92,10 +92,14 @@ const GymDashboard: React.FC<GymDashboardProps> = ({ onLogout }) => {
   // Initial Fetch
   useEffect(() => {
     dispatch(fetchMembersAction());
-    dispatch(fetchTrainersAction());
-    dispatch(fetchManagersAction());
+    if (userObj?.role !== "trainer") {
+      dispatch(fetchTrainersAction());
+    }
+    if (userObj?.role === "admin" || userObj?.role === "owner") {
+      dispatch(fetchManagersAction());
+    }
     dispatch(fetchPlansAction());
-  }, [dispatch]);
+  }, [dispatch, userObj?.role]);
 
   // If at exactly /dashboard, redirect to /dashboard/overview
   useEffect(() => {

@@ -39,6 +39,15 @@ const OverviewPanel: React.FC<Props> = ({
 
   useEffect(() => {
     const fetchDashboardData = async () => {
+      if (role === 'trainer') {
+        // Trainers do not have access to gym-wide financial/overview stats
+        setDashboardData((prev: any) => ({
+          ...prev,
+          totalMembers: members.length,
+          activeMembers: members.filter((m: any) => m.status === "Active").length,
+        }));
+        return;
+      }
       try {
         const response = await AxiosInstance.get('/dashboard/overview');
         if (response.data) {
