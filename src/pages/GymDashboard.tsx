@@ -273,7 +273,16 @@ const GymDashboard: React.FC<GymDashboardProps> = ({ onLogout }) => {
         {activeTab === "plans" && <PlansPanel gymName={userObj?.gymId?.name || "Your Gym"} />}
         {activeTab === "expenses" && <ExpenseTrackerPanel />}
         {activeTab === "attendance" && <AttendancePanel />}
-        {activeTab === "settings" && <SettingsPanel gymName={userObj?.gymId?.name || "Your Gym"} />}
+        {activeTab === "settings" && (
+          (userObj?.role === "admin" || userObj?.role === "owner") ? (
+            <SettingsPanel gymName={userObj?.gymId?.name || "Your Gym"} />
+          ) : (
+            <div className="panel" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', flexDirection: 'column', textAlign: 'center' }}>
+              <h2 style={{ fontSize: '24px', marginBottom: '10px' }}>Coming Soon</h2>
+              <p style={{ color: 'var(--text-secondary)' }}>Your profile settings will be available here shortly.</p>
+            </div>
+          )
+        )}
       </main>
     </div>
   );

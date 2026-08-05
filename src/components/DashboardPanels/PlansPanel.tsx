@@ -16,6 +16,10 @@ const overlayStyle: React.CSSProperties = {
 const PlansPanel: React.FC<Props> = ({ gymName }) => {
   const dispatch = useAppDispatch();
   const { plans, loading } = useAppSelector((state) => state.plan);
+  const { user } = useAppSelector((state) => state.auth);
+  
+  const role = (user?.role as string)?.toLowerCase() || '';
+  const canEdit = role === 'admin' || role === 'owner';
 
   const [showAddPlan, setShowAddPlan] = useState(false);
   const [newPlan, setNewPlan] = useState({ name: "", level: "", basePrice: "", durationMonths: "1", features: "" });
@@ -45,9 +49,11 @@ const PlansPanel: React.FC<Props> = ({ gymName }) => {
           <h2 className="page-title">Membership Plans</h2>
           <p className="page-subtitle">Plans currently active at {gymName}.</p>
         </div>
-        <button className="btn-blue" onClick={() => setShowAddPlan(true)}>
-          <Plus size={16} /> Add Plan
-        </button>
+        {canEdit && (
+          <button className="btn-blue" onClick={() => setShowAddPlan(true)}>
+            <Plus size={16} /> Add Plan
+          </button>
+        )}
       </div>
 
       {showAddPlan && (
@@ -118,13 +124,15 @@ const PlansPanel: React.FC<Props> = ({ gymName }) => {
                   <h3 className="plan-name">{p.name}</h3>
                   <p style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>Level: {p.level}</p>
                 </div>
-                <button style={{ background: "none", border: "none", color: "var(--danger)", cursor: "pointer" }} onClick={() => {
-                  if (window.confirm("Delete this plan?")) {
-                    dispatch(deletePlanAction(p._id || p.id));
-                  }
-                }}>
-                  <X size={16} />
-                </button>
+                {canEdit && (
+                  <button style={{ background: "none", border: "none", color: "var(--danger)", cursor: "pointer" }} onClick={() => {
+                    if (window.confirm("Delete this plan?")) {
+                      dispatch(deletePlanAction(p._id || p.id));
+                    }
+                  }}>
+                    <X size={16} />
+                  </button>
+                )}
               </div>
               <div className="plan-price-wrapper">
                 <span className="plan-price" style={{ color: "var(--primary)" }}>₹{p.basePrice}</span>
