@@ -41,6 +41,7 @@ const PlatformIntegrations = lazy(() => import("../pages/PlatformIntegrationsPag
 const PlatformTestimonials = lazy(() => import("../pages/PlatformTestimonialsPage").then((m) => ({ default: m.PlatformTestimonials })));
 const BlogList = lazy(() => import("../pages/BlogList").then((m) => ({ default: m.BlogList })));
 const BlogDetail = lazy(() => import("../pages/BlogDetail").then((m) => ({ default: m.BlogDetail })));
+const NotFound = lazy(() => import("../pages/NotFound"));
 
 // ── Loading Spinner ───────────────────────────────────────────────────────────
 const PageLoader = () => (
@@ -166,7 +167,8 @@ const AppRouter = () => {
         />
 
         {/* ── Fallback / 404 ────────────────────────────────────────────── */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="/404" element={<NotFound />} />
+        <Route path="*" element={<Navigate to="/404" replace />} />
 
       </Routes>
     </Suspense>

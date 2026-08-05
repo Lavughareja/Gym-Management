@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { LogOut, Settings, Sun, Moon, Dumbbell, Users, ClipboardList, Activity, LayoutDashboard, UserCog, UserCheck, Menu, Bell } from "lucide-react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Navigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../utils/reduxHooks";
 import { logoutAction } from "../redux/actions/authActions";
 
@@ -48,11 +48,12 @@ const PANEL_ROUTE_MAP: Record<string, string> = {
 
 /** Derive the active panel id from the current pathname */
 function getPanelFromPath(pathname: string): string {
+  if (pathname === "/dashboard" || pathname === "/dashboard/") return "overview";
   const seg = pathname.replace("/dashboard/", "").replace("/dashboard", "");
   const found = Object.entries(PANEL_ROUTE_MAP).find(([, path]) =>
     path === `/dashboard/${seg}` || path === pathname
   );
-  return found ? found[0] : "overview";
+  return found ? found[0] : "not_found";
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -102,6 +103,10 @@ const GymDashboard: React.FC<GymDashboardProps> = ({ onLogout }) => {
       navigate("/dashboard/overview", { replace: true });
     }
   }, [location.pathname, navigate]);
+
+  if (activeTab === "not_found") {
+    return <Navigate to="/404" replace />;
+  }
 
   // Theme logic
   useEffect(() => {

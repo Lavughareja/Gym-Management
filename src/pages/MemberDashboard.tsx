@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { LogOut, Activity, Dumbbell, BarChart3, Clock, Play, Square, Loader, Menu, X, Moon, Sun, LayoutDashboard, CreditCard, ChevronRight, CheckCircle2, User, Sparkles, ShoppingCart, FileText, Target, ClipboardList, ShieldCheck, PenLine, Eye, Trash2, BookOpen, UserCheck, Calendar, Salad, Ruler, ChevronDown, ChevronUp, Flame, Upload, Download, CheckCircle, Bell } from "lucide-react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Navigate } from "react-router-dom";
 import UserProfileModal from "../components/UserProfileModal/UserProfileModal";
 import PurchaseAICreditsModal from "../components/PurchaseAICreditsModal/PurchaseAICreditsModal";
 import ConfirmationModal from "../components/ConfirmationModal/ConfirmationModal";
@@ -87,7 +87,8 @@ function getMemberPanelFromPath(pathname: string): string {
     announcements:      "events",
     "personal-trainer": "pt",
   };
-  return map[seg] || "overview";
+  if (pathname === "/member" || pathname === "/member/") return "overview";
+  return map[seg] || "not_found";
 }
 
 type Tab = "overview" | "health_monitor" | "workouts" | "reports" | "plans" | "diet" | "library" | "pt" | "challenges" | "events" | "my_plan";
@@ -2280,6 +2281,10 @@ export const MemberDashboard: React.FC = () => {
     challenges: ChallengesPanel,
     events: <EventsViewPanel />,
   };
+
+  if (activeTab === "not_found") {
+    return <Navigate to="/404" replace />;
+  }
 
   return (
     <div className="app-container">
