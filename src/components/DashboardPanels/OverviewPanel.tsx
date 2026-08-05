@@ -176,7 +176,7 @@ const OverviewPanel: React.FC<Props> = ({
             <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "var(--text-primary)", marginBottom: 16 }}>Quick Actions</h3>
             <div className="actions-grid">
               {[
-                { label: "Add Member", icon: UserPlus, action: () => { setActiveTab("members"); setShowAddMember(true); }, hide: !canAddMember },
+                { label: "Add Member", icon: UserPlus, action: () => { setActiveTab("members"); setShowAddMember(true); }, hide: !canAddMember || ['gymmanager', 'manager', 'trainer'].includes(role?.toLowerCase()) },
                 { label: "Add Trainer", icon: Dumbbell, action: () => { setActiveTab("trainers"); setShowAddTrainer(true); }, hide: role === "trainer" },
                 { label: "View Plans", icon: ClipboardList, action: () => setActiveTab("plans") },
                 { label: "Managers", icon: UserCog, action: () => setActiveTab("managers"), hide: role === "gymmanager" },

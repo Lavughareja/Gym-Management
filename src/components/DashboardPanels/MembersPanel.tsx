@@ -63,7 +63,7 @@ const MembersPanel: React.FC<Props> = ({ role, canAddMember, showAddMember, setS
           <p style={{ fontSize: 13, color: '#64748b', margin: 0, fontWeight: 500 }}>Manage all gym members from one centralized dashboard.</p>
         </div>
 
-        {(canAddMember || role === "admin" || role === "superadmin" || role === "owner") && (
+        {((canAddMember || role === "admin" || role === "superadmin" || role === "owner") && !['gymmanager', 'manager', 'trainer'].includes(role?.toLowerCase())) && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <button style={{ padding: '9px 16px', background: '#fff', border: '1px solid #e2e8f0', color: '#475569', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 7, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
               <Download size={14} /> Template
