@@ -50,7 +50,7 @@ const OverviewPanel: React.FC<Props> = ({
         } else if (role === 'gymmanager' || role === 'manager') {
           endpoint = '/dashboard/manager-overview';
         }
-        
+
         const response = await AxiosInstance.get(endpoint);
         if (response.data) {
           setDashboardData((prev: any) => ({
@@ -101,7 +101,7 @@ const OverviewPanel: React.FC<Props> = ({
       { label: "Active Members", value: dashboardData.activeMembers, icon: CheckCircle2, color: "#10b981", bg: "rgba(16,185,129,0.1)" },
       { label: "Joined This Month", value: dashboardData.membersJoinedThisMonth, icon: UserPlus, color: "#f59e0b", bg: "rgba(245,158,11,0.1)" },
     ];
-    
+
     // Only show revenue to admins/owners, not managers
     if (role !== 'gymmanager' && role !== 'manager') {
       stats.push({ label: "Revenue (Mo.)", value: `₹${(dashboardData.revenueThisMonth || 0).toLocaleString('en-IN')}`, icon: CreditCard, color: "#8b5cf6", bg: "rgba(139,92,246,0.1)" });
@@ -130,7 +130,7 @@ const OverviewPanel: React.FC<Props> = ({
               {expiringTrials.map(t => t.name).join(', ')}. Reach out to convert them to members!
             </p>
           </div>
-          <button 
+          <button
             onClick={() => setActiveTab('trial_members')}
             style={{ padding: '8px 16px', background: '#d97706', color: '#fff', border: 'none', borderRadius: 8, fontWeight: 600, cursor: 'pointer' }}
           >
@@ -164,7 +164,7 @@ const OverviewPanel: React.FC<Props> = ({
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color, #e5e7eb)" />
               <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "var(--text-muted, #6b7280)" }} />
               <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "var(--text-muted, #6b7280)" }} />
-              <Tooltip 
+              <Tooltip
                 contentStyle={{ borderRadius: 8, border: "none", boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)" }}
                 cursor={{ fill: "rgba(37,99,235,0.05)" }}
               />
@@ -185,7 +185,7 @@ const OverviewPanel: React.FC<Props> = ({
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color, #e5e7eb)" />
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "var(--text-muted, #6b7280)" }} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "var(--text-muted, #6b7280)" }} />
-                <Tooltip 
+                <Tooltip
                   contentStyle={{ borderRadius: 8, border: "none", boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)" }}
                   cursor={{ fill: "rgba(16,185,129,0.05)" }}
                 />
