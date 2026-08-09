@@ -33,23 +33,25 @@ const OverviewPanel: React.FC<Props> = ({
     expiringMembersCount: 0,
     todayAttendanceCount: 0,
     pendingLeadsCount: 0,
-    chartData: []
+    chartData: [],
+    totalPtMembers: 0,
+    todayPtAttendanceCount: 0,
+    totalTodayAttendanceCount: 0,
+    expiringPtMembersCount: 0
   });
   const [expiringTrials, setExpiringTrials] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
-      if (role === 'trainer') {
-        // Trainers do not have access to gym-wide financial/overview stats
-        setDashboardData((prev: any) => ({
-          ...prev,
-          totalMembers: members.length,
-          activeMembers: members.filter((m: any) => m.status === "Active").length,
-        }));
-        return;
-      }
       try {
-        const response = await AxiosInstance.get('/dashboard/overview');
+        let endpoint = '/dashboard/overview';
+        if (role === 'trainer') {
+          endpoint = '/dashboard/trainer-overview';
+        } else if (role === 'gymmanager' || role === 'manager') {
+          endpoint = '/dashboard/manager-overview';
+        }
+        
+        const response = await AxiosInstance.get(endpoint);
         if (response.data) {
           setDashboardData((prev: any) => ({
             ...prev,
@@ -57,7 +59,7 @@ const OverviewPanel: React.FC<Props> = ({
           }));
         }
       } catch (error) {
-        console.error("Error fetching dashboard overview:", error);
+        console.error(`Error fetching dashboard overview for role ${role}:`, error);
       }
     };
 
@@ -82,17 +84,35 @@ const OverviewPanel: React.FC<Props> = ({
 
     fetchDashboardData();
     fetchExpiringTrials();
-  }, []);
+  }, [role]);
 
-  const stats = [
-    { label: "Total Members", value: dashboardData.totalMembers, icon: Users, color: "#2563eb", bg: "rgba(37,99,235,0.1)" },
-    { label: "Active Members", value: dashboardData.activeMembers, icon: CheckCircle2, color: "#10b981", bg: "rgba(16,185,129,0.1)" },
-    { label: "Joined This Month", value: dashboardData.membersJoinedThisMonth, icon: UserPlus, color: "#f59e0b", bg: "rgba(245,158,11,0.1)" },
-    { label: "Revenue (Mo.)", value: `₹${dashboardData.revenueThisMonth.toLocaleString('en-IN')}`, icon: CreditCard, color: "#8b5cf6", bg: "rgba(139,92,246,0.1)" },
-    { label: "Expiring (7 Days)", value: dashboardData.expiringMembersCount, icon: AlertTriangle, color: "#ef4444", bg: "rgba(239,68,68,0.1)" },
-    { label: "Today's Footfall", value: dashboardData.todayAttendanceCount, icon: Activity, color: "#0ea5e9", bg: "rgba(14,165,233,0.1)" },
-    { label: "Pending Leads", value: dashboardData.pendingLeadsCount, icon: Target, color: "#ec4899", bg: "rgba(236,72,153,0.1)" },
-  ];
+  let stats: any = [];
+  if (role === 'trainer') {
+    stats = [
+      { label: "PT Members", value: dashboardData.totalPtMembers || 0, icon: Users, color: "#2563eb", bg: "rgba(37,99,235,0.1)" },
+      { label: "PT Joined This Month", value: dashboardData.ptMembersJoinedThisMonth || 0, icon: UserPlus, color: "#f59e0b", bg: "rgba(245,158,11,0.1)" },
+      { label: "PT Check-ins", value: dashboardData.todayPtAttendanceCount || 0, icon: CheckCircle2, color: "#10b981", bg: "rgba(16,185,129,0.1)" },
+      { label: "Expiring PTs (7D)", value: dashboardData.expiringPtMembersCount || 0, icon: AlertTriangle, color: "#ef4444", bg: "rgba(239,68,68,0.1)" },
+      { label: "Gym Footfall", value: dashboardData.totalTodayAttendanceCount || 0, icon: Activity, color: "#0ea5e9", bg: "rgba(14,165,233,0.1)" },
+    ];
+  } else {
+    stats = [
+      { label: "Total Members", value: dashboardData.totalMembers, icon: Users, color: "#2563eb", bg: "rgba(37,99,235,0.1)" },
+      { label: "Active Members", value: dashboardData.activeMembers, icon: CheckCircle2, color: "#10b981", bg: "rgba(16,185,129,0.1)" },
+      { label: "Joined This Month", value: dashboardData.membersJoinedThisMonth, icon: UserPlus, color: "#f59e0b", bg: "rgba(245,158,11,0.1)" },
+    ];
+    
+    // Only show revenue to admins/owners, not managers
+    if (role !== 'gymmanager' && role !== 'manager') {
+      stats.push({ label: "Revenue (Mo.)", value: `₹${(dashboardData.revenueThisMonth || 0).toLocaleString('en-IN')}`, icon: CreditCard, color: "#8b5cf6", bg: "rgba(139,92,246,0.1)" });
+    }
+
+    stats.push(
+      { label: "Expiring (7 Days)", value: dashboardData.expiringMembersCount, icon: AlertTriangle, color: "#ef4444", bg: "rgba(239,68,68,0.1)" },
+      { label: "Today's Footfall", value: dashboardData.todayAttendanceCount, icon: Activity, color: "#0ea5e9", bg: "rgba(14,165,233,0.1)" },
+      { label: "Pending Leads", value: dashboardData.pendingLeadsCount, icon: Target, color: "#ec4899", bg: "rgba(236,72,153,0.1)" }
+    );
+  }
 
   return (
     <div className="page-container">
@@ -135,10 +155,12 @@ const OverviewPanel: React.FC<Props> = ({
 
       {/* Chart Section */}
       <div className="gym-card" style={{ marginBottom: "20px" }}>
-        <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "var(--text-primary)", marginBottom: 20 }}>Member Joins (This Year)</h3>
+        <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "var(--text-primary)", marginBottom: 20 }}>
+          {role === 'trainer' ? "PT Member Joins (This Year)" : "Member Joins (This Year)"}
+        </h3>
         <div style={{ width: "100%", height: 300 }}>
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={dashboardData.chartData}>
+            <BarChart data={dashboardData.chartData || []}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color, #e5e7eb)" />
               <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "var(--text-muted, #6b7280)" }} />
               <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "var(--text-muted, #6b7280)" }} />
@@ -152,33 +174,57 @@ const OverviewPanel: React.FC<Props> = ({
         </div>
       </div>
 
-      <div className="dashboard-grid">
-        <div className="gym-card">
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-            <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "var(--text-primary)" }}>Recent Members</h3>
-            <button className="btn-blue-outline" style={{ fontSize: "0.78rem", padding: "5px 12px" }} onClick={() => setActiveTab("members")}>
-              View All <ChevronRight size={14} />
-            </button>
-          </div>
-          <div className="checkin-list">
-            {members.slice(0, 5).map((m: any) => (
-              <div key={m.id} className="checkin-item">
-                <div className="checkin-member">
-                  <div className="checkin-avatar" style={{ background: "var(--primary-light)", color: "var(--primary)", fontSize: "0.78rem", fontWeight: 700 }}>
-                    {m.avatar}
-                  </div>
-                  <div>
-                    <div className="checkin-name">{m.name}</div>
-                    <div className="checkin-time">{m.plan} · {m.joined}</div>
-                  </div>
-                </div>
-                <span className={`checkin-status ${m.status === "Active" ? "status-active" : "status-inactive"}`}>
-                  {m.status}
-                </span>
-              </div>
-            ))}
+      {role !== 'trainer' && (
+        <div className="gym-card" style={{ marginBottom: "20px" }}>
+          <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "var(--text-primary)", marginBottom: 20 }}>
+            PT Member Joins (This Year)
+          </h3>
+          <div style={{ width: "100%", height: 300 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={dashboardData.ptChartData || []}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color, #e5e7eb)" />
+                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "var(--text-muted, #6b7280)" }} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "var(--text-muted, #6b7280)" }} />
+                <Tooltip 
+                  contentStyle={{ borderRadius: 8, border: "none", boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)" }}
+                  cursor={{ fill: "rgba(16,185,129,0.05)" }}
+                />
+                <Bar dataKey="joined" fill="#10b981" radius={[4, 4, 0, 0]} barSize={30} />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </div>
+      )}
+
+      <div className="dashboard-grid" style={{ gridTemplateColumns: role === 'trainer' ? '1fr' : undefined }}>
+        {role !== 'trainer' && (
+          <div className="gym-card">
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+              <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "var(--text-primary)" }}>Recent Members</h3>
+              <button className="btn-blue-outline" style={{ fontSize: "0.78rem", padding: "5px 12px" }} onClick={() => setActiveTab("members")}>
+                View All <ChevronRight size={14} />
+              </button>
+            </div>
+            <div className="checkin-list">
+              {members.slice(0, 5).map((m: any) => (
+                <div key={m.id} className="checkin-item">
+                  <div className="checkin-member">
+                    <div className="checkin-avatar" style={{ background: "var(--primary-light)", color: "var(--primary)", fontSize: "0.78rem", fontWeight: 700 }}>
+                      {m.avatar}
+                    </div>
+                    <div>
+                      <div className="checkin-name">{m.name}</div>
+                      <div className="checkin-time">{m.plan} · {m.joined}</div>
+                    </div>
+                  </div>
+                  <span className={`checkin-status ${m.status === "Active" ? "status-active" : "status-inactive"}`}>
+                    {m.status}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           <div className="gym-card">
@@ -188,7 +234,7 @@ const OverviewPanel: React.FC<Props> = ({
                 { label: "Add Member", icon: UserPlus, action: () => { setActiveTab("members"); setShowAddMember(true); }, hide: !canAddMember || ['gymmanager', 'manager', 'trainer'].includes(role?.toLowerCase()) },
                 { label: "Add Trainer", icon: Dumbbell, action: () => { setActiveTab("trainers"); setShowAddTrainer(true); }, hide: role === "trainer" },
                 { label: "View Plans", icon: ClipboardList, action: () => setActiveTab("plans") },
-                { label: "Managers", icon: UserCog, action: () => setActiveTab("managers"), hide: role === "gymmanager" },
+                { label: "Managers", icon: UserCog, action: () => setActiveTab("managers"), hide: role === "gymmanager" || role === "trainer" },
               ].filter(a => !a.hide).map(({ label, icon: Icon, action }) => (
                 <button key={label} className="action-btn" onClick={action}>
                   <Icon size={20} />
