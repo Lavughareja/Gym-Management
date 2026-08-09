@@ -1,4 +1,4 @@
-import type { AppDispatch } from "../store";
+import type { AppDispatch, RootState } from "../store";
 import { showSnackbar } from "../slices/snackbarSlice";
 import {
   ptRequestStart,
@@ -70,12 +70,17 @@ export const fetchMemberPtInfoAction = (memberId: string) => async (dispatch: Ap
   }
 };
 
-export const assignPtAction = (memberId: string, trainerId: string) => async (dispatch: AppDispatch) => {
+export const assignPtAction = (memberId: string, trainerId: string) => async (dispatch: AppDispatch, getState: () => RootState) => {
   try {
     // If trainerId is empty string, trainer is self-assigning — backend handles it
     await assignPtApi({ memberId, ...(trainerId ? { trainerId } : {}) });
     dispatch(showSnackbar({ message: "PT assigned successfully!", type: "success" }));
-    dispatch(fetchAllPtAssignmentsAction());
+    const role = getState().auth.user?.role;
+    if (role === 'trainer') {
+      dispatch(fetchMyPtMembersAction());
+    } else {
+      dispatch(fetchAllPtAssignmentsAction());
+    }
     return true;
   } catch (error: any) {
     dispatch(showSnackbar({ message: error?.response?.data?.message || "Failed to assign PT", type: "error" }));

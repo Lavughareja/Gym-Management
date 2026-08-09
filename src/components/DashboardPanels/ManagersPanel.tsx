@@ -68,25 +68,7 @@ const ManagersPanel: React.FC<Props> = ({ role }) => {
                 <label className="form-label">Date of Birth</label>
                 <input type="date" value={newManager.dateOfBirth} onChange={e => setNewManager({ ...newManager, dateOfBirth: e.target.value })} className="form-input" />
               </div>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 4, marginBottom: 8, padding: "8px 0" }}>
-                <div>
-                  <h4 style={{ fontSize: "0.9rem", fontWeight: 600, color: "var(--text-primary)" }}>Can Add Members</h4>
-                  <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: 2 }}>Allow this manager to register new members</p>
-                </div>
-                <div
-                  onClick={() => setNewManager({ ...newManager, canAddMember: !newManager.canAddMember })}
-                  style={{
-                    width: 44, height: 24, borderRadius: 12, background: newManager.canAddMember ? "var(--primary)" : "var(--border)",
-                    position: "relative", cursor: "pointer", transition: "all 0.3s ease"
-                  }}
-                >
-                  <div style={{
-                    width: 20, height: 20, background: "#fff", borderRadius: "50%",
-                    position: "absolute", top: 2, left: newManager.canAddMember ? 22 : 2,
-                    transition: "all 0.3s ease", boxShadow: "0 2px 4px rgba(0,0,0,0.2)"
-                  }} />
-                </div>
-              </div>
+
               <div style={{ display: "flex", gap: 10, marginTop: 8 }}>
                 <button className="btn-blue" style={{ flex: 1, justifyContent: "center" }}
                   disabled={inviteLoading}
@@ -120,9 +102,7 @@ const ManagersPanel: React.FC<Props> = ({ role }) => {
                   <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", whiteSpace: "nowrap" }}>Name</th>
                   <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", whiteSpace: "nowrap" }}>Email</th>
                   <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", whiteSpace: "nowrap" }}>Status</th>
-                  {(role === "admin" || role === "superadmin") && (
-                    <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", whiteSpace: "nowrap" }}>Can Add Members</th>
-                  )}
+
                   <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "0.75rem", fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.05em", whiteSpace: "nowrap" }}>Actions</th>
                 </tr>
               </thead>
@@ -138,20 +118,7 @@ const ManagersPanel: React.FC<Props> = ({ role }) => {
                         {m.isActive || m.status === 'Active' ? "Active" : "Pending Setup"}
                       </span>
                     </td>
-                    {(role === "admin" || role === "superadmin") && (
-                      <td style={{ padding: "14px 16px" }}>
-                        {(m.isActive || m.status === 'Active') && (
-                          <label className="switch" style={{ transform: "scale(0.8)", margin: 0 }}>
-                            <input
-                              type="checkbox"
-                              checked={!!m.canAddMember}
-                              onChange={(e) => dispatch(updateManagerPermissionAction(m._id || m.id, e.target.checked))}
-                            />
-                            <span className="slider" />
-                          </label>
-                        )}
-                      </td>
-                    )}
+
                     <td style={{ padding: "14px 16px" }}>
                       {(!m.isActive && m.status !== 'Active') && (
                         <button className="btn-blue-outline" style={{ fontSize: "0.75rem", padding: "4px 8px" }}
