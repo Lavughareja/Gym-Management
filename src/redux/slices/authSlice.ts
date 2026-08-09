@@ -40,6 +40,9 @@ const authSlice = createSlice({
     clearDeviceLimitFlag: (state) => {
       state.deviceLimitReached = false;
     },
+    updateUser: (state, action) => {
+      state.user = { ...state.user, ...action.payload };
+    },
   },
   extraReducers: (builder) => {
     // ── Login ──────────────────────────────────────────────────────────────
@@ -101,5 +104,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { clearError, clearDeviceLimitFlag } = authSlice.actions;
+export const { clearError, clearDeviceLimitFlag, updateUser } = authSlice.actions;
 export default authSlice.reducer;

@@ -22,9 +22,11 @@ import { fetchMembersAction } from "../redux/actions/memberActions";
 import { fetchTrainersAction } from "../redux/actions/trainerActions";
 import { fetchManagersAction } from "../redux/actions/managerActions";
 import { fetchPlansAction } from "../redux/actions/planActions";
+import { updateUser } from "../redux/slices/authSlice";
 import CrmPanel from "../components/DashboardPanels/CrmPanel";
 import TrialMembersPanel from "../components/DashboardPanels/TrialMembers/TrialMembersPanel.tsx";
 import ExpenseTrackerPanel from "../components/DashboardPanels/ExpenseTrackerPanel";
+import UserProfileModal from "../components/UserProfileModal/UserProfileModal";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Route Map — maps URL segments to panel IDs
@@ -73,7 +75,14 @@ const GymDashboard: React.FC<GymDashboardProps> = ({ onLogout }) => {
   const localUserStr = localStorage.getItem("dashUser");
   const localUser = localUserStr ? JSON.parse(localUserStr) : null;
   const userObj = {
-    name: (user as any)?.fullName || localUser?.ownerName,
+    name: ((user as any)?.firstName || localUser?.firstName || (user as any)?.lastName || localUser?.lastName)
+      ? `${(user as any)?.firstName || localUser?.firstName || ''} ${(user as any)?.lastName || localUser?.lastName || ''}`.trim()
+      : (user as any)?.fullName || localUser?.ownerName || localUser?.fullName,
+    fullName: (user as any)?.fullName || localUser?.fullName || localUser?.ownerName,
+    firstName: (user as any)?.firstName || localUser?.firstName,
+    lastName: (user as any)?.lastName || localUser?.lastName,
+    email: (user as any)?.email || localUser?.email,
+    profilePicture: (user as any)?.profilePicture || localUser?.profilePicture,
     role: (user as any)?.role || localUser?.role,
     canAddMember: (user as any)?.canAddMember || localUser?.canAddMember,
     _id: (user as any)?._id || localUser?._id,
@@ -88,6 +97,7 @@ const GymDashboard: React.FC<GymDashboardProps> = ({ onLogout }) => {
 
   const [showAddMember, setShowAddMember] = useState(false);
   const [showAddTrainer, setShowAddTrainer] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   // Initial Fetch
   useEffect(() => {
@@ -200,10 +210,17 @@ const GymDashboard: React.FC<GymDashboardProps> = ({ onLogout }) => {
             </label>
           </div>
 
-          <div className="profile-card" style={{ justifyContent: "space-between" }}>
+          <div className="profile-card" style={{ justifyContent: "space-between", cursor: "pointer" }} onClick={() => setShowProfileModal(true)}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <div className="profile-avatar">
-                {userObj?.name?.slice(0, 2).toUpperCase() || "U"}
+              <div className="profile-avatar" style={{ 
+                background: userObj.profilePicture ? "transparent" : "var(--primary)",
+                overflow: "hidden"
+              }}>
+                {userObj.profilePicture ? (
+                  <img src={userObj.profilePicture} alt="Profile" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                ) : (
+                  userObj?.name?.slice(0, 2).toUpperCase() || "U"
+                )}
               </div>
               <div className="profile-info">
                 <span className="profile-name">{userObj?.name || "User"}</span>
@@ -211,7 +228,10 @@ const GymDashboard: React.FC<GymDashboardProps> = ({ onLogout }) => {
               </div>
             </div>
             <button
-              onClick={handleLogout}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleLogout();
+              }}
               title="Logout"
               style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", padding: 4, borderRadius: 6, transition: "color 0.15s" }}
             >
@@ -288,6 +308,29 @@ const GymDashboard: React.FC<GymDashboardProps> = ({ onLogout }) => {
           )
         )}
       </main>
+
+      {showProfileModal && (
+        <UserProfileModal
+          user={{
+            id: userObj._id,
+            fullName: userObj.fullName || "",
+            firstName: userObj.firstName || "",
+            lastName: userObj.lastName || "",
+            email: userObj.email || "",
+            role: userObj.role || "",
+            profilePicture: userObj.profilePicture || "",
+          }}
+          onClose={() => setShowProfileModal(false)}
+          onSuccess={(updatedUser) => {
+            dispatch(updateUser(updatedUser));
+            if (localUserStr) {
+              const parsed = JSON.parse(localUserStr);
+              const merged = { ...parsed, ...updatedUser };
+              localStorage.setItem("dashUser", JSON.stringify(merged));
+            }
+          }}
+        />
+      )}
     </div>
   );
 };
