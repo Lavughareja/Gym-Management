@@ -13,6 +13,12 @@ export const getAllPtAssignmentsApi = () =>
 export const getMyPtMembersApi = () =>
   AxiosInstance.get('/pt/my-members');
 
+export const acceptPtAssignmentApi = (id: string) =>
+  AxiosInstance.post(`/pt/assignments/${id}/accept`);
+
+export const rejectPtAssignmentApi = (id: string) =>
+  AxiosInstance.post(`/pt/assignments/${id}/reject`);
+
 export const getMemberPtInfoApi = (memberId: string) =>
   AxiosInstance.get(`/pt/member/${memberId}`);
 

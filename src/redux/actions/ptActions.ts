@@ -21,6 +21,8 @@ import {
 import {
   assignPtApi,
   removePtAssignmentApi,
+  acceptPtAssignmentApi,
+  rejectPtAssignmentApi,
   getAllPtAssignmentsApi,
   getMyPtMembersApi,
   getMemberPtInfoApi,
@@ -70,11 +72,33 @@ export const fetchMemberPtInfoAction = (memberId: string) => async (dispatch: Ap
   }
 };
 
+
+export const acceptPtAssignmentAction = (id: string) => async (dispatch: AppDispatch) => {
+  try {
+    const res = await acceptPtAssignmentApi(id);
+    // The accept API returns the assignment without populated fields, so we re-fetch to get trainer details
+    dispatch(fetchMemberPtInfoAction(res.data.assignment.memberId) as any);
+    dispatch(showSnackbar({ message: "PT assignment accepted!", type: "success" }));
+  } catch (error: any) {
+    dispatch(showSnackbar({ message: error?.response?.data?.message || "Failed to accept", type: "error" }));
+  }
+};
+
+export const rejectPtAssignmentAction = (id: string) => async (dispatch: AppDispatch) => {
+  try {
+    await rejectPtAssignmentApi(id);
+    dispatch(setMemberPtInfo(null));
+    dispatch(showSnackbar({ message: "PT assignment rejected", type: "success" }));
+  } catch (error: any) {
+    dispatch(showSnackbar({ message: error?.response?.data?.message || "Failed to reject", type: "error" }));
+  }
+};
+
 export const assignPtAction = (memberId: string, trainerId: string) => async (dispatch: AppDispatch, getState: () => RootState) => {
   try {
     // If trainerId is empty string, trainer is self-assigning — backend handles it
     await assignPtApi({ memberId, ...(trainerId ? { trainerId } : {}) });
-    dispatch(showSnackbar({ message: "PT assigned successfully!", type: "success" }));
+    dispatch(showSnackbar({ message: "Sent notification to member for PT assignment", type: "success" }));
     const role = getState().auth.user?.role;
     if (role === 'trainer') {
       dispatch(fetchMyPtMembersAction());

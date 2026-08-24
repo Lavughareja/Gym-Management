@@ -20,6 +20,8 @@ import {
   fetchPtWorkoutPlansAction,
   fetchPtDietPlansAction,
   fetchPtMeasurementsAction,
+  acceptPtAssignmentAction,
+  rejectPtAssignmentAction,
 } from "../redux/actions/ptActions";
 import BMICalculator from "../components/BMICalculator/BMICalculator";
 import CaloriesCalculator from "../components/CaloriesCalculator/CaloriesCalculator";
@@ -1325,8 +1327,7 @@ export const MemberDashboard: React.FC = () => {
     { id: "plans",     label: "Gym Plans",  icon: CreditCard as any },
     { id: "challenges",label: "Challenges", icon: ShieldCheck as any },
     { id: "events",    label: "Announcements", icon: Bell as any },
-    // Only shown if member has an active PT
-    ...(ptState.memberPtInfo ? [{ id: "pt" as Tab, label: "Personal Trainer", icon: UserCheck as any }] : []),
+    { id: "pt" as Tab, label: "Personal Trainer", icon: UserCheck as any },
   ];
 
   const Sidebar = (
@@ -2084,148 +2085,183 @@ export const MemberDashboard: React.FC = () => {
         </div>
       </header>
 
-      {/* Trainer Info Card */}
-      {ptState.memberPtInfo && (
-        <div style={{
-          background: "linear-gradient(135deg, rgba(99,102,241,0.12), rgba(139,92,246,0.08))",
-          border: "1.5px solid rgba(99,102,241,0.3)",
-          borderRadius: 16, padding: "20px 24px", marginBottom: 24,
-          display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap",
-        }}>
+      {/* Conditional PT State Rendering */}
+      {!ptState.memberPtInfo ? (
+        <div style={{ textAlign: "center", padding: "60px 20px", color: "var(--text-muted)", background: "var(--bg-card)", borderRadius: 16, border: "1px dashed var(--border-color)", marginBottom: 24 }}>
+          <UserCheck size={48} style={{ opacity: 0.3, marginBottom: 16, margin: "0 auto" }} />
+          <h3 style={{ fontSize: 18, color: "var(--text-primary)", marginBottom: 8, fontWeight: 700 }}>No Personal Trainer Assigned</h3>
+          <p style={{ margin: 0, fontSize: 14 }}>You have not been assigned a Personal Trainer yet. Any incoming requests will appear here.</p>
+        </div>
+      ) : ptState.memberPtInfo.status === 'pending' ? (
+        <div style={{ textAlign: "center", padding: "50px 20px", background: "rgba(245,158,11,0.05)", borderRadius: 16, border: "1.5px dashed rgba(245,158,11,0.4)", marginBottom: 24 }}>
+          <Bell size={48} style={{ color: "#f59e0b", marginBottom: 16, margin: "0 auto", opacity: 0.8 }} />
+          <h3 style={{ fontSize: 22, color: "var(--text-primary)", marginBottom: 12, fontWeight: 800 }}>Pending Training Request</h3>
+          <p style={{ margin: "0 auto 24px", fontSize: 15, color: "var(--text-secondary)", maxWidth: 500, lineHeight: 1.6 }}>
+            <strong>{ptState.memberPtInfo.trainerId?.fullName || "A trainer"}</strong> has sent you a request to be your Personal Trainer. Do you want to accept this assignment?
+          </p>
+          <div style={{ display: "flex", justifyContent: "center", gap: 16 }}>
+            <button 
+              onClick={() => dispatch(acceptPtAssignmentAction(ptState.memberPtInfo._id))} 
+              style={{ background: "#10b981", color: "#fff", padding: "12px 28px", borderRadius: 12, fontWeight: 700, border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, boxShadow: "0 4px 12px rgba(16,185,129,0.2)", transition: "all 0.2s" }}
+              onMouseOver={(e) => { e.currentTarget.style.transform = "translateY(-2px)"; }}
+              onMouseOut={(e) => { e.currentTarget.style.transform = "translateY(0)"; }}
+            >
+              <CheckCircle size={18} /> Accept
+            </button>
+            <button 
+              onClick={() => dispatch(rejectPtAssignmentAction(ptState.memberPtInfo._id))} 
+              style={{ background: "transparent", color: "#ef4444", padding: "12px 28px", borderRadius: 12, fontWeight: 700, border: "1.5px solid #ef4444", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, transition: "all 0.2s" }}
+              onMouseOver={(e) => { e.currentTarget.style.background = "rgba(239,68,68,0.1)"; }}
+              onMouseOut={(e) => { e.currentTarget.style.background = "transparent"; }}
+            >
+              <X size={18} /> Reject
+            </button>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Trainer Info Card */}
           <div style={{
-            width: 56, height: 56, borderRadius: "50%",
-            background: "linear-gradient(135deg,#6366f1,#8b5cf6)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            color: "#fff", fontWeight: 800, fontSize: 20, flexShrink: 0,
+            background: "linear-gradient(135deg, rgba(99,102,241,0.12), rgba(139,92,246,0.08))",
+            border: "1.5px solid rgba(99,102,241,0.3)",
+            borderRadius: 16, padding: "20px 24px", marginBottom: 24,
+            display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap",
           }}>
-            {(ptState.memberPtInfo.trainerId?.fullName || "PT").slice(0, 2).toUpperCase()}
+            <div style={{
+              width: 56, height: 56, borderRadius: "50%",
+              background: "linear-gradient(135deg,#6366f1,#8b5cf6)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              color: "#fff", fontWeight: 800, fontSize: 20, flexShrink: 0,
+            }}>
+              {(ptState.memberPtInfo.trainerId?.fullName || "PT").slice(0, 2).toUpperCase()}
+            </div>
+            <div style={{ flex: 1 }}>
+              <p style={{ margin: 0, fontSize: 18, fontWeight: 800 }}>
+                {ptState.memberPtInfo.trainerId?.fullName || "Your Trainer"}
+              </p>
+              <p style={{ margin: 0, fontSize: 13, color: "var(--text-muted)" }}>
+                Your Personal Trainer · Assigned by {ptState.memberPtInfo.assignedBy?.fullName || "—"}
+              </p>
+            </div>
+            <div style={{ padding: "6px 14px", background: "rgba(99,102,241,0.15)", borderRadius: 20, color: "#6366f1", fontWeight: 700, fontSize: 13 }}>
+              Active PT
+            </div>
           </div>
-          <div style={{ flex: 1 }}>
-            <p style={{ margin: 0, fontSize: 18, fontWeight: 800 }}>
-              {ptState.memberPtInfo.trainerId?.fullName || "Your Trainer"}
-            </p>
-            <p style={{ margin: 0, fontSize: 13, color: "var(--text-muted)" }}>
-              Your Personal Trainer · Assigned by {ptState.memberPtInfo.assignedBy?.fullName || "—"}
-            </p>
-          </div>
-          <div style={{ padding: "6px 14px", background: "rgba(99,102,241,0.15)", borderRadius: 20, color: "#6366f1", fontWeight: 700, fontSize: 13 }}>
-            Active PT
-          </div>
-        </div>
-      )}
 
-      {/* Date Picker */}
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 24 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 16px", background: "var(--bg-card)", borderRadius: 12, border: "1.5px solid var(--border-color)" }}>
-          <Calendar size={16} color="var(--text-muted)" />
-          <input
-            type="date"
-            value={ptDate}
-            onChange={e => handlePtDateChange(e.target.value)}
-            style={{ border: "none", background: "none", color: "var(--text-primary)", fontSize: 14, fontWeight: 600, cursor: "pointer" }}
-          />
-        </div>
-        {ptState.loading && <Loader size={18} style={{ animation: "spin 1s linear infinite", color: "var(--text-muted)" }} />}
-      </div>
+          {/* Date Picker */}
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 24 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 16px", background: "var(--bg-card)", borderRadius: 12, border: "1.5px solid var(--border-color)" }}>
+              <Calendar size={16} color="var(--text-muted)" />
+              <input
+                type="date"
+                value={ptDate}
+                onChange={e => handlePtDateChange(e.target.value)}
+                style={{ border: "none", background: "none", color: "var(--text-primary)", fontSize: 14, fontWeight: 600, cursor: "pointer" }}
+              />
+            </div>
+            {ptState.loading && <Loader size={18} style={{ animation: "spin 1s linear infinite", color: "var(--text-muted)" }} />}
+          </div>
 
-      {/* Workout Plan Card */}
-      <div className="gym-card" style={{ marginBottom: 16 }}>
-        <h3 style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, fontSize: 16, fontWeight: 700 }}>
-          <Dumbbell size={18} color="#6366f1" /> Today's Workout Plan
-        </h3>
-        {ptState.workoutPlans.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "24px 0", color: "var(--text-muted)" }}>
-            <Dumbbell size={32} style={{ opacity: 0.3, marginBottom: 8 }} />
-            <p style={{ margin: 0, fontSize: 14 }}>No workout plan for {ptDate}</p>
-          </div>
-        ) : ptState.workoutPlans.map((plan: any) => (
-          <div key={plan._id} style={{ marginBottom: 12 }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
-              <thead>
-                <tr style={{ color: "var(--text-muted)", fontSize: 12 }}>
-                  <th style={{ textAlign: "left", paddingBottom: 8, fontWeight: 600 }}>Exercise</th>
-                  <th style={{ textAlign: "center", paddingBottom: 8, fontWeight: 600 }}>Sets</th>
-                  <th style={{ textAlign: "center", paddingBottom: 8, fontWeight: 600 }}>Reps</th>
-                  <th style={{ textAlign: "center", paddingBottom: 8, fontWeight: 600 }}>Weight</th>
-                </tr>
-              </thead>
-              <tbody>
-                {plan.exercises?.map((ex: any, i: number) => (
-                  <tr key={i} style={{ borderTop: "1px solid var(--border-color)" }}>
-                    <td style={{ padding: "8px 0", fontWeight: 600 }}>{ex.name}</td>
-                    <td style={{ textAlign: "center", padding: "8px 0" }}>{ex.sets}</td>
-                    <td style={{ textAlign: "center", padding: "8px 0" }}>{ex.reps}</td>
-                    <td style={{ textAlign: "center", padding: "8px 0", color: "var(--text-muted)" }}>{ex.weight || "—"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {plan.generalNotes && <p style={{ margin: "10px 0 0", fontSize: 13, color: "var(--text-muted)", fontStyle: "italic" }}>Note: {plan.generalNotes}</p>}
-          </div>
-        ))}
-      </div>
-
-      {/* Diet Plan Card */}
-      <div className="gym-card" style={{ marginBottom: 16 }}>
-        <h3 style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, fontSize: 16, fontWeight: 700 }}>
-          <Salad size={18} color="#22c55e" /> Today's Diet Plan
-        </h3>
-        {ptState.dietPlans.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "24px 0", color: "var(--text-muted)" }}>
-            <Salad size={32} style={{ opacity: 0.3, marginBottom: 8 }} />
-            <p style={{ margin: 0, fontSize: 14 }}>No diet plan for {ptDate}</p>
-          </div>
-        ) : ptState.dietPlans.map((plan: any) => (
-          <div key={plan._id}>
-            {plan.meals?.map((meal: any, i: number) => (
-              <div key={i} style={{
-                display: "flex", gap: 12, padding: "10px 0",
-                borderTop: i === 0 ? "none" : "1px solid var(--border-color)",
-                flexWrap: "wrap",
-              }}>
-                <span style={{ minWidth: 120, fontWeight: 700, fontSize: 13, color: "#22c55e" }}>{meal.mealType}</span>
-                <span style={{ flex: 1, fontSize: 14, lineHeight: 1.5 }}>{meal.foodItems}</span>
-                {meal.calories && <span style={{ fontSize: 12, color: "var(--text-muted)", whiteSpace: "nowrap", alignSelf: "center" }}>{meal.calories} kcal</span>}
+          {/* Workout Plan Card */}
+          <div className="gym-card" style={{ marginBottom: 16 }}>
+            <h3 style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, fontSize: 16, fontWeight: 700 }}>
+              <Dumbbell size={18} color="#6366f1" /> Today's Workout Plan
+            </h3>
+            {ptState.workoutPlans.length === 0 ? (
+              <div style={{ textAlign: "center", padding: "24px 0", color: "var(--text-muted)" }}>
+                <Dumbbell size={32} style={{ opacity: 0.3, marginBottom: 8 }} />
+                <p style={{ margin: 0, fontSize: 14 }}>No workout plan for {ptDate}</p>
+              </div>
+            ) : ptState.workoutPlans.map((plan: any) => (
+              <div key={plan._id} style={{ marginBottom: 12 }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+                  <thead>
+                    <tr style={{ color: "var(--text-muted)", fontSize: 12 }}>
+                      <th style={{ textAlign: "left", paddingBottom: 8, fontWeight: 600 }}>Exercise</th>
+                      <th style={{ textAlign: "center", paddingBottom: 8, fontWeight: 600 }}>Sets</th>
+                      <th style={{ textAlign: "center", paddingBottom: 8, fontWeight: 600 }}>Reps</th>
+                      <th style={{ textAlign: "center", paddingBottom: 8, fontWeight: 600 }}>Weight</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {plan.exercises?.map((ex: any, i: number) => (
+                      <tr key={i} style={{ borderTop: "1px solid var(--border-color)" }}>
+                        <td style={{ padding: "8px 0", fontWeight: 600 }}>{ex.name}</td>
+                        <td style={{ textAlign: "center", padding: "8px 0" }}>{ex.sets}</td>
+                        <td style={{ textAlign: "center", padding: "8px 0" }}>{ex.reps}</td>
+                        <td style={{ textAlign: "center", padding: "8px 0", color: "var(--text-muted)" }}>{ex.weight || "—"}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {plan.generalNotes && <p style={{ margin: "10px 0 0", fontSize: 13, color: "var(--text-muted)", fontStyle: "italic" }}>Note: {plan.generalNotes}</p>}
               </div>
             ))}
-            {plan.waterIntake && <p style={{ margin: "10px 0 0", fontSize: 13, color: "#06b6d4" }}>💧 Water intake: {plan.waterIntake}L</p>}
-            {plan.generalNotes && <p style={{ margin: "8px 0 0", fontSize: 13, color: "var(--text-muted)", fontStyle: "italic" }}>Note: {plan.generalNotes}</p>}
           </div>
-        ))}
-      </div>
 
-      {/* Measurements Card */}
-      <div className="gym-card">
-        <h3 style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, fontSize: 16, fontWeight: 700 }}>
-          <Ruler size={18} color="#f59e0b" /> Measurements — {ptDate}
-        </h3>
-        {ptState.measurements.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "24px 0", color: "var(--text-muted)" }}>
-            <Ruler size={32} style={{ opacity: 0.3, marginBottom: 8 }} />
-            <p style={{ margin: 0, fontSize: 14 }}>No measurements recorded for {ptDate}</p>
+          {/* Diet Plan Card */}
+          <div className="gym-card" style={{ marginBottom: 16 }}>
+            <h3 style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, fontSize: 16, fontWeight: 700 }}>
+              <Salad size={18} color="#22c55e" /> Today's Diet Plan
+            </h3>
+            {ptState.dietPlans.length === 0 ? (
+              <div style={{ textAlign: "center", padding: "24px 0", color: "var(--text-muted)" }}>
+                <Salad size={32} style={{ opacity: 0.3, marginBottom: 8 }} />
+                <p style={{ margin: 0, fontSize: 14 }}>No diet plan for {ptDate}</p>
+              </div>
+            ) : ptState.dietPlans.map((plan: any) => (
+              <div key={plan._id}>
+                {plan.meals?.map((meal: any, i: number) => (
+                  <div key={i} style={{
+                    display: "flex", gap: 12, padding: "10px 0",
+                    borderTop: i === 0 ? "none" : "1px solid var(--border-color)",
+                    flexWrap: "wrap",
+                  }}>
+                    <span style={{ minWidth: 120, fontWeight: 700, fontSize: 13, color: "#22c55e" }}>{meal.mealType}</span>
+                    <span style={{ flex: 1, fontSize: 14, lineHeight: 1.5 }}>{meal.foodItems}</span>
+                    {meal.calories && <span style={{ fontSize: 12, color: "var(--text-muted)", whiteSpace: "nowrap", alignSelf: "center" }}>{meal.calories} kcal</span>}
+                  </div>
+                ))}
+                {plan.waterIntake && <p style={{ margin: "10px 0 0", fontSize: 13, color: "#06b6d4" }}>💧 Water intake: {plan.waterIntake}L</p>}
+                {plan.generalNotes && <p style={{ margin: "8px 0 0", fontSize: 13, color: "var(--text-muted)", fontStyle: "italic" }}>Note: {plan.generalNotes}</p>}
+              </div>
+            ))}
           </div>
-        ) : ptState.measurements.map((m: any) => (
-          <div key={m._id}>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 10, marginBottom: 12 }}>
-              {[
-                ["Weight", m.weight, "kg"], ["Height", m.height, "cm"],
-                ["Chest", m.chest, "cm"], ["Waist", m.waist, "cm"],
-                ["Hips", m.hips, "cm"], ["Arms", m.arms, "cm"],
-                ["Thighs", m.thighs, "cm"], ["Shoulders", m.shoulders, "cm"],
-                ["Body Fat", m.bodyFat, "%"], ["BMI", m.bmi, ""],
-              ].filter(([, val]) => val != null).map(([label, val, unit]) => (
-                <div key={String(label)} style={{ background: "var(--bg-secondary)", borderRadius: 10, padding: "10px 14px", border: "1px solid var(--border-color)" }}>
-                  <p style={{ margin: 0, fontSize: 11, color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5 }}>{label}</p>
-                  <p style={{ margin: "4px 0 0", fontSize: 20, fontWeight: 800 }}>
-                    {val}<span style={{ fontSize: 12, color: "var(--text-muted)", marginLeft: 2 }}>{unit}</span>
-                  </p>
+
+          {/* Measurements Card */}
+          <div className="gym-card">
+            <h3 style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, fontSize: 16, fontWeight: 700 }}>
+              <Ruler size={18} color="#f59e0b" /> Measurements — {ptDate}
+            </h3>
+            {ptState.measurements.length === 0 ? (
+              <div style={{ textAlign: "center", padding: "24px 0", color: "var(--text-muted)" }}>
+                <Ruler size={32} style={{ opacity: 0.3, marginBottom: 8 }} />
+                <p style={{ margin: 0, fontSize: 14 }}>No measurements recorded for {ptDate}</p>
+              </div>
+            ) : ptState.measurements.map((m: any) => (
+              <div key={m._id}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 10, marginBottom: 12 }}>
+                  {[
+                    ["Weight", m.weight, "kg"], ["Height", m.height, "cm"],
+                    ["Chest", m.chest, "cm"], ["Waist", m.waist, "cm"],
+                    ["Hips", m.hips, "cm"], ["Arms", m.arms, "cm"],
+                    ["Thighs", m.thighs, "cm"], ["Shoulders", m.shoulders, "cm"],
+                    ["Body Fat", m.bodyFat, "%"], ["BMI", m.bmi, ""],
+                  ].filter(([, val]) => val != null).map(([label, val, unit]) => (
+                    <div key={String(label)} style={{ background: "var(--bg-secondary)", borderRadius: 10, padding: "10px 14px", border: "1px solid var(--border-color)" }}>
+                      <p style={{ margin: 0, fontSize: 11, color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5 }}>{label}</p>
+                      <p style={{ margin: "4px 0 0", fontSize: 20, fontWeight: 800 }}>
+                        {val}<span style={{ fontSize: 12, color: "var(--text-muted)", marginLeft: 2 }}>{unit}</span>
+                      </p>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-            {m.notes && <p style={{ margin: 0, fontSize: 13, color: "var(--text-muted)", fontStyle: "italic" }}>Note: {m.notes}</p>}
+                {m.notes && <p style={{ margin: 0, fontSize: 13, color: "var(--text-muted)", fontStyle: "italic" }}>Note: {m.notes}</p>}
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </>
+      )}
     </div>
   );
 
