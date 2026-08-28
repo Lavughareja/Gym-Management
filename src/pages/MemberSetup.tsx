@@ -4,6 +4,8 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { memberSetupApi } from "../services/apis/memberApis";
 import { AUTH_TOKEN_KEY } from "../utils/constant";
 import { useAppDispatch } from "../utils/reduxHooks";
+import { useSelector } from "react-redux";
+import type { RootState } from "../redux/store";
 import { showSnackbar } from "../redux/slices/snackbarSlice";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -14,6 +16,7 @@ export const MemberSetup: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [searchParams] = useSearchParams();
+  const { branding } = useSelector((state: RootState) => state.whiteLabel);
 
   const [token, setToken] = useState("");
   const [password, setPassword] = useState("");
@@ -89,12 +92,16 @@ export const MemberSetup: React.FC = () => {
       <div className="gym-card" style={{ maxWidth: 420, width: "100%", padding: "40px", textAlign: "center" }}>
         <div style={{ display: "flex", justifyContent: "center", marginBottom: 24 }}>
           <div className="brand-icon-wrapper" style={{ width: 48, height: 48, background: 'none', boxShadow: 'none' }}>
-            <img src="/logo.png" alt="Trainix Logo" style={{ width: 48, height: 48, objectFit: 'contain', borderRadius: 10 }} />
+            {branding.logoUrl ? (
+              <img src={branding.logoUrl} alt={branding.gymName} style={{ width: 48, height: 48, objectFit: 'contain', borderRadius: 10 }} />
+            ) : (
+              <img src="/logo.png" alt="Trainix Logo" style={{ width: 48, height: 48, objectFit: 'contain', borderRadius: 10 }} />
+            )}
           </div>
         </div>
         
         <h2 className="page-title" style={{ fontSize: "1.75rem", marginBottom: 8 }}>Member Setup</h2>
-        <p className="page-subtitle" style={{ marginBottom: 32 }}>Set your password to activate your account</p>
+        <p className="page-subtitle" style={{ marginBottom: 32 }}>Set your password to activate your {branding.gymName} account</p>
 
         <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           <div style={{ textAlign: "left" }}>

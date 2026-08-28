@@ -9,6 +9,8 @@ import { getWorkoutsApi, createWorkoutApi, logWorkoutApi, getWorkoutReportApi, d
 import { getMeApi } from "../services/apis/memberApis";
 import { getPlansApi } from "../services/apis/planApis";
 import { useAppDispatch, useAppSelector } from "../utils/reduxHooks";
+import { useSelector } from "react-redux";
+import type { RootState } from "../redux/store";
 import { showSnackbar } from "../redux/slices/snackbarSlice";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { getWeeklyStatsApi, getStreakStatsApi, completeChallengeApi } from "../services/apis/memberApis";
@@ -101,6 +103,7 @@ export const MemberDashboard: React.FC = () => {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
   const ptState = useAppSelector((s) => s.pt);
+  const { branding } = useSelector((state: RootState) => state.whiteLabel);
 
   // Read user info from localStorage
   const localUserStr = localStorage.getItem("dashUser");
@@ -2346,8 +2349,12 @@ export const MemberDashboard: React.FC = () => {
             <Menu size={28} color="var(--text-primary)" />
           </button>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <img src="/logo.png" alt="Logo" style={{ width: 32, height: 32, objectFit: "contain", borderRadius: 8 }} />
-            <span className="brand-name" style={{ fontSize: "1rem" }}>TRAINIX</span>
+            {branding.logoUrl ? (
+              <img src={branding.logoUrl} alt={branding.gymName} style={{ width: 32, height: 32, objectFit: "contain", borderRadius: 8 }} />
+            ) : (
+              <img src="/logo.png" alt="Logo" style={{ width: 32, height: 32, objectFit: "contain", borderRadius: 8 }} />
+            )}
+            <span className="brand-name" style={{ fontSize: "1rem" }}>{branding.gymName.toUpperCase()}</span>
           </div>
           <div style={{ width: 40 }} />
         </header>

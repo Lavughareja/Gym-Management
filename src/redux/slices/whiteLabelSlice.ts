@@ -1,4 +1,5 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import type { PayloadAction } from "@reduxjs/toolkit";
 import { resolveWhiteLabelBySubdomain } from '../../services/apis/whiteLabelApis';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -37,10 +38,22 @@ const DEFAULT_BRANDING: GymBranding = {
   subdomain:      null,
 };
 
+const getInitialBranding = (): GymBranding => {
+  const saved = localStorage.getItem("gymBranding");
+  if (saved) {
+    try {
+      return { ...DEFAULT_BRANDING, ...JSON.parse(saved) };
+    } catch {
+      return DEFAULT_BRANDING;
+    }
+  }
+  return DEFAULT_BRANDING;
+};
+
 const initialState: WhiteLabelState = {
-  branding: DEFAULT_BRANDING,
+  branding: getInitialBranding(),
   loading:  false,
-  resolved: false,
+  resolved: !!localStorage.getItem("gymBranding"),
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -69,12 +82,15 @@ const whiteLabelSlice = createSlice({
   reducers: {
     // Dispatch after login to refresh branding from the login response
     setGymBranding(state, action: PayloadAction<Partial<GymBranding>>) {
-      state.branding = { ...DEFAULT_BRANDING, ...action.payload } as GymBranding;
+      const merged = { ...DEFAULT_BRANDING, ...action.payload } as GymBranding;
+      state.branding = merged;
       state.resolved = true;
+      localStorage.setItem("gymBranding", JSON.stringify(merged));
     },
     resetBranding(state) {
       state.branding = DEFAULT_BRANDING;
       state.resolved = false;
+      localStorage.removeItem("gymBranding");
     },
   },
   extraReducers: (builder) => {
@@ -85,7 +101,9 @@ const whiteLabelSlice = createSlice({
       .addCase(resolveWhiteLabelAction.fulfilled, (state, action) => {
         state.loading  = false;
         state.resolved = true;
-        state.branding = { ...DEFAULT_BRANDING, ...action.payload };
+        const merged = { ...DEFAULT_BRANDING, ...action.payload };
+        state.branding = merged;
+        localStorage.setItem("gymBranding", JSON.stringify(merged));
       })
       .addCase(resolveWhiteLabelAction.rejected, (state) => {
         state.loading  = false;

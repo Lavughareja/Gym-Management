@@ -1,8 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { Plus, X, Laptop, ShieldCheck, Wifi, MapPin, Loader } from "lucide-react";
+import React, { useEffect, useState, useRef } from "react";
+import { Plus, X, Laptop, ShieldCheck, Wifi, MapPin, Loader, Image, Copy, Check } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../utils/reduxHooks";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../redux/store";
 import { fetchDevicesAction, addDeviceAction, deleteDeviceAction } from "../../redux/actions/deviceActions";
 import { getGymInvoiceSettingsApi, updateGymInvoiceSettingsApi } from "../../services/apis/invoiceApis";
+import { getOwnerBrandingApi, updateOwnerBrandingApi, uploadOwnerLogoApi, checkSubdomainApi } from "../../services/apis/whiteLabelApis";
+import { setGymBranding } from "../../redux/slices/whiteLabelSlice";
 import { showSnackbar } from "../../redux/slices/snackbarSlice";
 
 interface Props {
@@ -18,6 +22,8 @@ const overlayStyle: React.CSSProperties = {
 const SettingsPanel: React.FC<Props> = ({ gymName }) => {
   const dispatch = useAppDispatch();
   const { devices, loading } = useAppSelector((state) => state.device);
+  const { branding } = useSelector((state: RootState) => state.whiteLabel);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [showAddDevice, setShowAddDevice] = useState(false);
   const [newDevice, setNewDevice] = useState({ name: "", serialNumber: "", ipAddress: "", provider: "Essl" });
@@ -26,9 +32,24 @@ const SettingsPanel: React.FC<Props> = ({ gymName }) => {
   const [invoiceSettings, setInvoiceSettings] = useState({ address: "", phone: "", gstNumber: "", invoiceTerms: "" });
   const [savingInvoice, setSavingInvoice] = useState(false);
 
+  // ── Branding state ────────────────────────────────────────────────────────
+  const [brandingForm, setBrandingForm] = useState({
+    gymName: branding.gymName,
+    primaryColor: branding.primaryColor,
+    secondaryColor: branding.secondaryColor,
+    tagline: branding.tagline || "",
+    subdomain: branding.subdomain || "",
+  });
+  const [savingBranding, setSavingBranding] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [checkingSubdomain, setCheckingSubdomain] = useState(false);
+  const [subdomainStatus, setSubdomainStatus] = useState<"available" | "taken" | null>(null);
+  const [copiedCode, setCopiedCode] = useState(false);
+
   useEffect(() => {
     dispatch(fetchDevicesAction());
     fetchInvoiceSettings();
+    fetchBranding();
   }, [dispatch]);
 
   const fetchInvoiceSettings = async () => {
@@ -47,6 +68,25 @@ const SettingsPanel: React.FC<Props> = ({ gymName }) => {
     }
   };
 
+  const fetchBranding = async () => {
+    try {
+      const res = await getOwnerBrandingApi();
+      const b = res.data.branding || res.data;
+      if (b) {
+        setBrandingForm({
+          gymName: b.gymName || "",
+          primaryColor: b.primaryColor || "#2563eb",
+          secondaryColor: b.secondaryColor || "#1d4ed8",
+          tagline: b.tagline || "",
+          subdomain: b.subdomain || "",
+        });
+        dispatch(setGymBranding(b));
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const handleSaveInvoiceSettings = async () => {
     setSavingInvoice(true);
     try {
@@ -56,6 +96,60 @@ const SettingsPanel: React.FC<Props> = ({ gymName }) => {
       dispatch(showSnackbar({ message: err?.response?.data?.message || "Failed to update settings", type: "error" }));
     } finally {
       setSavingInvoice(false);
+    }
+  };
+
+  const handleSaveBranding = async () => {
+    setSavingBranding(true);
+    try {
+      const res = await updateOwnerBrandingApi(brandingForm);
+      const updated = res.data.branding || res.data;
+      dispatch(setGymBranding(updated));
+      dispatch(showSnackbar({ message: "Gym branding updated successfully", type: "success" }));
+    } catch (err: any) {
+      dispatch(showSnackbar({ message: err?.response?.data?.message || "Failed to update branding", type: "error" }));
+    } finally {
+      setSavingBranding(false);
+    }
+  };
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || !e.target.files[0]) return;
+    const formData = new FormData();
+    formData.append("logo", e.target.files[0]);
+    setUploadingLogo(true);
+    try {
+      const res = await uploadOwnerLogoApi(formData);
+      const logoUrl = res.data.logoUrl;
+      dispatch(setGymBranding({ ...branding, logoUrl }));
+      dispatch(showSnackbar({ message: "Logo uploaded successfully", type: "success" }));
+    } catch (err: any) {
+      dispatch(showSnackbar({ message: err?.response?.data?.message || "Logo upload failed", type: "error" }));
+    } finally {
+      setUploadingLogo(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleCheckSubdomain = async () => {
+    if (!brandingForm.subdomain.trim()) return;
+    setCheckingSubdomain(true);
+    setSubdomainStatus(null);
+    try {
+      const res = await checkSubdomainApi(brandingForm.subdomain.trim());
+      setSubdomainStatus(res.data.available ? "available" : "taken");
+    } catch {
+      setSubdomainStatus("taken");
+    } finally {
+      setCheckingSubdomain(false);
+    }
+  };
+
+  const handleCopyCode = () => {
+    if (branding.gymCode) {
+      navigator.clipboard.writeText(branding.gymCode);
+      setCopiedCode(true);
+      setTimeout(() => setCopiedCode(false), 2000);
     }
   };
 
@@ -207,6 +301,168 @@ const SettingsPanel: React.FC<Props> = ({ gymName }) => {
             </button>
           </div>
         </div>
+      </div>
+
+      {/* ── Gym Branding ─────────────────────────────────────────────── */}
+      <div className="gym-card" style={{ gridColumn: "1 / -1" }}>
+        <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text-primary)", marginBottom: 4 }}>Gym Branding</h3>
+        <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginBottom: 20 }}>Customize your gym logo, colors, and subdomain</p>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 16 }}>
+
+          {/* Logo Upload */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <label className="form-label">Gym Logo</label>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{ width: 56, height: 56, borderRadius: 10, border: "1px solid var(--border-color)", background: "var(--bg-secondary)", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
+                {branding.logoUrl ? (
+                  <img src={branding.logoUrl} alt="logo" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
+                ) : (
+                  <Image size={24} style={{ color: "var(--text-muted)" }} />
+                )}
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                <input ref={fileInputRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleLogoUpload} />
+                <button
+                  className="btn-blue-outline"
+                  style={{ padding: "6px 14px", fontSize: "0.8rem" }}
+                  disabled={uploadingLogo}
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  {uploadingLogo ? <><Loader size={14} style={{ animation: "spin 1s linear infinite" }} /> Uploading...</> : "Upload Logo"}
+                </button>
+                <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>PNG or JPG, max 2MB</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Gym Name */}
+          <div>
+            <label className="form-label">Gym Name</label>
+            <input
+              type="text"
+              value={brandingForm.gymName}
+              onChange={e => setBrandingForm({ ...brandingForm, gymName: e.target.value })}
+              placeholder="e.g. Fit Zone Gym"
+              className="form-input"
+            />
+          </div>
+
+          {/* Tagline */}
+          <div>
+            <label className="form-label">Tagline (Optional)</label>
+            <input
+              type="text"
+              value={brandingForm.tagline}
+              onChange={e => setBrandingForm({ ...brandingForm, tagline: e.target.value })}
+              placeholder="e.g. Train Hard, Live Strong"
+              className="form-input"
+            />
+          </div>
+
+          {/* Subdomain */}
+          <div>
+            <label className="form-label">Subdomain</label>
+            <div style={{ display: "flex", gap: 8 }}>
+              <input
+                type="text"
+                value={brandingForm.subdomain}
+                onChange={e => { setBrandingForm({ ...brandingForm, subdomain: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "") }); setSubdomainStatus(null); }}
+                placeholder="e.g. fitzone"
+                className="form-input"
+                style={{ flex: 1 }}
+              />
+              <button
+                className="btn-blue-outline"
+                style={{ padding: "0 14px", fontSize: "0.8rem", whiteSpace: "nowrap", flexShrink: 0 }}
+                disabled={checkingSubdomain || !brandingForm.subdomain.trim()}
+                onClick={handleCheckSubdomain}
+              >
+                {checkingSubdomain ? <Loader size={14} style={{ animation: "spin 1s linear infinite" }} /> : "Check"}
+              </button>
+            </div>
+            {subdomainStatus === "available" && <p style={{ fontSize: "0.8rem", color: "#16a34a", marginTop: 4 }}>Available</p>}
+            {subdomainStatus === "taken" && <p style={{ fontSize: "0.8rem", color: "#dc2626", marginTop: 4 }}>Already taken</p>}
+            <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: 4 }}>{brandingForm.subdomain ? `${brandingForm.subdomain}.trainix.com` : "yourname.trainix.com"}</p>
+          </div>
+
+          {/* Primary Color */}
+          <div>
+            <label className="form-label">Primary Color</label>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <input
+                type="color"
+                value={brandingForm.primaryColor}
+                onChange={e => setBrandingForm({ ...brandingForm, primaryColor: e.target.value })}
+                style={{ width: 40, height: 40, padding: 2, border: "1px solid var(--border-color)", borderRadius: 8, cursor: "pointer", background: "var(--bg-secondary)" }}
+              />
+              <input
+                type="text"
+                value={brandingForm.primaryColor}
+                onChange={e => setBrandingForm({ ...brandingForm, primaryColor: e.target.value })}
+                placeholder="#2563eb"
+                className="form-input"
+                style={{ flex: 1 }}
+              />
+            </div>
+          </div>
+
+          {/* Secondary Color */}
+          <div>
+            <label className="form-label">Secondary Color</label>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <input
+                type="color"
+                value={brandingForm.secondaryColor}
+                onChange={e => setBrandingForm({ ...brandingForm, secondaryColor: e.target.value })}
+                style={{ width: 40, height: 40, padding: 2, border: "1px solid var(--border-color)", borderRadius: 8, cursor: "pointer", background: "var(--bg-secondary)" }}
+              />
+              <input
+                type="text"
+                value={brandingForm.secondaryColor}
+                onChange={e => setBrandingForm({ ...brandingForm, secondaryColor: e.target.value })}
+                placeholder="#1d4ed8"
+                className="form-input"
+                style={{ flex: 1 }}
+              />
+            </div>
+          </div>
+
+          {/* Gym Code */}
+          {branding.gymCode !== undefined && (
+            <div>
+              <label className="form-label">Gym Code (read-only)</label>
+              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                <input
+                  type="text"
+                  value={branding.gymCode || "NOT_GENERATED"}
+                  readOnly
+                  className="form-input"
+                  style={{ flex: 1, background: "var(--bg-secondary)", cursor: "default" }}
+                />
+                <button
+                  className="btn-blue-outline"
+                  style={{ padding: "0 14px", fontSize: "0.8rem", flexShrink: 0 }}
+                  onClick={handleCopyCode}
+                  disabled={!branding.gymCode}
+                >
+                  {copiedCode ? <Check size={14} /> : <Copy size={14} />}
+                </button>
+              </div>
+              <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: 4 }}>Members can use this code to find your gym</p>
+            </div>
+          )}
+
+        </div>
+
+        <button
+          className="btn-blue"
+          style={{ marginTop: 20, justifyContent: "center" }}
+          disabled={savingBranding}
+          onClick={handleSaveBranding}
+        >
+          {savingBranding ? <><Loader size={16} style={{ animation: "spin 1s linear infinite" }} /> Saving...</> : "Save Branding"}
+        </button>
       </div>
 
       {showAddDevice && (

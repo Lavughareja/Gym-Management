@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { LogOut, Settings, Sun, Moon, Dumbbell, Users, ClipboardList, Activity, LayoutDashboard, UserCog, UserCheck, Menu, Bell } from "lucide-react";
 import { useNavigate, useLocation, Navigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../utils/reduxHooks";
+import { useSelector } from "react-redux";
+import type { RootState } from "../redux/store";
 import { logoutAction } from "../redux/actions/authActions";
 
 // Dashboard Panels
@@ -71,6 +73,7 @@ const GymDashboard: React.FC<GymDashboardProps> = ({ onLogout }) => {
   const location = useLocation();
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
+  const { branding } = useSelector((state: RootState) => state.whiteLabel);
 
   const localUserStr = localStorage.getItem("dashUser");
   const localUser = localUserStr ? JSON.parse(localUserStr) : null;
@@ -133,6 +136,11 @@ const GymDashboard: React.FC<GymDashboardProps> = ({ onLogout }) => {
     }
   }, [isDarkMode]);
 
+  // Update browser tab title with gym name
+  useEffect(() => {
+    document.title = branding.gymName;
+  }, [branding.gymName]);
+
   const handleLogout = async () => {
     await dispatch(logoutAction());
     localStorage.removeItem("dashUser");
@@ -173,10 +181,14 @@ const GymDashboard: React.FC<GymDashboardProps> = ({ onLogout }) => {
       <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
         <div className="sidebar-brand">
           <div className="brand-icon-wrapper" style={{ background: 'none', boxShadow: 'none', padding: 0 }}>
-            <img src="/logo.png" alt="Trainix" style={{ width: 44, height: 44, objectFit: 'contain', borderRadius: 10 }} />
+            {branding.logoUrl ? (
+              <img src={branding.logoUrl} alt={branding.gymName} style={{ width: 44, height: 44, objectFit: 'contain', borderRadius: 10 }} />
+            ) : (
+              <img src="/logo.png" alt="Trainix" style={{ width: 44, height: 44, objectFit: 'contain', borderRadius: 10 }} />
+            )}
           </div>
           <div>
-            <h1 className="brand-name">TRAINIX</h1>
+            <h1 className="brand-name">{branding.gymName.toUpperCase()}</h1>
             <p className="brand-subtitle">Gym Dashboard</p>
           </div>
         </div>
@@ -249,8 +261,12 @@ const GymDashboard: React.FC<GymDashboardProps> = ({ onLogout }) => {
             <Menu size={24} />
           </button>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <img src="/logo.png" alt="Logo" style={{ width: 32, height: 32, objectFit: "contain", borderRadius: 8 }} />
-            <span className="brand-name" style={{ fontSize: "1rem" }}>TRAINIX</span>
+            {branding.logoUrl ? (
+              <img src={branding.logoUrl} alt={branding.gymName} style={{ width: 32, height: 32, objectFit: "contain", borderRadius: 8 }} />
+            ) : (
+              <img src="/logo.png" alt="Logo" style={{ width: 32, height: 32, objectFit: "contain", borderRadius: 8 }} />
+            )}
+            <span className="brand-name" style={{ fontSize: "1rem" }}>{branding.gymName.toUpperCase()}</span>
           </div>
           <div style={{ width: 40 }} />
         </header>

@@ -12,6 +12,7 @@ import attendanceReducer from "./slices/attendanceSlice";
 import deviceReducer from "./slices/deviceSlice";
 import ptReducer from "./slices/ptSlice";
 import crmReducer from "./slices/crmSlice";
+import whiteLabelReducer from "./slices/whiteLabelSlice";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Redux Store
@@ -32,6 +33,7 @@ export const store = configureStore({
     device:     deviceReducer,
     pt:         ptReducer,
     crm:        crmReducer,
+    whiteLabel: whiteLabelReducer,
   },
 });
 

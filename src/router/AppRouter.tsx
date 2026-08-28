@@ -1,8 +1,11 @@
-import React, { lazy, Suspense } from "react";
+import React, { lazy, Suspense, useEffect } from "react";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import { Loader } from "lucide-react";
 import ProtectedRoute, { getStoredUser, getDashboardRoot, isAuthenticated } from "./ProtectedRoute";
 import type { UserRole } from "./ProtectedRoute";
+import { useDispatch, useSelector } from "react-redux";
+import { resolveWhiteLabelAction } from "../redux/slices/whiteLabelSlice";
+import type { RootState } from "../redux/store";
 
 // ── Lazy-loaded pages ─────────────────────────────────────────────────────────
 const Home = lazy(() => import("../pages/Home").then((m) => ({ default: m.Home })));
@@ -84,6 +87,26 @@ function WithBack<T extends { onBack: () => void }>(Component: React.ComponentTy
 // ─────────────────────────────────────────────────────────────────────────────
 
 const AppRouter = () => {
+  const dispatch = useDispatch();
+  const { branding } = useSelector((state: RootState) => state.whiteLabel);
+
+  // Detect subdomain on app load
+  useEffect(() => {
+    const hostname = window.location.hostname;
+    const parts = hostname.split('.');
+    const reserved = ['www', 'app', 'localhost'];
+    if (parts.length >= 3 && !reserved.includes(parts[0])) {
+      dispatch(resolveWhiteLabelAction(parts[0]) as any);
+    }
+  }, []);
+
+  // Apply primary/secondary colors as CSS variables whenever branding changes
+  useEffect(() => {
+    const root = document.documentElement;
+    root.style.setProperty('--primary', branding.primaryColor);
+    root.style.setProperty('--primary-hover', branding.secondaryColor);
+  }, [branding.primaryColor, branding.secondaryColor]);
+
   return (
     <Suspense fallback={<PageLoader />}>
       <Routes>

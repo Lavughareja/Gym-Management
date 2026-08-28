@@ -10,6 +10,7 @@ import type {
 } from "../../services/apis/authApis";
 import { AUTH_TOKEN_KEY } from "../../utils/constant";
 import { showSnackbar } from "../slices/snackbarSlice";
+import { setGymBranding } from "../slices/whiteLabelSlice";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Auth Actions (Async Thunks)
@@ -23,6 +24,9 @@ export const loginAction = createAsyncThunk(
       const token = response?.data?.token;
       if (token) {
         localStorage.setItem(AUTH_TOKEN_KEY, token);
+      }
+      if (response?.data?.gymBranding) {
+        dispatch(setGymBranding(response.data.gymBranding));
       }
       dispatch(showSnackbar({ message: response?.data?.message || "Login successful!", type: "success" }));
       return response.data;

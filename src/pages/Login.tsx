@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { ArrowLeft, Loader, Mail, Lock, Eye, EyeOff, X, CheckCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../utils/reduxHooks";
+import { useSelector } from "react-redux";
+import type { RootState } from "../redux/store";
 import { loginAction } from "../redux/actions/authActions";
 import { forgotPasswordApi } from "../services/apis/authApis";
 
@@ -12,6 +14,7 @@ import { forgotPasswordApi } from "../services/apis/authApis";
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const { branding } = useSelector((state: RootState) => state.whiteLabel);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -84,12 +87,17 @@ const Login: React.FC = () => {
       <div className="gym-card" style={{ maxWidth: 420, width: "100%", padding: "40px", textAlign: "center" }}>
         <div style={{ display: "flex", justifyContent: "center", marginBottom: 24 }}>
           <div className="brand-icon-wrapper" style={{ width: 48, height: 48, background: 'none', boxShadow: 'none' }}>
-            <img src="/logo.png" alt="Trainix Logo" style={{ width: 48, height: 48, objectFit: 'contain', borderRadius: 10 }} />
+            {branding.logoUrl ? (
+              <img src={branding.logoUrl} alt={branding.gymName} style={{ width: 48, height: 48, objectFit: 'contain', borderRadius: 10 }} />
+            ) : (
+              <img src="/logo.png" alt="Trainix Logo" style={{ width: 48, height: 48, objectFit: 'contain', borderRadius: 10 }} />
+            )}
           </div>
         </div>
         
         <h2 className="page-title" style={{ fontSize: "1.75rem", marginBottom: 8 }}>Welcome Back</h2>
-        <p className="page-subtitle" style={{ marginBottom: 32 }}>Sign in to your Trainix account</p>
+        <p className="page-subtitle" style={{ marginBottom: branding.tagline ? 8 : 32 }}>Sign in to your {branding.gymName} account</p>
+        {branding.tagline && <p className="page-subtitle" style={{ marginBottom: 32, fontSize: "0.85rem" }}>{branding.tagline}</p>}
 
         <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           <div style={{ textAlign: "left" }}>
