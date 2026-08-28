@@ -423,7 +423,7 @@ const MemberDetailView: React.FC<{
           : expandWorkout ? workoutPlans.map((plan: any) => (
             <div key={plan._id} style={{ background: "var(--bg-hover)", borderRadius: 10, padding: 14, marginBottom: 10 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
-                  <span style={{ fontSize: 13, color: "var(--text-muted)" }}>Created by {plan.trainerId?.fullName || "—"}</span>
+                  <span style={{ fontSize: 13, color: "var(--text-muted)" }}>Created by {plan.trainerId?.fullName || trainerName || "—"}</span>
                   {canEdit && (
                     <button onClick={() => dispatch(deletePtWorkoutPlanAction(plan._id))} style={{ background: "none", border: "none", cursor: "pointer", color: "#f87171" }}><Trash2 size={15} /></button>
                   )}
@@ -460,7 +460,7 @@ const MemberDetailView: React.FC<{
           : expandDiet ? dietPlans.map((plan: any) => (
             <div key={plan._id} style={{ background: "var(--bg-hover)", borderRadius: 10, padding: 14, marginBottom: 10 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
-                  <span style={{ fontSize: 13, color: "var(--text-muted)" }}>By {plan.trainerId?.fullName || "—"}{plan.waterIntake ? ` · 💧 ${plan.waterIntake}L water` : ""}</span>
+                  <span style={{ fontSize: 13, color: "var(--text-muted)" }}>By {plan.trainerId?.fullName || trainerName || "—"}{plan.waterIntake ? ` · 💧 ${plan.waterIntake}L water` : ""}</span>
                   {canEdit && (
                     <button onClick={() => dispatch(deletePtDietPlanAction(plan._id))} style={{ background: "none", border: "none", cursor: "pointer", color: "#f87171" }}><Trash2 size={15} /></button>
                   )}
@@ -484,7 +484,7 @@ const MemberDetailView: React.FC<{
           : expandMeasure ? measurements.map((m: any) => (
             <div key={m._id} style={{ background: "var(--bg-hover)", borderRadius: 10, padding: 14, marginBottom: 10 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
-                  <span style={{ fontSize: 13, color: "var(--text-muted)" }}>By {m.trainerId?.fullName || "—"}</span>
+                  <span style={{ fontSize: 13, color: "var(--text-muted)" }}>By {m.trainerId?.fullName || trainerName || "—"}</span>
                   {canEdit && (
                     <button onClick={() => dispatch(deletePtMeasurementAction(m._id))} style={{ background: "none", border: "none", cursor: "pointer", color: "#f87171" }}><Trash2 size={15} /></button>
                   )}
@@ -515,41 +515,11 @@ const MemberDetailView: React.FC<{
   );
 };
 
-// ─── Trainer Member Row (for trainer's "assign me" view) ──────────────────
-const TrainerMemberRow: React.FC<{
-  member: any; currentPt: string | null;
-  onAssign: (memberId: string) => Promise<void>;
-}> = ({ member, currentPt, onAssign }) => {
-  const [assigning, setAssigning] = useState(false);
-  return (
-    <div style={{ background: "var(--bg-card)", borderRadius: 14, padding: "14px 18px", border: "1.5px solid var(--border-color)", display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
-      <div style={{ width: 40, height: 40, borderRadius: "50%", background: "linear-gradient(135deg,#6366f1,#8b5cf6)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontWeight: 700, fontSize: 15, flexShrink: 0 }}>
-        {(member.name || member.fullName || "?").slice(0, 2).toUpperCase()}
-      </div>
-      <div style={{ flex: 1, minWidth: 120 }}>
-        <p style={{ margin: 0, fontWeight: 700, fontSize: 14 }}>{member.name || member.fullName}</p>
-        <p style={{ margin: 0, fontSize: 12, color: "var(--text-muted)" }}>{member.email}</p>
-      </div>
-      <span style={{ fontSize: 13, color: currentPt ? "#22c55e" : "var(--text-muted)", fontWeight: 600, flexShrink: 0, display: "flex", alignItems: "center", gap: 4 }}>
-        {currentPt ? <><UserCheck size={13} />{currentPt}</> : "No PT"}
-      </span>
-      <button
-        disabled={assigning}
-        onClick={async () => { setAssigning(true); await onAssign(member._id || member.id); setAssigning(false); }}
-        style={{ padding: "7px 16px", borderRadius: 8, border: "none", background: "linear-gradient(135deg,#6366f1,#8b5cf6)", color: "#fff", fontWeight: 600, fontSize: 13, cursor: assigning ? "not-allowed" : "pointer", display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-        {assigning ? <Loader size={14} style={{ animation: "spin 1s linear infinite" }} /> : <UserCheck size={14} />}
-        {assigning ? "Assigning..." : "Assign Me"}
-      </button>
-    </div>
-  );
-};
-
 // ─── MAIN PANEL ────────────────────────────────────────────────────────────
 const PtManagementPanel: React.FC<Props> = ({ role, userId }) => {
   const dispatch = useAppDispatch();
   const { assignments, myMembers, loading } = useAppSelector(s => s.pt);
   const { members } = useAppSelector(s => s.member);
-  const { trainers } = useAppSelector(s => s.trainer);
 
   const [selectedAssignment, setSelectedAssignment] = useState<any>(null);
   const [selectedMemberForAssign, setSelectedMemberForAssign] = useState<any>(null);
@@ -558,7 +528,6 @@ const PtManagementPanel: React.FC<Props> = ({ role, userId }) => {
   const [viewTab, setViewTab] = useState<"all" | "assigned">("assigned");
 
   const isTrainer = role === "trainer";
-  const isAdminOrManager = role === "admin" || role === "gymmanager";
 
   useEffect(() => {
     if (isTrainer) {
@@ -570,9 +539,6 @@ const PtManagementPanel: React.FC<Props> = ({ role, userId }) => {
 
   // List to show depends on role
   const assignmentList = isTrainer ? myMembers : assignments;
-
-  // Members not yet assigned (for "assign" view)
-  const assignedMemberIds = new Set(assignments.filter((a: any) => a.isActive).map((a: any) => a.memberId?._id || a.memberId));
 
   const filteredMembers = members.filter((m: any) =>
     (m.name || m.fullName || "").toLowerCase().includes(memberSearch.toLowerCase()) ||

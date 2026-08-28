@@ -13,7 +13,7 @@ import { showSnackbar } from "../redux/slices/snackbarSlice";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { getWeeklyStatsApi, getStreakStatsApi, completeChallengeApi } from "../services/apis/memberApis";
 import { getLatestBmiReportApi, uploadBmiReportApi } from "../services/apis/bmiApis";
-import { getMemberDietHistoryApi, generateDietPlanApi, generateDietPlanFromWorkoutApi, createManualDietPlanApi } from "../services/apis/dietApis";
+import { getMemberDietHistoryApi, generateDietPlanApi, generateDietPlanFromWorkoutApi } from "../services/apis/dietApis";
 import WorkoutLibraryPage from "../components/WorkoutLibrary/WorkoutLibraryPage";
 import {
   fetchMemberPtInfoAction,

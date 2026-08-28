@@ -72,12 +72,14 @@ export const fetchMemberPtInfoAction = (memberId: string) => async (dispatch: Ap
   }
 };
 
-
 export const acceptPtAssignmentAction = (id: string) => async (dispatch: AppDispatch) => {
   try {
     const res = await acceptPtAssignmentApi(id);
-    // The accept API returns the assignment without populated fields, so we re-fetch to get trainer details
-    dispatch(fetchMemberPtInfoAction(res.data.assignment.memberId) as any);
+    const rawMemberId = res.data?.assignment?.memberId;
+    const memberId = typeof rawMemberId === "object" ? rawMemberId?._id : rawMemberId;
+    if (memberId) {
+      dispatch(fetchMemberPtInfoAction(memberId) as any);
+    }
     dispatch(showSnackbar({ message: "PT assignment accepted!", type: "success" }));
   } catch (error: any) {
     dispatch(showSnackbar({ message: error?.response?.data?.message || "Failed to accept", type: "error" }));
@@ -138,6 +140,9 @@ export const createPtWorkoutPlanAction = (data: any) => async (dispatch: AppDisp
   try {
     const res = await createPtWorkoutPlanApi(data);
     dispatch(addWorkoutPlan(res.data.plan));
+    if (data.memberId) {
+      dispatch(fetchPtWorkoutPlansAction(data.memberId, data.date) as any);
+    }
     dispatch(showSnackbar({ message: "Workout plan created!", type: "success" }));
     return true;
   } catch (error: any) {
@@ -172,6 +177,9 @@ export const createPtDietPlanAction = (data: any) => async (dispatch: AppDispatc
   try {
     const res = await createPtDietPlanApi(data);
     dispatch(addDietPlan(res.data.plan));
+    if (data.memberId) {
+      dispatch(fetchPtDietPlansAction(data.memberId, data.date) as any);
+    }
     dispatch(showSnackbar({ message: "Diet plan created!", type: "success" }));
     return true;
   } catch (error: any) {
@@ -206,6 +214,9 @@ export const createPtMeasurementAction = (data: any) => async (dispatch: AppDisp
   try {
     const res = await createPtMeasurementApi(data);
     dispatch(addMeasurement(res.data.measurement));
+    if (data.memberId) {
+      dispatch(fetchPtMeasurementsAction(data.memberId, data.date) as any);
+    }
     dispatch(showSnackbar({ message: "Measurement recorded!", type: "success" }));
     return true;
   } catch (error: any) {
