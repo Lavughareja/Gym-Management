@@ -63,4 +63,12 @@ export const apiRoutes = {
   crmLeads: "/crm/leads",
   crmLeadsConvert: "/crm/leads/:id/convert",
   crmFollowUps: "/crm/followups",
+
+  // ── White Label ───────────────────────────────────────────────────────────
+  resolveWhiteLabel: '/white-label/resolve',
+
+  // ── Owner Branding ────────────────────────────────────────────────────────
+  ownerBranding:          '/owner/branding',
+  ownerBrandingLogo:      '/owner/branding/logo',
+  ownerBrandingSubdomain: '/owner/branding/check-subdomain',
 } as const;
