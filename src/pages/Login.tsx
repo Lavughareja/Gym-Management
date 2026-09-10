@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ArrowLeft, Loader, Mail, Lock, Eye, EyeOff, X, CheckCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../utils/reduxHooks";
@@ -6,6 +6,8 @@ import { useSelector } from "react-redux";
 import type { RootState } from "../redux/store";
 import { loginAction } from "../redux/actions/authActions";
 import { forgotPasswordApi } from "../services/apis/authApis";
+import { resolveWhiteLabelByCode } from "../services/apis/whiteLabelApis";
+import { setGymBranding, resetBranding } from "../redux/slices/whiteLabelSlice";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Login Page
@@ -15,6 +17,12 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { branding } = useSelector((state: RootState) => state.whiteLabel);
+  
+  const [step, setStep] = useState<1 | 2>(branding?.gymId ? 2 : 1);
+  const [gymCode, setGymCode] = useState("");
+  const [codeLoading, setCodeLoading] = useState(false);
+  const [codeError, setCodeError] = useState("");
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -59,6 +67,22 @@ const Login: React.FC = () => {
     }
   };
 
+  const handleCodeSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!gymCode) return;
+    setCodeLoading(true);
+    setCodeError("");
+    try {
+      const res = await resolveWhiteLabelByCode(gymCode);
+      dispatch(setGymBranding(res.data));
+      setStep(2);
+    } catch (err: any) {
+      setCodeError(err?.response?.data?.message || "Invalid gym code. Please try again.");
+    } finally {
+      setCodeLoading(false);
+    }
+  };
+
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setForgotError("");
@@ -95,68 +119,109 @@ const Login: React.FC = () => {
           </div>
         </div>
         
-        <h2 className="page-title" style={{ fontSize: "1.75rem", marginBottom: 8 }}>Welcome Back</h2>
-        <p className="page-subtitle" style={{ marginBottom: branding.tagline ? 8 : 32 }}>Sign in to your {branding.gymName} account</p>
-        {branding.tagline && <p className="page-subtitle" style={{ marginBottom: 32, fontSize: "0.85rem" }}>{branding.tagline}</p>}
+        <h2 className="page-title" style={{ fontSize: "1.75rem", marginBottom: 8 }}>
+          {step === 1 ? "Enter Gym Code" : "Welcome Back"}
+        </h2>
+        <p className="page-subtitle" style={{ marginBottom: step === 2 && branding.tagline ? 8 : 32 }}>
+          {step === 1 ? "Please enter your gym's code to continue" : `Sign in to your ${branding.gymName} account`}
+        </p>
+        {step === 2 && branding.tagline && <p className="page-subtitle" style={{ marginBottom: 32, fontSize: "0.85rem" }}>{branding.tagline}</p>}
 
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-          <div style={{ textAlign: "left" }}>
-            <label className="form-label">Email Address</label>
-            <div style={{ position: "relative" }}>
-              <Mail size={18} style={{ position: "absolute", left: 14, top: 12, color: "var(--text-muted)" }} />
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="form-input"
-                style={{ paddingLeft: 42 }}
-                placeholder="john@example.com"
-                required
-              />
+        {step === 1 ? (
+          <form onSubmit={handleCodeSubmit} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+            <div style={{ textAlign: "left" }}>
+              <label className="form-label">Gym Code</label>
+              <div style={{ position: "relative" }}>
+                <input
+                  type="text"
+                  value={gymCode}
+                  onChange={(e) => setGymCode(e.target.value.toUpperCase())}
+                  className="form-input"
+                  placeholder="e.g. GYM123"
+                  required
+                />
+              </div>
+              {codeError && <p style={{ color: "#dc2626", fontSize: "0.85rem", marginTop: 4 }}>{codeError}</p>}
             </div>
-          </div>
+            <button
+              type="submit"
+              className="btn-blue"
+              style={{ width: "100%", justifyContent: "center", padding: "12px", marginTop: 8 }}
+              disabled={codeLoading}
+            >
+              {codeLoading ? <Loader size={18} style={{ animation: "spin 1s linear infinite" }} /> : "Continue"}
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+            <div style={{ textAlign: "left" }}>
+              <label className="form-label">Email Address</label>
+              <div style={{ position: "relative" }}>
+                <Mail size={18} style={{ position: "absolute", left: 14, top: 12, color: "var(--text-muted)" }} />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="form-input"
+                  style={{ paddingLeft: 42 }}
+                  placeholder="john@example.com"
+                  required
+                />
+              </div>
+            </div>
 
-          <div style={{ textAlign: "left" }}>
-            <label className="form-label">Password</label>
-            <div style={{ position: "relative" }}>
-              <Lock size={18} style={{ position: "absolute", left: 14, top: 12, color: "var(--text-muted)" }} />
-              <input
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="form-input"
-                style={{ paddingLeft: 42, paddingRight: 42 }}
-                placeholder="••••••••"
-                required
-              />
+            <div style={{ textAlign: "left" }}>
+              <label className="form-label">Password</label>
+              <div style={{ position: "relative" }}>
+                <Lock size={18} style={{ position: "absolute", left: 14, top: 12, color: "var(--text-muted)" }} />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="form-input"
+                  style={{ paddingLeft: 42, paddingRight: 42 }}
+                  placeholder="••••••••"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{ position: "absolute", right: 14, top: 12, background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", padding: 0 }}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+              <div style={{ textAlign: "right", marginTop: 8 }}>
+                <button
+                  type="button"
+                  onClick={() => { setShowForgot(true); setForgotSent(false); setForgotError(""); setForgotEmail(""); }}
+                  style={{ fontSize: "0.8rem", color: "var(--primary)", background: "none", border: "none", cursor: "pointer", padding: 0 }}
+                >
+                  Forgot Password?
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="btn-blue"
+              style={{ width: "100%", justifyContent: "center", padding: "12px", marginTop: 8 }}
+              disabled={loading}
+            >
+              {loading ? <Loader size={18} style={{ animation: "spin 1s linear infinite" }} /> : "Sign In"}
+            </button>
+            
+            <div style={{ textAlign: "center", marginTop: 8 }}>
               <button
                 type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                style={{ position: "absolute", right: 14, top: 12, background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", padding: 0 }}
+                onClick={() => { setStep(1); dispatch(resetBranding()); }}
+                style={{ fontSize: "0.85rem", color: "var(--primary)", background: "none", border: "none", cursor: "pointer" }}
               >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                Change Gym Code
               </button>
             </div>
-            <div style={{ textAlign: "right", marginTop: 8 }}>
-              <button
-                type="button"
-                onClick={() => { setShowForgot(true); setForgotSent(false); setForgotError(""); setForgotEmail(""); }}
-                style={{ fontSize: "0.8rem", color: "var(--primary)", background: "none", border: "none", cursor: "pointer", padding: 0 }}
-              >
-                Forgot Password?
-              </button>
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            className="btn-blue"
-            style={{ width: "100%", justifyContent: "center", padding: "12px", marginTop: 8 }}
-            disabled={loading}
-          >
-            {loading ? <Loader size={18} style={{ animation: "spin 1s linear infinite" }} /> : "Sign In"}
-          </button>
-        </form>
+          </form>
+        )}
       </div>
 
       {/* Forgot Password Modal */}
