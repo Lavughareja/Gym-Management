@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { LogOut, Settings, Sun, Moon, Dumbbell, Users, ClipboardList, Activity, LayoutDashboard, UserCog, UserCheck, Menu, Bell } from "lucide-react";
 import { useNavigate, useLocation, Navigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../utils/reduxHooks";
 import { useSelector } from "react-redux";
 import type { RootState } from "../redux/store";
 import { logoutAction } from "../redux/actions/authActions";
+import { removeFcmToken } from "../utils/firebase";
 
 // Dashboard Panels
 import OverviewPanel from "../components/DashboardPanels/OverviewPanel";
@@ -30,9 +31,9 @@ import TrialMembersPanel from "../components/DashboardPanels/TrialMembers/TrialM
 import ExpenseTrackerPanel from "../components/DashboardPanels/ExpenseTrackerPanel";
 import UserProfileModal from "../components/UserProfileModal/UserProfileModal";
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Route Map — maps URL segments to panel IDs
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Route Map â€” maps URL segments to panel IDs
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const PANEL_ROUTE_MAP: Record<string, string> = {
   overview: "/dashboard/overview",
@@ -60,9 +61,9 @@ function getPanelFromPath(pathname: string): string {
   return found ? found[0] : "not_found";
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // GymDashboard
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface GymDashboardProps {
   onLogout?: () => void;
@@ -92,7 +93,7 @@ const GymDashboard: React.FC<GymDashboardProps> = ({ onLogout }) => {
     gymId: (user as any)?.gymId || localUser?.gymId,
   };
 
-  // Derive active panel from URL — always in sync
+  // Derive active panel from URL â€” always in sync
   const activeTab = getPanelFromPath(location.pathname);
 
   const [isDarkMode, setIsDarkMode] = useState(() => localStorage.getItem("theme") === "dark");
@@ -142,6 +143,7 @@ const GymDashboard: React.FC<GymDashboardProps> = ({ onLogout }) => {
   }, [branding.gymName]);
 
   const handleLogout = async () => {
+    await removeFcmToken().catch(() => {});
     await dispatch(logoutAction());
     localStorage.removeItem("dashUser");
     if (onLogout) {
@@ -352,3 +354,5 @@ const GymDashboard: React.FC<GymDashboardProps> = ({ onLogout }) => {
 };
 
 export default GymDashboard;
+
+

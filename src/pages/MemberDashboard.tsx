@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { LogOut, Activity, Dumbbell, BarChart3, Clock, Play, Square, Loader, Menu, X, Moon, Sun, LayoutDashboard, CreditCard, ChevronRight, CheckCircle2, User, Sparkles, ShoppingCart, FileText, Target, ClipboardList, ShieldCheck, PenLine, Eye, Trash2, BookOpen, UserCheck, Calendar, Salad, Ruler, ChevronDown, ChevronUp, Flame, Upload, Download, CheckCircle, Bell } from "lucide-react";
 import { useNavigate, useLocation, Navigate } from "react-router-dom";
 import UserProfileModal from "../components/UserProfileModal/UserProfileModal";
@@ -156,6 +156,8 @@ export const MemberDashboard: React.FC = () => {
   };
 
   const handleLogout = async () => {
+    const { removeFcmToken } = await import("../utils/firebase");
+    await removeFcmToken().catch(() => {});
     const { logoutAction } = await import("../redux/actions/authActions");
     await dispatch(logoutAction());
     localStorage.removeItem("dashUser");
@@ -2367,3 +2369,4 @@ export const MemberDashboard: React.FC = () => {
 };
 
 export default MemberDashboard;
+

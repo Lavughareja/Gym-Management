@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Calendar, Send, Clock, Plus, Bell } from 'lucide-react';
 import { createEventMessageApi, getEventMessagesApi } from '../../services/apis/eventMessageApis';
 import { useAppDispatch } from '../../utils/reduxHooks';
@@ -68,7 +68,7 @@ const AnnouncementsPanel = () => {
       <header className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h2 className="page-title">Events & Announcements</h2>
-          <p className="page-subtitle">Send messages and event notices to all gym members, trainers, and managers.</p>
+          <p className="page-subtitle">Send push notifications to all gym members, trainers, and managers who have the app installed.</p>
         </div>
         <button className="btn-blue" onClick={() => setShowForm(!showForm)}>
           <Plus size={18} style={{ marginRight: 8 }} /> Create Announcement
@@ -96,7 +96,7 @@ const AnnouncementsPanel = () => {
               <textarea 
                 className="form-input" 
                 rows={4} 
-                placeholder="Type the message that will be sent via WhatsApp..." 
+                placeholder="Type the announcement message to send as push notification..." 
                 value={message} 
                 onChange={(e) => setMessage(e.target.value)} 
                 maxLength={2000}
@@ -144,7 +144,7 @@ const AnnouncementsPanel = () => {
             <div style={{ display: 'flex', gap: 12 }}>
               <button type="submit" className="btn-blue">
                 <Send size={18} style={{ marginRight: 8 }} /> 
-                {sendNow ? 'Send Now via WhatsApp' : 'Schedule Announcement'}
+                {sendNow ? 'Send Push Notification' : 'Schedule Announcement'}
               </button>
               <button type="button" className="btn-blue-outline" onClick={() => setShowForm(false)}>
                 Cancel
@@ -210,3 +210,4 @@ const AnnouncementsPanel = () => {
 };
 
 export default AnnouncementsPanel;
+

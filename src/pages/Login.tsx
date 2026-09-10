@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { ArrowLeft, Loader, Mail, Lock, Eye, EyeOff, X, CheckCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../utils/reduxHooks";
@@ -8,10 +8,11 @@ import { loginAction } from "../redux/actions/authActions";
 import { forgotPasswordApi } from "../services/apis/authApis";
 import { resolveWhiteLabelByCode } from "../services/apis/whiteLabelApis";
 import { setGymBranding, resetBranding } from "../redux/slices/whiteLabelSlice";
+import { requestNotificationPermission } from "../utils/firebase";
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Login Page
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
@@ -64,6 +65,9 @@ const Login: React.FC = () => {
       } else {
         navigate("/dashboard/overview", { replace: true });
       }
+
+      // Register device for push notifications (fire-and-forget, non-blocking)
+      requestNotificationPermission().catch(() => {});
     }
   };
 
@@ -111,7 +115,7 @@ const Login: React.FC = () => {
       <div className="gym-card" style={{ maxWidth: 420, width: "100%", padding: "40px", textAlign: "center" }}>
         <div style={{ display: "flex", justifyContent: "center", marginBottom: 24 }}>
           <div className="brand-icon-wrapper" style={{ width: 48, height: 48, background: 'none', boxShadow: 'none' }}>
-            {branding.logoUrl ? (
+            {step === 2 && branding.logoUrl ? (
               <img src={branding.logoUrl} alt={branding.gymName} style={{ width: 48, height: 48, objectFit: 'contain', borderRadius: 10 }} />
             ) : (
               <img src="/logo.png" alt="Trainix Logo" style={{ width: 48, height: 48, objectFit: 'contain', borderRadius: 10 }} />
@@ -180,7 +184,7 @@ const Login: React.FC = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   className="form-input"
                   style={{ paddingLeft: 42, paddingRight: 42 }}
-                  placeholder="••••••••"
+                  placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
                   required
                 />
                 <button
@@ -292,3 +296,6 @@ export default Login;
 
 // Named export kept for backward compatibility with any lazy imports
 export { Login };
+
+
+
