@@ -79,3 +79,13 @@ export const changePasswordApi = async (currentPassword: string, newPassword: st
   const response = await AxiosInstance.post(apiRoutes.changePassword, { currentPassword, newPassword, confirmPassword });
   return response;
 };
+
+export const sendOtpApi = async (email: string, purpose: string = 'owner_registration') => {
+  const response = await AxiosInstance.post('/auth/send-otp', { email, purpose });
+  return response.data;
+};
+
+export const verifyOtpApi = async (email: string, otp: string, purpose: string = 'owner_registration') => {
+  const response = await AxiosInstance.post('/auth/verify-otp', { email, otp, purpose });
+  return response.data;
+};

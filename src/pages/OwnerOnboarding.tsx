@@ -5,6 +5,7 @@ import { registerOwnerAction } from "../redux/actions/authActions";
 import { createOrderAction, verifySignatureAction } from "../redux/actions/paymentActions";
 import { Check, Loader, Lock, Mail, Smartphone, Globe, Eye, EyeOff } from "lucide-react";
 import type { PlanType } from "../utils/constant";
+import { sendOtpApi, verifyOtpApi } from "../services/apis/authApis";
 
 declare global {
   interface Window {
