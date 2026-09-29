@@ -37,7 +37,7 @@ AxiosInstance.interceptors.response.use(
     const status = error?.response?.status;
 
     if (status === 401) {
-      const isLoginRequest = error?.config?.url?.includes('/login');
+      const isLoginRequest = error?.config?.url?.includes('/login') || error?.config?.url?.includes('superadmin');
       
       if (!isLoginRequest) {
         // Token expired / unauthorized — clear storage and redirect

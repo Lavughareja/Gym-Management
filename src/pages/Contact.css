@@ -1,0 +1,142 @@
+.contact-inline-1 {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  box-shadow: var(--shadow-lg);
+}
+
+.contact-inline-2 {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.contact-inline-3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.contact-inline-4 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.contact-inline-5 {
+  color: var(--primary);
+}
+
+.contact-inline-6 {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.contact-inline-7 {
+  padding: 12px;
+}
+
+.contact-inline-8 {
+  font-size: 1rem;
+  font-weight: 600;
+  padding-left: 12px;
+  padding-top: 6px;
+}
+
+.contact-inline-9 {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin: 0 auto 8px;
+}
+
+.contact-inline-10 {
+  color: var(--primary);
+  transform: rotate(45deg);
+  animation: pulse 2s infinite;
+}
+
+.contact-inline-11 {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.contact-inline-12 {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.contact-inline-13 {
+  width: 80%;
+  height: 4px;
+  background-color: var(--border-color);
+  margin: 12px auto 0;
+  position: relative;
+  border-radius: 2px;
+}
+
+.contact-inline-14 {
+  width: 4px;
+  height: 30px;
+  background-color: var(--border-color);
+  position: absolute;
+  left: 40%;
+}
+
+.contact-inline-15 {
+  width: 4px;
+  height: 30px;
+  background-color: var(--border-color);
+  position: absolute;
+  left: 70%;
+}
+
+.contact-inline-16 {
+  width: 8px;
+  height: 8px;
+  background-color: var(--primary);
+  border-radius: 50%;
+  position: absolute;
+  left: 55%;
+}
+
+.contact-inline-17 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.contact-inline-18 {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+
+.contact-inline-19 {
+  color: var(--danger);
+}
+
+.contact-inline-20 {
+  color: var(--danger);
+}
+
+.contact-inline-21 {
+  color: var(--danger);
+}
+
+.contact-inline-22 {
+  width: 100%;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.contact-inline-23 {
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  width: 14px;
+  height: 14px;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+}
+

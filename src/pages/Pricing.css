@@ -1,0 +1,138 @@
+.pricing-inline-1 {
+  max-width: 460px;
+  width: 100%;
+  padding: 36px 32px;
+  text-align: center;
+  position: relative;
+}
+
+.pricing-inline-2 {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+}
+
+.pricing-inline-3 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.pricing-inline-4 {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: 22px;
+  line-height: 1.6;
+}
+
+.pricing-inline-5 {
+  color: var(--text-primary);
+}
+
+.pricing-inline-6 {
+  color: var(--primary);
+}
+
+.pricing-inline-7 {
+  text-align: left;
+  margin-bottom: 18px;
+}
+
+.pricing-inline-8 {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.pricing-inline-9 {
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.pricing-inline-10 {
+  color: #ef4444;
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+.pricing-inline-11 {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pricing-inline-12 {
+  width: 100%;
+  justify-content: center;
+  padding: 13px;
+}
+
+.pricing-inline-13 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pricing-inline-14 {
+  animation: spin 1s linear infinite;
+}
+
+.pricing-inline-15 {
+  width: 100%;
+  justify-content: center;
+  padding: 11px;
+}
+
+.pricing-inline-16 {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  min-height: 45px;
+}
+
+.pricing-inline-17 {
+  width: 100%;
+  margin-top: auto;
+  justify-content: center;
+}
+
+.pricing-inline-18 {
+  margin-top: 40px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+}
+
+.pricing-inline-19 {
+  color: var(--primary);
+  flex-shrink: 0px;
+}
+
+.pricing-inline-20 {
+  text-align: left;
+}
+
+.pricing-inline-21 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.pricing-inline-22 {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+

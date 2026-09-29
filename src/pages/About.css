@@ -1,0 +1,149 @@
+.about-inline-1 {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  box-shadow: var(--shadow-lg);
+}
+
+.about-inline-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 24px 0;
+}
+
+.about-inline-3 {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.about-inline-4 {
+  color: var(--primary);
+}
+
+.about-inline-5 {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.about-inline-6 {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin: 0px;
+}
+
+.about-inline-7 {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.about-inline-8 {
+  color: var(--primary);
+}
+
+.about-inline-9 {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.about-inline-10 {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin: 0px;
+}
+
+.about-inline-11 {
+  font-size: 0.9rem;
+}
+
+.about-inline-12 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.about-inline-13 {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+}
+
+.about-inline-14 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.about-inline-15 {
+  padding: 12px;
+  font-size: 0.8rem;
+  justify-content: center;
+}
+
+.about-inline-16 {
+  margin-right: 6px;
+}
+
+.about-inline-17 {
+  padding: 16px;
+  border-radius: 8px;
+  background-color: var(--accent-light);
+  border-left: 4px solid var(--primary);
+}
+
+.about-inline-18 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.about-inline-19 {
+  display: flex;
+  justify-content: space-between;
+  margin: 8px 0;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.about-inline-20 {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 8px 0 0;
+}
+
+.about-inline-21 {
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  margin-top: 8px;
+  border-top: 1px solid var(--border-color);
+  padding-top: 8px;
+}
+
+.about-inline-22 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--text-primary);
+}
+
+.about-inline-23 {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  text-align: center;
+  max-width: 600px;
+  margin: 6px auto 0;
+}
+
+.about-inline-24 {
+  margin-top: 16px;
+  width: 100%;
+  justify-content: center;
+  font-size: 0.8rem;
+  padding: 6px 12px;
+}
+

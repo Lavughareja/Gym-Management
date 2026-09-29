@@ -1,0 +1,112 @@
+.gym-dashboard-inline-1 {
+  background: none;
+  box-shadow: none;
+  padding: 0px;
+}
+
+.gym-dashboard-inline-2 {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+.gym-dashboard-inline-3 {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+.gym-dashboard-inline-4 {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0px;
+}
+
+.gym-dashboard-inline-5 {
+  cursor: pointer;
+}
+
+.gym-dashboard-inline-6 {
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.gym-dashboard-inline-7 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.gym-dashboard-inline-8 {
+  overflow: hidden;
+}
+
+.gym-dashboard-inline-9 {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gym-dashboard-inline-10 {
+  text-transform: capitalize;
+}
+
+.gym-dashboard-inline-11 {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 4px;
+  border-radius: 6px;
+  transition: color 0.15s;
+}
+
+.gym-dashboard-inline-12 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gym-dashboard-inline-13 {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.gym-dashboard-inline-14 {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.gym-dashboard-inline-15 {
+  font-size: 1rem;
+}
+
+.gym-dashboard-inline-16 {
+  width: 40px;
+}
+
+.gym-dashboard-inline-17 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  flex-direction: column;
+  text-align: center;
+}
+
+.gym-dashboard-inline-18 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.gym-dashboard-inline-19 {
+  color: var(--text-secondary);
+}
+

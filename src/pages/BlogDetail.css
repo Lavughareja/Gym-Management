@@ -1,0 +1,143 @@
+.blog-detail-inline-1 {
+  min-height: 100vh;
+  background: #ffffff;
+  font-family: 'Inter', sans-serif;
+}
+
+.blog-detail-inline-2 {
+  padding-top: 100px;
+  padding-bottom: 80px;
+}
+
+.blog-detail-inline-3 {
+  display: flex;
+  justify-content: center;
+  padding: 120px;
+}
+
+.blog-detail-inline-4 {
+  animation: spin 1s linear infinite;
+  color: var(--primary);
+}
+
+.blog-detail-inline-5 {
+  text-align: center;
+  padding: 120px;
+}
+
+.blog-detail-inline-6 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 16px;
+}
+
+.blog-detail-inline-7 {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.blog-detail-inline-8 {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  color: #64748b;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 32px;
+}
+
+.blog-detail-inline-9 {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.2;
+  margin-bottom: 24px;
+  letter-spacing: -0.02em;
+}
+
+.blog-detail-inline-10 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 40px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.blog-detail-inline-11 {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+.blog-detail-inline-12 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.blog-detail-inline-13 {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.blog-detail-inline-14 {
+  font-weight: 600;
+  color: #334155;
+}
+
+.blog-detail-inline-15 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.blog-detail-inline-16 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f1f5f9;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  color: #475569;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.blog-detail-inline-17 {
+  margin-bottom: 48px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.blog-detail-inline-18 {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.blog-detail-inline-19 {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #334155;
+}
+

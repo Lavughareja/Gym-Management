@@ -1,3 +1,4 @@
+import './WorkoutLibrary.css';
 import React, { useState, useEffect, useRef } from "react";
 import {
   Plus, Pencil, Trash2, BookOpen, Video, X, Check, Loader,
@@ -456,40 +457,40 @@ const WorkoutLibrary: React.FC = () => {
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <div style={styles.page}>
+    <div className="page">
 
       {/* Toast */}
       {toast && (
-        <div style={{ ...styles.toast, background: toast.type === "success" ? "#16a34a" : "#dc2626" }}>
+        <div className="toast" style={{background: toast.type === "success" ? "#16a34a" : "#dc2626" }}>
           {toast.type === "success" ? <Check size={16} /> : <X size={16} />} {toast.msg}
         </div>
       )}
 
       {/* Header */}
-      <div style={styles.header}>
-        <div style={styles.headerLeft}>
+      <div className="header">
+        <div className="header-left">
           {selectedCat ? (
             <>
-              <button style={styles.backBtn} onClick={() => setSelectedCat(null)}>
+              <button className="back-btn" onClick={() => setSelectedCat(null)}>
                 <ChevronLeft size={18} />
               </button>
               <div>
-                <div style={styles.pageTitle}>
+                <div className="page-title">
                   <BookOpen size={20} color="#3b82f6" />
                   {selectedCat.name}
                 </div>
-                <div style={styles.pageSub}>{videos.length} exercise{videos.length !== 1 ? "s" : ""}</div>
+                <div className="page-sub">{videos.length} exercise{videos.length !== 1 ? "s" : ""}</div>
               </div>
             </>
           ) : (
             <div>
-              <div style={styles.pageTitle}><BookOpen size={20} color="#3b82f6" /> Workout Videos</div>
-              <div style={styles.pageSub}>{categories.length} categor{categories.length !== 1 ? "ies" : "y"}</div>
+              <div className="page-title"><BookOpen size={20} color="#3b82f6" /> Workout Videos</div>
+              <div className="page-sub">{categories.length} categor{categories.length !== 1 ? "ies" : "y"}</div>
             </div>
           )}
         </div>
         <button
-          style={styles.addBtn}
+          className="add-btn"
           onClick={selectedCat ? openAddVid : openAddCat}
         >
           <Plus size={18} />
@@ -500,47 +501,47 @@ const WorkoutLibrary: React.FC = () => {
       {/* ── Categories View ─────────────────────────────────────────────── */}
       {!selectedCat && (
         loading ? (
-          <div style={styles.center}><Loader size={32} color="#3b82f6" style={{ animation: "spin 1s linear infinite" }} /></div>
+          <div className="center"><Loader size={32} color="#3b82f6" style={{ animation: "spin 1s linear infinite" }} /></div>
         ) : categories.length === 0 ? (
-          <div style={styles.empty}>
+          <div className="empty">
             <BookOpen size={48} color="#cbd5e1" />
             <h3 style={{ margin: "12px 0 4px", color: "#64748b" }}>No Categories Yet</h3>
             <p style={{ color: "#94a3b8", fontSize: 14 }}>Create your first workout category to get started.</p>
-            <button style={styles.addBtn} onClick={openAddCat}><Plus size={16} /> Add Category</button>
+            <button className="add-btn" onClick={openAddCat}><Plus size={16} /> Add Category</button>
           </div>
         ) : (
-          <div style={styles.catGrid}>
+          <div className="cat-grid">
             {categories.map((cat) => (
-              <div key={cat._id} style={styles.catCard} onClick={() => setSelectedCat(cat)}>
-                <div style={styles.catImgWrap}>
+              <div key={cat._id} className="cat-card" onClick={() => setSelectedCat(cat)}>
+                <div className="cat-img-wrap">
                   <img
                     src={cat.coverImage}
                     alt={cat.name}
-                    style={styles.catImg}
+                    className="cat-img"
                     onError={(e) => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400"; }}
                   />
-                  <div style={styles.catOverlay}>
+                  <div className="cat-overlay">
                     {!cat.isPublished && (
-                      <span style={styles.draftBadge}><EyeOff size={10} /> Draft</span>
+                      <span className="draft-badge"><EyeOff size={10} /> Draft</span>
                     )}
                   </div>
                 </div>
-                <div style={styles.catBody}>
-                  <div style={styles.catName}>{cat.name}</div>
-                  <div style={styles.catMeta}>
-                    <span style={styles.catCount}><Video size={12} /> {cat.videoCount} video{cat.videoCount !== 1 ? "s" : ""}</span>
-                    <span style={{ ...styles.pubBadge, background: cat.isPublished ? "#dcfce7" : "#f1f5f9", color: cat.isPublished ? "#16a34a" : "#64748b" }}>
+                <div className="cat-body">
+                  <div className="cat-name">{cat.name}</div>
+                  <div className="cat-meta">
+                    <span className="cat-count"><Video size={12} /> {cat.videoCount} video{cat.videoCount !== 1 ? "s" : ""}</span>
+                    <span className="pub-badge" style={{background: cat.isPublished ? "#dcfce7" : "#f1f5f9", color: cat.isPublished ? "#16a34a" : "#64748b" }}>
                       {cat.isPublished ? <><Eye size={10} /> Published</> : <><EyeOff size={10} /> Draft</>}
                     </span>
                   </div>
-                  {cat.description && <div style={styles.catDesc}>{cat.description}</div>}
+                  {cat.description && <div className="cat-desc">{cat.description}</div>}
                 </div>
-                <div style={styles.catActions} onClick={(e) => e.stopPropagation()}>
-                  <button style={styles.iconBtn} title="Edit" onClick={() => openEditCat(cat)}>
+                <div className="cat-actions" onClick={(e) => e.stopPropagation()}>
+                  <button className="icon-btn" title="Edit" onClick={() => openEditCat(cat)}>
                     <Pencil size={15} />
                   </button>
                   <button
-                    style={{ ...styles.iconBtn, color: "#ef4444" }}
+                    className="icon-btn" style={{color: "#ef4444" }}
                     title="Delete"
                     onClick={() => deleteCat(cat)}
                     disabled={deletingId === cat._id}
@@ -557,53 +558,53 @@ const WorkoutLibrary: React.FC = () => {
       {/* ── Videos View ─────────────────────────────────────────────────── */}
       {selectedCat && (
         videosLoading ? (
-          <div style={styles.center}><Loader size={32} color="#3b82f6" style={{ animation: "spin 1s linear infinite" }} /></div>
+          <div className="center"><Loader size={32} color="#3b82f6" style={{ animation: "spin 1s linear infinite" }} /></div>
         ) : videos.length === 0 ? (
-          <div style={styles.empty}>
+          <div className="empty">
             <Video size={48} color="#cbd5e1" />
             <h3 style={{ margin: "12px 0 4px", color: "#64748b" }}>No Exercises Yet</h3>
             <p style={{ color: "#94a3b8", fontSize: 14 }}>Add your first exercise to this category.</p>
-            <button style={styles.addBtn} onClick={openAddVid}><Plus size={16} /> Add Exercise</button>
+            <button className="add-btn" onClick={openAddVid}><Plus size={16} /> Add Exercise</button>
           </div>
         ) : (
-          <div style={styles.vidList}>
+          <div className="vid-list">
             {videos.map((v, idx) => {
               const diff = DIFFICULTY_COLORS[v.difficulty] || DIFFICULTY_COLORS.beginner;
               return (
-                <div key={v._id} style={styles.vidCard}>
-                  <div style={styles.vidNum}>{idx + 1}</div>
+                <div key={v._id} className="vid-card">
+                  <div className="vid-num">{idx + 1}</div>
                   {v.thumbnailUrl ? (
-                    <img src={v.thumbnailUrl} alt={v.title} style={styles.vidThumb}
+                    <img src={v.thumbnailUrl} alt={v.title} className="vid-thumb"
                       onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
                   ) : (
-                    <div style={styles.vidThumbPlaceholder}><Video size={24} color="#94a3b8" /></div>
+                    <div className="vid-thumb-placeholder"><Video size={24} color="#94a3b8" /></div>
                   )}
-                  <div style={styles.vidInfo}>
-                    <div style={styles.vidTitle}>{v.title}</div>
-                    <div style={styles.vidMeta}>
-                      <span style={styles.metaChip}><Dumbbell size={11} /> {v.bodyPart}</span>
+                  <div className="vid-info">
+                    <div className="vid-title">{v.title}</div>
+                    <div className="vid-meta">
+                      <span className="meta-chip"><Dumbbell size={11} /> {v.bodyPart}</span>
                       {v.durationSecs > 0 && (
-                        <span style={styles.metaChip}><Clock size={11} /> {Math.round(v.durationSecs / 60)}m</span>
+                        <span className="meta-chip"><Clock size={11} /> {Math.round(v.durationSecs / 60)}m</span>
                       )}
-                      <span style={{ ...styles.metaChip, background: diff.bg, color: diff.text }}>
+                      <span className="meta-chip" style={{background: diff.bg, color: diff.text }}>
                         {v.difficulty}
                       </span>
                     </div>
                     {v.musclesTargeted?.length > 0 && (
-                      <div style={styles.muscles}>
+                      <div className="muscles">
                         {v.musclesTargeted.map((m) => (
-                          <span key={m} style={styles.musclePill}>{m}</span>
+                          <span key={m} className="muscle-pill">{m}</span>
                         ))}
                       </div>
                     )}
-                    {v.description && <div style={styles.vidDesc}>{v.description}</div>}
+                    {v.description && <div className="vid-desc">{v.description}</div>}
                   </div>
-                  <div style={styles.vidActions}>
-                    <button style={styles.iconBtn} title="Edit" onClick={() => openEditVid(v)}>
+                  <div className="vid-actions">
+                    <button className="icon-btn" title="Edit" onClick={() => openEditVid(v)}>
                       <Pencil size={15} />
                     </button>
                     <button
-                      style={{ ...styles.iconBtn, color: "#ef4444" }}
+                      className="icon-btn" style={{color: "#ef4444" }}
                       title="Delete"
                       onClick={() => deleteVid(v)}
                       disabled={deletingId === v._id}
@@ -620,20 +621,20 @@ const WorkoutLibrary: React.FC = () => {
 
       {/* ── Category Modal ────────────────────────────────────────────────── */}
       {showCatModal && (
-        <div style={styles.overlay} onClick={() => setShowCatModal(false)}>
-          <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
-            <div style={styles.modalHeader}>
-              <h3 style={styles.modalTitle}>{editingCatId ? "Edit Category" : "New Category"}</h3>
-              <button style={styles.closeBtn} onClick={() => setShowCatModal(false)}><X size={18} /></button>
+        <div className="overlay" onClick={() => setShowCatModal(false)}>
+          <div className="modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3 className="modal-title">{editingCatId ? "Edit Category" : "New Category"}</h3>
+              <button className="close-btn" onClick={() => setShowCatModal(false)}><X size={18} /></button>
             </div>
 
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Category Name *</label>
-              <input style={styles.input} placeholder="e.g. Shoulder" value={catForm.name}
+            <div className="form-group">
+              <label className="label">Category Name *</label>
+              <input className="input" placeholder="e.g. Shoulder" value={catForm.name}
                 onChange={(e) => setCatForm({ ...catForm, name: e.target.value })} />
             </div>
 
-            <div style={styles.formGroup}>
+            <div className="form-group">
               <ImageUploader
                 label="Cover Image"
                 required
@@ -642,14 +643,14 @@ const WorkoutLibrary: React.FC = () => {
               />
             </div>
 
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Description</label>
-              <textarea style={{ ...styles.input, height: 80, resize: "vertical" }} placeholder="Short description..." value={catForm.description}
+            <div className="form-group">
+              <label className="label">Description</label>
+              <textarea className="input" style={{height: 80, resize: "vertical" }} placeholder="Short description..." value={catForm.description}
                 onChange={(e) => setCatForm({ ...catForm, description: e.target.value })} />
             </div>
 
-            <div style={styles.formGroup}>
-              <label style={{ ...styles.label, display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
+            <div className="form-group">
+              <label className="label" style={{display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
                 <input type="checkbox" checked={catForm.isPublished}
                   onChange={(e) => setCatForm({ ...catForm, isPublished: e.target.checked })}
                   style={{ width: 16, height: 16 }} />
@@ -657,9 +658,9 @@ const WorkoutLibrary: React.FC = () => {
               </label>
             </div>
 
-            <div style={styles.modalFooter}>
-              <button style={styles.cancelBtn} onClick={() => setShowCatModal(false)}>Cancel</button>
-              <button style={styles.saveBtn} onClick={saveCat} disabled={catSaving}>
+            <div className="modal-footer">
+              <button className="cancel-btn" onClick={() => setShowCatModal(false)}>Cancel</button>
+              <button className="save-btn" onClick={saveCat} disabled={catSaving}>
                 {catSaving ? <Loader size={16} style={{ animation: "spin 1s linear infinite" }} /> : <Check size={16} />}
                 {catSaving ? "Saving…" : "Save Category"}
               </button>
@@ -670,27 +671,27 @@ const WorkoutLibrary: React.FC = () => {
 
       {/* ── Video Modal ───────────────────────────────────────────────────── */}
       {showVidModal && (
-        <div style={styles.overlay} onClick={() => setShowVidModal(false)}>
-          <div style={{ ...styles.modal, maxWidth: 560 }} onClick={(e) => e.stopPropagation()}>
-            <div style={styles.modalHeader}>
-              <h3 style={styles.modalTitle}>{editingVidId ? "Edit Exercise" : "Add Exercise"}</h3>
-              <button style={styles.closeBtn} onClick={() => setShowVidModal(false)}><X size={18} /></button>
+        <div className="overlay" onClick={() => setShowVidModal(false)}>
+          <div className="modal" style={{maxWidth: 560 }} onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3 className="modal-title">{editingVidId ? "Edit Exercise" : "Add Exercise"}</h3>
+              <button className="close-btn" onClick={() => setShowVidModal(false)}><X size={18} /></button>
             </div>
 
-            <div style={styles.formRow}>
-              <div style={{ ...styles.formGroup, flex: 1 }}>
-                <label style={styles.label}>Exercise Title *</label>
-                <input style={styles.input} placeholder="e.g. Shoulder Press" value={vidForm.title}
+            <div className="form-row">
+              <div className="form-group" style={{flex: 1 }}>
+                <label className="label">Exercise Title *</label>
+                <input className="input" placeholder="e.g. Shoulder Press" value={vidForm.title}
                   onChange={(e) => setVidForm({ ...vidForm, title: e.target.value })} />
               </div>
-              <div style={{ ...styles.formGroup, flex: 1 }}>
-                <label style={styles.label}>Body Part *</label>
-                <input style={styles.input} placeholder="e.g. Shoulder" value={vidForm.bodyPart}
+              <div className="form-group" style={{flex: 1 }}>
+                <label className="label">Body Part *</label>
+                <input className="input" placeholder="e.g. Shoulder" value={vidForm.bodyPart}
                   onChange={(e) => setVidForm({ ...vidForm, bodyPart: e.target.value })} />
               </div>
             </div>
 
-            <div style={styles.formGroup}>
+            <div className="form-group">
               <VideoUploader
                 label="Video File"
                 required
@@ -699,7 +700,7 @@ const WorkoutLibrary: React.FC = () => {
               />
             </div>
 
-            <div style={styles.formGroup}>
+            <div className="form-group">
               <ImageUploader
                 label="Thumbnail Image (optional)"
                 value={vidForm.thumbnailUrl}
@@ -707,42 +708,42 @@ const WorkoutLibrary: React.FC = () => {
               />
             </div>
 
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Muscles Targeted (comma-separated)</label>
-              <input style={styles.input} placeholder="e.g. Front Deltoid, Side Deltoid, Trapezius"
+            <div className="form-group">
+              <label className="label">Muscles Targeted (comma-separated)</label>
+              <input className="input" placeholder="e.g. Front Deltoid, Side Deltoid, Trapezius"
                 value={vidForm.musclesTargeted}
                 onChange={(e) => setVidForm({ ...vidForm, musclesTargeted: e.target.value })} />
             </div>
 
-            <div style={styles.formRow}>
-              <div style={{ ...styles.formGroup, flex: 1 }}>
-                <label style={styles.label}>Difficulty</label>
-                <select style={styles.input} value={vidForm.difficulty}
+            <div className="form-row">
+              <div className="form-group" style={{flex: 1 }}>
+                <label className="label">Difficulty</label>
+                <select className="input" value={vidForm.difficulty}
                   onChange={(e) => setVidForm({ ...vidForm, difficulty: e.target.value as any })}>
                   <option value="beginner">Beginner</option>
                   <option value="intermediate">Intermediate</option>
                   <option value="advanced">Advanced</option>
                 </select>
               </div>
-              <div style={{ ...styles.formGroup, flex: 1 }}>
-                <label style={styles.label}>Duration (seconds)</label>
-                <input type="number" style={styles.input} placeholder="e.g. 180"
+              <div className="form-group" style={{flex: 1 }}>
+                <label className="label">Duration (seconds)</label>
+                <input type="number" className="input" placeholder="e.g. 180"
                   value={vidForm.durationSecs || ""}
                   onChange={(e) => setVidForm({ ...vidForm, durationSecs: Number(e.target.value) })} />
               </div>
             </div>
 
-            <div style={styles.formGroup}>
-              <label style={styles.label}>Description / Notes</label>
-              <textarea style={{ ...styles.input, height: 80, resize: "vertical" }}
+            <div className="form-group">
+              <label className="label">Description / Notes</label>
+              <textarea className="input" style={{height: 80, resize: "vertical" }}
                 placeholder="Key form tips, notes about this exercise..."
                 value={vidForm.description}
                 onChange={(e) => setVidForm({ ...vidForm, description: e.target.value })} />
             </div>
 
-            <div style={styles.modalFooter}>
-              <button style={styles.cancelBtn} onClick={() => setShowVidModal(false)}>Cancel</button>
-              <button style={styles.saveBtn} onClick={saveVid} disabled={vidSaving}>
+            <div className="modal-footer">
+              <button className="cancel-btn" onClick={() => setShowVidModal(false)}>Cancel</button>
+              <button className="save-btn" onClick={saveVid} disabled={vidSaving}>
                 {vidSaving ? <Loader size={16} style={{ animation: "spin 1s linear infinite" }} /> : <Check size={16} />}
                 {vidSaving ? "Saving…" : "Save Exercise"}
               </button>
@@ -762,130 +763,6 @@ const WorkoutLibrary: React.FC = () => {
 // Styles
 // ─────────────────────────────────────────────────────────────────────────────
 
-const styles: Record<string, React.CSSProperties> = {
-  page: { display: "flex", flexDirection: "column", gap: 24, fontFamily: "'Inter', sans-serif" },
-  header: { display: "flex", alignItems: "center", justifyContent: "space-between" },
-  headerLeft: { display: "flex", alignItems: "center", gap: 12 },
-  backBtn: {
-    background: "#f1f5f9", border: "1px solid #e2e8f0", borderRadius: 8,
-    padding: 8, cursor: "pointer", display: "flex", alignItems: "center", color: "#475569",
-  },
-  pageTitle: {
-    fontSize: 20, fontWeight: 700, color: "#0f172a",
-    display: "flex", alignItems: "center", gap: 8,
-  },
-  pageSub: { fontSize: 13, color: "#64748b", marginTop: 2 },
-  addBtn: {
-    display: "flex", alignItems: "center", gap: 8, padding: "10px 18px",
-    background: "#3b82f6", color: "#fff", border: "none", borderRadius: 10,
-    fontSize: 14, fontWeight: 600, cursor: "pointer",
-  },
-  center: { display: "flex", justifyContent: "center", padding: 60 },
-  empty: {
-    display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-    padding: 60, gap: 8, background: "#fff", borderRadius: 16, border: "1px solid #e2e8f0",
-  },
 
-  // Category grid
-  catGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))", gap: 16 },
-  catCard: {
-    background: "#fff", border: "1px solid #e2e8f0", borderRadius: 16, overflow: "hidden",
-    cursor: "pointer", transition: "box-shadow 0.2s, transform 0.15s",
-    boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
-    position: "relative",
-  },
-  catImgWrap: { position: "relative", height: 160, overflow: "hidden" },
-  catImg: { width: "100%", height: "100%", objectFit: "cover" },
-  catOverlay: { position: "absolute", top: 8, left: 8 },
-  draftBadge: {
-    background: "rgba(0,0,0,0.6)", color: "#fff", fontSize: 11, fontWeight: 600,
-    padding: "3px 8px", borderRadius: 20, display: "flex", alignItems: "center", gap: 4,
-  },
-  catBody: { padding: "14px 16px 10px" },
-  catName: { fontSize: 16, fontWeight: 700, color: "#0f172a", marginBottom: 8 },
-  catMeta: { display: "flex", alignItems: "center", gap: 8, marginBottom: 6 },
-  catCount: { fontSize: 12, color: "#64748b", display: "flex", alignItems: "center", gap: 4 },
-  pubBadge: { fontSize: 11, fontWeight: 600, padding: "2px 8px", borderRadius: 20, display: "flex", alignItems: "center", gap: 4 },
-  catDesc: { fontSize: 12, color: "#64748b", lineHeight: 1.5, marginTop: 4 },
-  catActions: {
-    display: "flex", gap: 4, padding: "8px 12px", borderTop: "1px solid #f1f5f9",
-    justifyContent: "flex-end",
-  },
-
-  // Video list
-  vidList: { display: "flex", flexDirection: "column", gap: 12 },
-  vidCard: {
-    background: "#fff", border: "1px solid #e2e8f0", borderRadius: 14, padding: "16px 20px",
-    display: "flex", alignItems: "flex-start", gap: 16,
-    boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
-  },
-  vidNum: { fontSize: 13, fontWeight: 700, color: "#94a3b8", minWidth: 24, paddingTop: 2 },
-  vidThumb: { width: 80, height: 56, borderRadius: 8, objectFit: "cover", flexShrink: 0, border: "1px solid #e2e8f0" },
-  vidThumbPlaceholder: {
-    width: 80, height: 56, borderRadius: 8, background: "#f8fafc",
-    display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-    border: "1px solid #e2e8f0",
-  },
-  vidInfo: { flex: 1 },
-  vidTitle: { fontSize: 15, fontWeight: 700, color: "#0f172a", marginBottom: 6 },
-  vidMeta: { display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 6 },
-  metaChip: {
-    fontSize: 11, fontWeight: 600, padding: "3px 8px", borderRadius: 20,
-    background: "#f1f5f9", color: "#475569", display: "flex", alignItems: "center", gap: 4,
-  },
-  muscles: { display: "flex", flexWrap: "wrap", gap: 5, marginTop: 4 },
-  musclePill: {
-    fontSize: 11, padding: "2px 8px", borderRadius: 20, background: "#e0e7ff", color: "#4f46e5", fontWeight: 600,
-  },
-  vidDesc: { fontSize: 12, color: "#64748b", marginTop: 6, lineHeight: 1.5 },
-  vidActions: { display: "flex", flexDirection: "column", gap: 6 },
-
-  // Shared
-  iconBtn: {
-    background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 8,
-    padding: 7, cursor: "pointer", display: "flex", color: "#475569", transition: "background 0.15s",
-  },
-
-  // Toast
-  toast: {
-    position: "fixed", top: 20, right: 20, zIndex: 9999,
-    color: "#fff", padding: "12px 18px", borderRadius: 10, fontSize: 14, fontWeight: 600,
-    display: "flex", alignItems: "center", gap: 8,
-    boxShadow: "0 8px 24px rgba(0,0,0,0.2)",
-  },
-
-  // Modal
-  overlay: {
-    position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 1000,
-    display: "flex", alignItems: "center", justifyContent: "center", padding: 20,
-  },
-  modal: {
-    background: "#fff", borderRadius: 20, padding: "28px 32px", width: "100%",
-    maxWidth: 480, maxHeight: "90vh", overflowY: "auto",
-    boxShadow: "0 24px 60px rgba(0,0,0,0.15)",
-  },
-  modalHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 },
-  modalTitle: { fontSize: 18, fontWeight: 700, color: "#0f172a", margin: 0 },
-  closeBtn: { background: "none", border: "none", cursor: "pointer", color: "#64748b", display: "flex" },
-  formGroup: { display: "flex", flexDirection: "column", gap: 6, marginBottom: 16 },
-  formRow: { display: "flex", gap: 16, marginBottom: 0 },
-  label: { fontSize: 13, fontWeight: 600, color: "#475569" },
-  input: {
-    background: "#f8fafc", border: "1px solid #cbd5e1", borderRadius: 8,
-    color: "#0f172a", fontSize: 14, padding: "10px 12px", outline: "none",
-    fontFamily: "'Inter', sans-serif", width: "100%", boxSizing: "border-box",
-  },
-  imgPreview: { width: "100%", height: 120, objectFit: "cover", borderRadius: 8, marginTop: 6, border: "1px solid #e2e8f0" },
-  modalFooter: { display: "flex", gap: 10, justifyContent: "flex-end", marginTop: 8 },
-  cancelBtn: {
-    padding: "10px 20px", background: "#f1f5f9", border: "1px solid #e2e8f0",
-    borderRadius: 8, color: "#475569", fontWeight: 600, fontSize: 14, cursor: "pointer",
-  },
-  saveBtn: {
-    padding: "10px 20px", background: "#3b82f6", border: "none",
-    borderRadius: 8, color: "#fff", fontWeight: 600, fontSize: 14, cursor: "pointer",
-    display: "flex", alignItems: "center", gap: 8,
-  },
-};
 
 export default WorkoutLibrary;

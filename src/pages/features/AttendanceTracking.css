@@ -1,0 +1,821 @@
+.attendance-tracking-inline-1 {
+  background: #fff;
+  min-height: 100vh;
+  font-family: 'Inter','Segoe UI',sans-serif;
+}
+
+.attendance-tracking-inline-2 {
+  background: linear-gradient(135deg, #064e3b 0%, #047857 55%, #059669 100%);
+  color: #fff;
+  padding-top: 140px;
+  padding-bottom: 100px;
+  position: relative;
+  overflow: hidden;
+}
+
+.attendance-tracking-inline-3 {
+  position: absolute;
+  top: -25%;
+  right: -8%;
+  width: 560px;
+  height: 560px;
+  border-radius: 50%;
+  background: rgba(52,211,153,0.2);
+  filter: blur(100px);
+  pointer-events: none;
+}
+
+.attendance-tracking-inline-4 {
+  position: absolute;
+  bottom: -15%;
+  left: 8%;
+  width: 380px;
+  height: 380px;
+  border-radius: 50%;
+  background: rgba(16,185,129,0.15);
+  filter: blur(80px);
+  pointer-events: none;
+}
+
+.attendance-tracking-inline-5 {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px;
+  position: relative;
+  z-index: 1;
+}
+
+.attendance-tracking-inline-6 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+
+.attendance-tracking-inline-7 {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.18);
+  padding: 6px 16px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 24px;
+  color: #a7f3d0;
+}
+
+.attendance-tracking-inline-8 {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #34d399;
+  display: inline-block;
+}
+
+.attendance-tracking-inline-9 {
+  font-size: 60px;
+  font-weight: 900;
+  line-height: 1.08;
+  margin: 0 0 24px;
+  color: #fff;
+}
+
+.attendance-tracking-inline-10 {
+  background: linear-gradient(90deg, #6ee7b7, #a7f3d0);
+  webkit-background-clip: text;
+  webkit-text-fill-color: transparent;
+}
+
+.attendance-tracking-inline-11 {
+  font-size: 18px;
+  line-height: 1.7;
+  color: #d1fae5;
+  margin-bottom: 40px;
+  max-width: 480px;
+}
+
+.attendance-tracking-inline-12 {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 36px;
+  flex-wrap: wrap;
+}
+
+.attendance-tracking-inline-13 {
+  padding: 14px 32px;
+  background: #059669;
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 8px 32px rgba(5,150,105,0.4);
+}
+
+.attendance-tracking-inline-14 {
+  padding: 14px 32px;
+  background: transparent;
+  color: #fff;
+  border: 1.5px solid rgba(255,255,255,0.28);
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.attendance-tracking-inline-15 {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.attendance-tracking-inline-16 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #a7f3d0;
+}
+
+.attendance-tracking-inline-17 {
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
+.attendance-tracking-inline-18 {
+  width: 100%;
+  max-width: 420px;
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.4);
+  overflow: hidden;
+}
+
+.attendance-tracking-inline-19 {
+  background: #0f172a;
+  padding: 24px;
+}
+
+.attendance-tracking-inline-20 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.attendance-tracking-inline-21 {
+  font-size: 16px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.attendance-tracking-inline-22 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #34d399;
+  background: rgba(52,211,153,0.1);
+  padding: 4px 10px;
+  border-radius: 100px;
+}
+
+.attendance-tracking-inline-23 {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 10px #34d399;
+}
+
+.attendance-tracking-inline-24 {
+  display: flex;
+  gap: 12px;
+}
+
+.attendance-tracking-inline-25 {
+  flex: 1;
+  background: rgba(255,255,255,0.1);
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.attendance-tracking-inline-26 {
+  font-size: 11px;
+  color: #94a3b8;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.attendance-tracking-inline-27 {
+  font-size: 24px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.attendance-tracking-inline-28 {
+  flex: 1;
+  background: rgba(255,255,255,0.1);
+  padding: 12px;
+  border-radius: 12px;
+}
+
+.attendance-tracking-inline-29 {
+  font-size: 11px;
+  color: #94a3b8;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.attendance-tracking-inline-30 {
+  font-size: 24px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.attendance-tracking-inline-31 {
+  padding: 0 24px;
+}
+
+.attendance-tracking-inline-32 {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 20px 0 12px;
+}
+
+.attendance-tracking-inline-33 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+}
+
+.attendance-tracking-inline-34 {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.attendance-tracking-inline-35 {
+  flex: 1;
+}
+
+.attendance-tracking-inline-36 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.attendance-tracking-inline-37 {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.attendance-tracking-inline-38 {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.attendance-tracking-inline-39 {
+  height: 16px;
+}
+
+.attendance-tracking-inline-40 {
+  position: absolute;
+  top: 20%;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  background: #34d399;
+  filter: blur(50px);
+  opacity: 0.3;
+}
+
+.attendance-tracking-inline-41 {
+  position: absolute;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: #059669;
+  filter: blur(60px);
+  opacity: 0.2;
+}
+
+.attendance-tracking-inline-42 {
+  background: #fff;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.attendance-tracking-inline-43 {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 32px;
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 0px;
+}
+
+.attendance-tracking-inline-44 {
+  padding: 32px 24px;
+  text-align: center;
+}
+
+.attendance-tracking-inline-45 {
+  font-size: 34px;
+  font-weight: 900;
+  color: #059669;
+}
+
+.attendance-tracking-inline-46 {
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.attendance-tracking-inline-47 {
+  background: #f8fafc;
+  padding: 96px 0;
+}
+
+.attendance-tracking-inline-48 {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+.attendance-tracking-inline-49 {
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto 64px;
+}
+
+.attendance-tracking-inline-50 {
+  background: #fee2e2;
+  color: #dc2626;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: 100px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  display: inline-block;
+  margin-bottom: 16px;
+}
+
+.attendance-tracking-inline-51 {
+  font-size: 44px;
+  font-weight: 900;
+  color: #0f172a;
+  margin: 0 0 16px;
+  line-height: 1.1;
+}
+
+.attendance-tracking-inline-52 {
+  font-size: 18px;
+  color: #64748b;
+  line-height: 1.7;
+}
+
+.attendance-tracking-inline-53 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.attendance-tracking-inline-54 {
+  background: #fff;
+  padding: 32px;
+  border-radius: 20px;
+  border: 1px solid #fee2e2;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+}
+
+.attendance-tracking-inline-55 {
+  width: 48px;
+  height: 48px;
+  background: #fff1f2;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.attendance-tracking-inline-56 {
+  font-size: 18px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 10px;
+}
+
+.attendance-tracking-inline-57 {
+  font-size: 15px;
+  color: #64748b;
+  line-height: 1.65;
+  margin: 0px;
+}
+
+.attendance-tracking-inline-58 {
+  background: #fff;
+  padding: 96px 0;
+  border-top: 1px solid #f1f5f9;
+}
+
+.attendance-tracking-inline-59 {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+.attendance-tracking-inline-60 {
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto 64px;
+}
+
+.attendance-tracking-inline-61 {
+  background: #d1fae5;
+  color: #059669;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: 100px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  display: inline-block;
+  margin-bottom: 16px;
+}
+
+.attendance-tracking-inline-62 {
+  font-size: 44px;
+  font-weight: 900;
+  color: #0f172a;
+  margin: 0 0 16px;
+  line-height: 1.1;
+}
+
+.attendance-tracking-inline-63 {
+  background: #0f172a;
+  border-radius: 32px;
+  overflow: hidden;
+  max-width: 960px;
+  margin: 0 auto;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.3);
+}
+
+.attendance-tracking-inline-64 {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding: 16px;
+}
+
+.attendance-tracking-inline-65 {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 12px;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.attendance-tracking-inline-66 {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.attendance-tracking-inline-67 {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.attendance-tracking-inline-68 {
+  font-size: 11px;
+  color: #475569;
+  font-weight: 500;
+}
+
+.attendance-tracking-inline-69 {
+  padding: 48px;
+  display: flex;
+  gap: 64px;
+  align-items: center;
+}
+
+.attendance-tracking-inline-70 {
+  flex: 1;
+}
+
+.attendance-tracking-inline-71 {
+  font-size: 30px;
+  font-weight: 900;
+  color: #fff;
+  margin-bottom: 16px;
+  line-height: 1.2;
+}
+
+.attendance-tracking-inline-72 {
+  font-size: 16px;
+  color: #94a3b8;
+  line-height: 1.7;
+  margin-bottom: 32px;
+}
+
+.attendance-tracking-inline-73 {
+  list-style: none;
+  padding: 0px;
+  margin: 0px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.attendance-tracking-inline-74 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+.attendance-tracking-inline-75 {
+  flex-shrink: 0px;
+}
+
+.attendance-tracking-inline-76 {
+  width: 240px;
+  flex-shrink: 0px;
+  aspect-ratio: 4/3;
+  background: #1e293b;
+  border-radius: 20px;
+  border: 5px solid #334155;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+}
+
+.attendance-tracking-inline-77 {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #475569;
+  text-align: center;
+  padding: 0 12px;
+  line-height: 1.5;
+}
+
+.attendance-tracking-inline-78 {
+  background: #f8fafc;
+  padding: 96px 0;
+  border-top: 1px solid #f1f5f9;
+}
+
+.attendance-tracking-inline-79 {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+.attendance-tracking-inline-80 {
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto 64px;
+}
+
+.attendance-tracking-inline-81 {
+  background: #d1fae5;
+  color: #059669;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: 100px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  display: inline-block;
+  margin-bottom: 16px;
+}
+
+.attendance-tracking-inline-82 {
+  font-size: 44px;
+  font-weight: 900;
+  color: #0f172a;
+  margin: 0px;
+  line-height: 1.1;
+}
+
+.attendance-tracking-inline-83 {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.attendance-tracking-inline-84 {
+  background: #fff;
+  padding: 28px;
+  border-radius: 20px;
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.02);
+}
+
+.attendance-tracking-inline-85 {
+  width: 40px;
+  height: 40px;
+  background: #f8fafc;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.attendance-tracking-inline-86 {
+  font-size: 15px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 8px;
+}
+
+.attendance-tracking-inline-87 {
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.65;
+  margin: 0px;
+}
+
+.attendance-tracking-inline-88 {
+  background: #fff;
+  padding: 96px 0;
+  border-top: 1px solid #f1f5f9;
+}
+
+.attendance-tracking-inline-89 {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+.attendance-tracking-inline-90 {
+  font-size: 44px;
+  font-weight: 900;
+  color: #0f172a;
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.attendance-tracking-inline-91 {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.attendance-tracking-inline-92 {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+}
+
+.attendance-tracking-inline-93 {
+  width: 100%;
+  padding: 20px 24px;
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 700;
+  font-size: 15px;
+  color: #0f172a;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.attendance-tracking-inline-94 {
+  transition: transform 0.2s;
+  flex-shrink: 0px;
+}
+
+.attendance-tracking-inline-95 {
+  padding: 0 24px 20px;
+  font-size: 15px;
+  color: #64748b;
+  line-height: 1.7;
+}
+
+.attendance-tracking-inline-96 {
+  background: linear-gradient(135deg, #047857 0%, #064e3b 100%);
+  padding: 96px 32px;
+  text-align: center;
+}
+
+.attendance-tracking-inline-97 {
+  max-width: 680px;
+  margin: 0 auto;
+  color: #fff;
+}
+
+.attendance-tracking-inline-98 {
+  width: 64px;
+  height: 64px;
+  background: rgba(255,255,255,0.12);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 32px;
+}
+
+.attendance-tracking-inline-99 {
+  font-size: 48px;
+  font-weight: 900;
+  margin-bottom: 20px;
+  line-height: 1.1;
+}
+
+.attendance-tracking-inline-100 {
+  font-size: 18px;
+  color: #d1fae5;
+  line-height: 1.7;
+  margin-bottom: 40px;
+}
+
+.attendance-tracking-inline-101 {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.attendance-tracking-inline-102 {
+  padding: 16px 36px;
+  background: #fff;
+  color: #059669;
+  border: none;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+}
+
+.attendance-tracking-inline-103 {
+  display: inline;
+  vertical-align: middle;
+  margin-left: 6px;
+}
+
+.attendance-tracking-inline-104 {
+  padding: 16px 36px;
+  background: transparent;
+  color: #fff;
+  border: 2px solid rgba(255,255,255,0.35);
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.attendance-tracking-inline-105 {
+  font-size: 13px;
+  color: #d1fae5;
+  font-weight: 500;
+}
+

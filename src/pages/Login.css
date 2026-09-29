@@ -1,0 +1,310 @@
+.login-inline-1 {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-secondary);
+}
+
+.login-inline-2 {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  padding: 8px 16px;
+}
+
+.login-inline-3 {
+  max-width: 420px;
+  width: 100%;
+  padding: 40px;
+  text-align: center;
+}
+
+.login-inline-4 {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.login-inline-5 {
+  width: 48px;
+  height: 48px;
+  background: none;
+  box-shadow: none;
+}
+
+.login-inline-6 {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+.login-inline-7 {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+.login-inline-8 {
+  font-size: 1.75rem;
+  margin-bottom: 8px;
+}
+
+.login-inline-9 {
+  margin-bottom: 32px;
+  font-size: 0.85rem;
+}
+
+.login-inline-10 {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.login-inline-11 {
+  text-align: left;
+}
+
+.login-inline-12 {
+  position: relative;
+}
+
+.login-inline-13 {
+  color: #dc2626;
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+
+.login-inline-14 {
+  width: 100%;
+  justify-content: center;
+  padding: 12px;
+  margin-top: 8px;
+}
+
+.login-inline-15 {
+  animation: spin 1s linear infinite;
+}
+
+.login-inline-16 {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.login-inline-17 {
+  text-align: left;
+}
+
+.login-inline-18 {
+  position: relative;
+}
+
+.login-inline-19 {
+  position: absolute;
+  left: 14px;
+  top: 12px;
+  color: var(--text-muted);
+}
+
+.login-inline-20 {
+  padding-left: 42px;
+}
+
+.login-inline-21 {
+  text-align: left;
+}
+
+.login-inline-22 {
+  position: relative;
+}
+
+.login-inline-23 {
+  position: absolute;
+  left: 14px;
+  top: 12px;
+  color: var(--text-muted);
+}
+
+.login-inline-24 {
+  padding-left: 42px;
+  padding-right: 42px;
+}
+
+.login-inline-25 {
+  position: absolute;
+  right: 14px;
+  top: 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 0px;
+}
+
+.login-inline-26 {
+  text-align: right;
+  margin-top: 8px;
+}
+
+.login-inline-27 {
+  font-size: 0.8rem;
+  color: var(--primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0px;
+}
+
+.login-inline-28 {
+  width: 100%;
+  justify-content: center;
+  padding: 12px;
+  margin-top: 8px;
+}
+
+.login-inline-29 {
+  animation: spin 1s linear infinite;
+}
+
+.login-inline-30 {
+  text-align: center;
+  margin-top: 8px;
+}
+
+.login-inline-31 {
+  font-size: 0.85rem;
+  color: var(--primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.login-inline-32 {
+  position: fixed;
+  inset: 0px;
+  background: rgba(0,0,0,0.5);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.login-inline-33 {
+  width: 100%;
+  max-width: 400px;
+  padding: 32px;
+  position: relative;
+}
+
+.login-inline-34 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.login-inline-35 {
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin: 0px;
+}
+
+.login-inline-36 {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 4px;
+  border-radius: 6px;
+}
+
+.login-inline-37 {
+  text-align: center;
+  padding: 10px 0 16px;
+}
+
+.login-inline-38 {
+  color: var(--primary);
+  margin: 0 auto 16px;
+  display: block;
+}
+
+.login-inline-39 {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.login-inline-40 {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+}
+
+.login-inline-41 {
+  width: 100%;
+  justify-content: center;
+}
+
+.login-inline-42 {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+}
+
+.login-inline-43 {
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  color: #dc2626;
+  font-size: 0.85rem;
+}
+
+.login-inline-44 {
+  margin-bottom: 16px;
+}
+
+.login-inline-45 {
+  position: relative;
+}
+
+.login-inline-46 {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  color: var(--text-muted);
+}
+
+.login-inline-47 {
+  padding-left: 36px;
+}
+
+.login-inline-48 {
+  display: flex;
+  gap: 12px;
+}
+
+.login-inline-49 {
+  flex: 1;
+  justify-content: center;
+  padding: 10px;
+}
+
+.login-inline-50 {
+  flex: 1;
+  justify-content: center;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.login-inline-51 {
+  animation: spin 1s linear infinite;
+}
+

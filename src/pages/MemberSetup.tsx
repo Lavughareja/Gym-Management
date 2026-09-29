@@ -11,19 +11,19 @@ import { showSnackbar } from "../redux/slices/snackbarSlice";
 // ─────────────────────────────────────────────────────────────────────────────
 // MemberSetup Page
 // ─────────────────────────────────────────────────────────────────────────────
-
+import "./MemberSetup.css";
 export const MemberSetup: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [searchParams] = useSearchParams();
-  const { branding } = useSelector((state: RootState) => state.whiteLabel);
-
+  const {
+    branding
+  } = useSelector((state: RootState) => state.whiteLabel);
   const [token, setToken] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
-
   useEffect(() => {
     const t = searchParams.get("token");
     if (t) {
@@ -32,27 +32,36 @@ export const MemberSetup: React.FC = () => {
       setErrorMsg("Invalid or missing invitation token.");
     }
   }, [searchParams]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!password || !confirmPassword) {
-      dispatch(showSnackbar({ message: "Please fill all fields", type: "error" }));
+      dispatch(showSnackbar({
+        message: "Please fill all fields",
+        type: "error"
+      }));
       return;
     }
-
     if (password !== confirmPassword) {
-      dispatch(showSnackbar({ message: "Passwords do not match", type: "error" }));
+      dispatch(showSnackbar({
+        message: "Passwords do not match",
+        type: "error"
+      }));
       return;
     }
-
     setLoading(true);
     try {
-      const response = await memberSetupApi({ token, password });
+      const response = await memberSetupApi({
+        token,
+        password
+      });
       const jwtToken = response.data.token;
       if (jwtToken) {
         localStorage.setItem(AUTH_TOKEN_KEY, jwtToken);
       }
-      dispatch(showSnackbar({ message: response.data.message || "Setup successful!", type: "success" }));
+      dispatch(showSnackbar({
+        message: response.data.message || "Setup successful!",
+        type: "success"
+      }));
 
       // Save dashUser for ProtectedRoute
       const userData = response.data?.user || response.data;
@@ -62,94 +71,65 @@ export const MemberSetup: React.FC = () => {
         role: "member",
         canAddMember: false,
         _id: userData?._id,
-        gymId: userData?.gymId,
+        gymId: userData?.gymId
       };
       localStorage.setItem("dashUser", JSON.stringify(dashUser));
 
       // Navigate to member dashboard
-      navigate("/member/overview", { replace: true });
+      navigate("/member/overview", {
+        replace: true
+      });
     } catch (error: any) {
       const message = error?.response?.data?.message || "Setup failed. Please try again.";
-      dispatch(showSnackbar({ message, type: "error" }));
+      dispatch(showSnackbar({
+        message,
+        type: "error"
+      }));
     } finally {
       setLoading(false);
     }
   };
-
   if (errorMsg) {
-    return (
-      <div className="page-container" style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg-secondary)" }}>
-        <div className="gym-card" style={{ maxWidth: 420, width: "100%", padding: "40px", textAlign: "center" }}>
-          <h2 className="page-title" style={{ color: "var(--danger)" }}>Error</h2>
+    return <div className="page-container member-setup-inline-1">
+        <div className="gym-card member-setup-inline-2">
+          <h2 className="page-title member-setup-inline-3">Error</h2>
           <p className="page-subtitle">{errorMsg}</p>
         </div>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className="page-container" style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg-secondary)" }}>
-      <div className="gym-card" style={{ maxWidth: 420, width: "100%", padding: "40px", textAlign: "center" }}>
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: 24 }}>
-          <div className="brand-icon-wrapper" style={{ width: 48, height: 48, background: 'none', boxShadow: 'none' }}>
-            {branding.logoUrl ? (
-              <img src={branding.logoUrl} alt={branding.gymName} style={{ width: 48, height: 48, objectFit: 'contain', borderRadius: 10 }} />
-            ) : (
-              <img src="/logo.png" alt="Trainix Logo" style={{ width: 48, height: 48, objectFit: 'contain', borderRadius: 10 }} />
-            )}
+  return <div className="page-container member-setup-inline-4">
+      <div className="gym-card member-setup-inline-5">
+        <div className="member-setup-inline-6">
+          <div className="brand-icon-wrapper member-setup-inline-7">
+            {branding.logoUrl ? <img src={branding.logoUrl} alt={branding.gymName} className="member-setup-inline-8" /> : <img src="/logo.png" alt="Trainix Logo" className="member-setup-inline-9" />}
           </div>
         </div>
         
-        <h2 className="page-title" style={{ fontSize: "1.75rem", marginBottom: 8 }}>Member Setup</h2>
-        <p className="page-subtitle" style={{ marginBottom: 32 }}>Set your password to activate your {branding.gymName} account</p>
+        <h2 className="page-title member-setup-inline-10">Member Setup</h2>
+        <p className="page-subtitle member-setup-inline-11">Set your password to activate your {branding.gymName} account</p>
 
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-          <div style={{ textAlign: "left" }}>
+        <form onSubmit={handleSubmit} className="member-setup-inline-12">
+          <div className="member-setup-inline-13">
             <label className="form-label">Create Password</label>
-            <div style={{ position: "relative" }}>
-              <Lock size={18} style={{ position: "absolute", left: 14, top: 12, color: "var(--text-muted)" }} />
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="form-input"
-                style={{ paddingLeft: 42 }}
-                placeholder="••••••••"
-                required
-                minLength={8}
-              />
+            <div className="member-setup-inline-14">
+              <Lock size={18} className="member-setup-inline-15" />
+              <input type="password" value={password} onChange={e => setPassword(e.target.value)} className="form-input member-setup-inline-16" placeholder="••••••••" required minLength={8} />
             </div>
           </div>
 
-          <div style={{ textAlign: "left" }}>
+          <div className="member-setup-inline-17">
             <label className="form-label">Confirm Password</label>
-            <div style={{ position: "relative" }}>
-              <Lock size={18} style={{ position: "absolute", left: 14, top: 12, color: "var(--text-muted)" }} />
-              <input
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="form-input"
-                style={{ paddingLeft: 42 }}
-                placeholder="••••••••"
-                required
-                minLength={8}
-              />
+            <div className="member-setup-inline-18">
+              <Lock size={18} className="member-setup-inline-19" />
+              <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} className="form-input member-setup-inline-20" placeholder="••••••••" required minLength={8} />
             </div>
           </div>
 
-          <button
-            type="submit"
-            className="btn-blue"
-            style={{ width: "100%", justifyContent: "center", padding: "12px", marginTop: 8 }}
-            disabled={loading}
-          >
-            {loading ? <Loader size={18} style={{ animation: "spin 1s linear infinite" }} /> : "Activate Account"}
+          <button type="submit" className="btn-blue member-setup-inline-21" disabled={loading}>
+            {loading ? <Loader size={18} className="member-setup-inline-22" /> : "Activate Account"}
           </button>
         </form>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default MemberSetup;

@@ -1,3 +1,5 @@
+import DemoRequests from './DemoRequests';
+import './SuperAdminDashboard.css';
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch, RootState } from "../../redux/store";
@@ -72,14 +74,14 @@ const SuperAdminDashboard: React.FC = () => {
         <>
           {/* ─── DASHBOARD TAB ──────────────────────────────────────────────── */}
           {activeTab === "dashboard" && (
-            <div style={styles.page}>
-              <div style={styles.sectionTitle}>
+            <div className="page">
+              <div className="section-title">
                 <BarChart3 size={18} /> Platform Overview
-                {statsLoading && <span style={styles.loadingPill}>Loading…</span>}
+                {statsLoading && <span className="loading-pill">Loading…</span>}
               </div>
 
               {/* Stats cards */}
-              <div style={styles.statsGrid}>
+              <div className="stats-grid">
                 <StatsCard
                   icon={<Dumbbell size={24} color="#fff" />}
                   label="Total Gyms"
@@ -174,15 +176,15 @@ const SuperAdminDashboard: React.FC = () => {
               {/* Plan breakdown */}
               {stats && stats.planBreakdown.length > 0 && (
                 <>
-                  <div style={{ ...styles.sectionTitle, marginTop: 36 }}>
+                  <div className="section-title" style={{marginTop: 36 }}>
                     <CreditCard size={18} /> Subscription Plan Breakdown
                   </div>
-                  <div style={styles.planGrid}>
+                  <div className="plan-grid">
                     {stats.planBreakdown.map((p) => (
-                      <div key={p._id} style={styles.planCard}>
-                        <div style={styles.planName}>{p._id?.toUpperCase() || "—"}</div>
-                        <div style={styles.planCount}>{p.count}</div>
-                        <div style={styles.planLabel}>gyms</div>
+                      <div key={p._id} className="plan-card">
+                        <div className="plan-name">{p._id?.toUpperCase() || "—"}</div>
+                        <div className="plan-count">{p.count}</div>
+                        <div className="plan-label">gyms</div>
                       </div>
                     ))}
                   </div>
@@ -192,21 +194,19 @@ const SuperAdminDashboard: React.FC = () => {
               {/* Recent gyms */}
               {stats && stats.recentGyms.length > 0 && (
                 <>
-                  <div style={{ ...styles.sectionTitle, marginTop: 36 }}>
+                  <div className="section-title" style={{marginTop: 36 }}>
                     <Clock size={18} /> Recently Joined Gyms
                   </div>
-                  <div style={styles.recentGrid}>
+                  <div className="recent-grid">
                     {stats.recentGyms.map((g: any) => (
-                      <div key={g._id} style={styles.recentCard}>
-                        <div style={styles.recentName}>{g.name}</div>
-                        <div style={styles.recentEmail}>{g.email}</div>
-                        <div style={styles.recentDate}>
+                      <div key={g._id} className="recent-card">
+                        <div className="recent-name">{g.name}</div>
+                        <div className="recent-email">{g.email}</div>
+                        <div className="recent-date">
                           {new Date(g.createdAt).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" })}
                         </div>
                         <span
-                          style={{
-                            ...styles.activeDot,
-                            background: g.isActive ? "#4ade80" : "#f87171",
+                          className="active-dot" style={{background: g.isActive ? "#4ade80" : "#f87171",
                           }}
                         />
                       </div>
@@ -219,15 +219,15 @@ const SuperAdminDashboard: React.FC = () => {
 
           {/* ─── GYMS TAB ───────────────────────────────────────────────────── */}
           {activeTab === "gyms" && (
-            <div style={styles.page}>
-              <div style={styles.sectionTitle}>
+            <div className="page">
+              <div className="section-title">
                 <Dumbbell size={18} /> All Registered Gyms
-                <span style={styles.countPill}>
+                <span className="count-pill">
                   {pagination?.total ?? 0} total
                 </span>
               </div>
 
-              <div style={styles.tableCard}>
+              <div className="table-card">
                 <GymTable
                   gyms={gyms}
                   loading={gymsLoading}
@@ -252,126 +252,15 @@ const SuperAdminDashboard: React.FC = () => {
 
           {/* ─── BLOG MANAGEMENT TAB ────────────────────────────────────────── */}
           {activeTab === "blogs" && <BlogManagement />}
+
+          {/* ─── DEMO REQUESTS TAB ────────────────────────────────────────── */}
+          {activeTab === "demo-requests" && <DemoRequests />}
         </>
       )}
     </SuperAdminLayout>
   );
 };
 
-const styles: Record<string, React.CSSProperties> = {
-  page: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 12,
-  },
-  sectionTitle: {
-    fontSize: 15,
-    fontWeight: 700,
-    color: "#94a3b8",
-    letterSpacing: "0.04em",
-    textTransform: "uppercase",
-    display: "flex",
-    alignItems: "center",
-    gap: 10,
-    marginBottom: 4,
-  },
-  loadingPill: {
-    fontSize: 11,
-    background: "#e0e7ff",
-    color: "#4f46e5",
-    borderRadius: 20,
-    padding: "4px 10px",
-    fontWeight: 600,
-    letterSpacing: "0.04em",
-  },
-  countPill: {
-    fontSize: 11,
-    background: "#e0e7ff",
-    color: "#4f46e5",
-    borderRadius: 20,
-    padding: "4px 10px",
-    fontWeight: 600,
-  },
-  statsGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
-    gap: 16,
-    marginBottom: 4,
-  },
-  planGrid: {
-    display: "flex",
-    gap: 14,
-    flexWrap: "wrap",
-  },
-  planCard: {
-    background: "#ffffff",
-    border: "1px solid #e2e8f0",
-    borderRadius: 14,
-    padding: "18px 24px",
-    textAlign: "center",
-    minWidth: 120,
-  },
-  planName: {
-    fontSize: 11,
-    fontWeight: 700,
-    color: "#4f46e5",
-    letterSpacing: "0.08em",
-    marginBottom: 4,
-  },
-  planCount: {
-    fontSize: 32,
-    fontWeight: 800,
-    color: "#0f172a",
-    lineHeight: 1,
-  },
-  planLabel: {
-    fontSize: 12,
-    color: "#64748b",
-    marginTop: 2,
-  },
-  recentGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
-    gap: 12,
-  },
-  recentCard: {
-    background: "#ffffff",
-    border: "1px solid #e2e8f0",
-    borderRadius: 12,
-    padding: "14px 16px",
-    position: "relative",
-  },
-  recentName: {
-    fontSize: 14,
-    fontWeight: 700,
-    color: "#0f172a",
-    marginBottom: 2,
-  },
-  recentEmail: {
-    fontSize: 11,
-    color: "#64748b",
-    marginBottom: 6,
-  },
-  recentDate: {
-    fontSize: 11,
-    color: "#94a3b8",
-  },
-  activeDot: {
-    position: "absolute",
-    top: 14,
-    right: 14,
-    width: 8,
-    height: 8,
-    borderRadius: "50%",
-    display: "block",
-  },
-  tableCard: {
-    background: "#ffffff",
-    border: "1px solid #e2e8f0",
-    borderRadius: 16,
-    overflow: "hidden",
-    boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.05)",
-  },
-};
+
 
 export default SuperAdminDashboard;

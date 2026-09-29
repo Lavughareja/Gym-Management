@@ -71,4 +71,8 @@ export const apiRoutes = {
   ownerBranding:          '/owner/branding',
   ownerBrandingLogo:      '/owner/branding/logo',
   ownerBrandingSubdomain: '/owner/branding/check-subdomain',
+  // ── Demo Requests ─────────────────────────────────────────────────────────
+  demoRequests: '/demo-requests',
+  demoRequestStatus: '/demo-requests/:id/status',
+  startTrial: '/demo-requests/:id/start-trial',
 } as const;

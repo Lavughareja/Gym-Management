@@ -8,6 +8,8 @@ import { getGymInvoiceSettingsApi, updateGymInvoiceSettingsApi } from "../../ser
 import { getOwnerBrandingApi, updateOwnerBrandingApi, uploadOwnerLogoApi, checkSubdomainApi } from "../../services/apis/whiteLabelApis";
 import { setGymBranding } from "../../redux/slices/whiteLabelSlice";
 import { showSnackbar } from "../../redux/slices/snackbarSlice";
+import { upgradeOrderApi, verifyUpgradeApi } from "../../services/apis/paymentApis";
+import { loadRazorpay } from "../../utils/razorpayUtils";
 
 interface Props {
   gymName: string;
@@ -23,6 +25,7 @@ const SettingsPanel: React.FC<Props> = ({ gymName }) => {
   const dispatch = useAppDispatch();
   const { devices, loading } = useAppSelector((state) => state.device);
   const { branding } = useSelector((state: RootState) => state.whiteLabel);
+  const { user }: any = useSelector((state: RootState) => state.auth);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [showAddDevice, setShowAddDevice] = useState(false);
@@ -52,7 +55,201 @@ const SettingsPanel: React.FC<Props> = ({ gymName }) => {
     fetchBranding();
   }, [dispatch]);
 
-  const fetchInvoiceSettings = async () => {
+
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [upgrading, setUpgrading] = useState(false);
+
+  const handleUpgradePlan = async (plan: string) => {
+    setUpgrading(true);
+    try {
+      const isLoaded = await loadRazorpay();
+      if (!isLoaded) {
+        dispatch(showSnackbar({ message: "Razorpay failed to load", type: "error" }));
+        setUpgrading(false);
+        return;
+      }
+
+      const res = await upgradeOrderApi({ plan });
+      const { order, isMock } = res.data;
+
+      if (isMock) {
+        const verifyRes = await verifyUpgradeApi({
+          razorpayOrderId: order.orderId,
+          razorpayPaymentId: "mock_payment_123",
+          razorpaySignature: "mock_signature_123"
+        });
+        dispatch(showSnackbar({ message: verifyRes.data.message || "Plan upgraded!", type: "success" }));
+        setShowUpgradeModal(false);
+        setUpgrading(false);
+        // Refresh page or user to update plan status
+        window.location.reload();
+        return;
+      }
+
+      const options = {
+        key: 'rzp_test_StgMX0peQZajFc',
+        amount: order.amount,
+        currency: order.currency,
+        name: branding.gymName,
+        description: "Plan Upgrade",
+        order_id: order.orderId,
+        handler: async function (response: any) {
+          try {
+            const verifyRes = await verifyUpgradeApi({
+              razorpayOrderId: response.razorpay_order_id,
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpaySignature: response.razorpay_signature,
+            });
+            dispatch(showSnackbar({ message: verifyRes.data.message || "Plan upgraded!", type: "success" }));
+            setShowUpgradeModal(false);
+            window.location.reload();
+          } catch (err: any) {
+            dispatch(showSnackbar({ message: err.response?.data?.message || "Payment verification failed", type: "error" }));
+          }
+        },
+        prefill: {
+          email: order.email,
+        },
+        theme: {
+          color: branding.primaryColor || "#3b82f6",
+        },
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.on("payment.failed", function (response: any) {
+        dispatch(showSnackbar({ message: response.error.description, type: "error" }));
+      });
+      rzp.open();
+      
+    } catch (err: any) {
+      dispatch(showSnackbar({ message: err.response?.data?.message || "Failed to upgrade plan", type: "error" }));
+    } finally {
+      setUpgrading(false);
+    }
+  };
+
+  const upgradePlans = [
+    {
+      id: "starter",
+      name: "Starter",
+      desc: "For small gyms just getting started.",
+      price: "₹1,999",
+      features: ["Up to 100 Members", "Basic Reports", "Email Support", "1 Branch", "1 Admin"],
+      isPopular: false,
+    },
+    {
+      id: "plus",
+      name: "Plus",
+      desc: "Perfect for growing fitness centers.",
+      price: "₹2,999",
+      features: ["Up to 500 Members", "Advanced Analytics", "Priority Support", "2 Branches", "5 Staff Members"],
+      isPopular: false,
+    },
+    {
+      id: "professional",
+      name: "Professional",
+      desc: "Everything you need to scale rapidly.",
+      price: "₹4,999",
+      features: ["Unlimited Members", "Biometric Integration", "WhatsApp Automation", "5 Branches", "Unlimited Staff"],
+      isPopular: true,
+    },
+    {
+      id: "enterprise",
+      name: "Enterprise",
+      desc: "For large franchises and networks.",
+      price: "₹9,999",
+      features: ["Unlimited Everything", "Custom Development", "Dedicated Account Manager", "White-label App", "API Access"],
+      isPopular: false,
+    },
+  ];
+
+  const UpgradePlanModal = () => {
+    if (!showUpgradeModal) return null;
+    return (
+      <div style={overlayStyle}>
+        <div style={{ background: "white", borderRadius: 16, width: "100%", maxWidth: 900, position: "relative", maxHeight: "90vh", overflowY: "auto" }}>
+          {/* Header */}
+          <div style={{ padding: "28px 32px 20px", borderBottom: "1px solid #f1f5f9", position: "sticky", top: 0, background: "white", zIndex: 1, borderRadius: "16px 16px 0 0" }}>
+            <button onClick={() => setShowUpgradeModal(false)} style={{ position: "absolute", top: 20, right: 20, background: "none", border: "none", cursor: "pointer", padding: 4 }}>
+              <X size={22} color="#64748b" />
+            </button>
+            <h2 style={{ fontSize: "1.5rem", fontWeight: 700, color: "#0f172a", margin: 0 }}>Upgrade Your Plan</h2>
+            <p style={{ color: "#64748b", marginTop: 4, marginBottom: 0 }}>Simple, transparent pricing. No hidden fees.</p>
+          </div>
+
+          {/* Plans Grid */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr 1fr", gap: 16, padding: "24px 32px 32px" }}>
+            {upgradePlans.map(p => (
+              <div key={p.id} style={{
+                border: p.isPopular ? "2px solid var(--primary)" : "1px solid #e2e8f0",
+                borderRadius: 16,
+                padding: 24,
+                position: "relative",
+                boxShadow: p.isPopular ? "0 8px 32px rgba(59,130,246,0.15)" : "0 1px 4px rgba(0,0,0,0.05)",
+                display: "flex",
+                flexDirection: "column",
+              }}>
+                {p.isPopular && (
+                  <div style={{
+                    position: "absolute", top: -13, left: "50%", transform: "translateX(-50%)",
+                    background: "linear-gradient(90deg, var(--primary), #6366f1)",
+                    color: "white", padding: "3px 14px", borderRadius: 20,
+                    fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase",
+                    whiteSpace: "nowrap"
+                  }}>
+                    Most Popular
+                  </div>
+                )}
+
+                <h3 style={{ fontSize: "1.05rem", fontWeight: 700, color: "#0f172a", marginBottom: 4 }}>{p.name}</h3>
+                <p style={{ fontSize: "0.78rem", color: "#94a3b8", marginBottom: 16, minHeight: 32 }}>{p.desc}</p>
+
+                <div style={{ marginBottom: 20 }}>
+                  <span style={{ fontSize: "1.8rem", fontWeight: 800, color: "#0f172a" }}>{p.price}</span>
+                  <span style={{ color: "#94a3b8", fontSize: "0.85rem" }}>/mo</span>
+                </div>
+
+                <ul style={{ listStyle: "none", padding: 0, margin: "0 0 20px", flex: 1 }}>
+                  {p.features.map((feat, i) => (
+                    <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8, marginBottom: 10, fontSize: "0.82rem", color: "#475569" }}>
+                      <Check size={15} color="var(--primary)" style={{ flexShrink: 0, marginTop: 1 }} />
+                      {feat}
+                    </li>
+                  ))}
+                </ul>
+
+                <button
+                  onClick={() => handleUpgradePlan(p.id)}
+                  disabled={upgrading}
+                  style={{
+                    width: "100%",
+                    padding: "10px 0",
+                    borderRadius: 10,
+                    border: "none",
+                    fontWeight: 600,
+                    fontSize: "0.9rem",
+                    cursor: upgrading ? "not-allowed" : "pointer",
+                    background: p.isPopular ? "var(--primary)" : "#0f172a",
+                    color: "white",
+                    transition: "opacity 0.2s",
+                    opacity: upgrading ? 0.7 : 1,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 6,
+                  }}
+                >
+                  {upgrading ? <Loader size={16} style={{ animation: "spin 1s linear infinite" }} /> : "Select Plan"}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+    const fetchInvoiceSettings = async () => {
     try {
       const res = await getGymInvoiceSettingsApi();
       if (res.data.settings) {
@@ -174,6 +371,20 @@ const SettingsPanel: React.FC<Props> = ({ gymName }) => {
       </div>
 
       <div className="dashboard-grid">
+        {user?.role === 'admin' && (
+          <div className="gym-card" style={{ gridColumn: "1 / -1", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div>
+              <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text-primary)" }}>Subscription Plan</h3>
+              <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginTop: 4 }}>
+                Current Plan: <span style={{ fontWeight: 600, color: "var(--primary)" }}>{user.paymentStatus ? "Premium" : "Free Trial"}</span> 
+                {user.planEndDate && ` (Expires on ${new Date(user.planEndDate).toLocaleDateString('en-GB')})`}
+              </p>
+            </div>
+            <button className="btn-blue" onClick={() => setShowUpgradeModal(true)}>
+              Upgrade / Manage Plan
+            </button>
+          </div>
+        )}
         <div className="gym-card">
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
             <div>
@@ -438,16 +649,38 @@ const SettingsPanel: React.FC<Props> = ({ gymName }) => {
                   value={branding.gymCode || "NOT_GENERATED"}
                   readOnly
                   className="form-input"
-                  style={{ flex: 1, background: "var(--bg-secondary)", cursor: "default" }}
+                  style={{ flex: 1, background: "var(--bg-secondary)", cursor: "default", color: branding.gymCode ? "var(--text-primary)" : "var(--text-muted)" }}
                 />
-                <button
-                  className="btn-blue-outline"
-                  style={{ padding: "0 14px", fontSize: "0.8rem", flexShrink: 0 }}
-                  onClick={handleCopyCode}
-                  disabled={!branding.gymCode}
-                >
-                  {copiedCode ? <Check size={14} /> : <Copy size={14} />}
-                </button>
+                {branding.gymCode ? (
+                  <button
+                    className="btn-blue-outline"
+                    style={{ padding: "0 14px", fontSize: "0.8rem", flexShrink: 0 }}
+                    onClick={handleCopyCode}
+                  >
+                    {copiedCode ? <Check size={14} /> : <Copy size={14} />}
+                  </button>
+                ) : (
+                  <button
+                    className="btn-blue"
+                    style={{ padding: "0 14px", fontSize: "0.8rem", flexShrink: 0 }}
+                    onClick={async () => {
+                      try {
+                        setSavingBranding(true);
+                        const reqBody = { ...brandingForm, generateGymCode: true };
+                        const updated = await updateOwnerBrandingApi(reqBody);
+                        dispatch(setGymBranding(updated.data || updated));
+                        dispatch(showSnackbar({ message: "Gym Code generated successfully", type: "success" }));
+                      } catch (error) {
+                        dispatch(showSnackbar({ message: error.response?.data?.message || "Failed to generate Gym Code", type: "error" }));
+                      } finally {
+                        setSavingBranding(false);
+                      }
+                    }}
+                    disabled={savingBranding}
+                  >
+                    Generate Code
+                  </button>
+                )}
               </div>
               <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: 4 }}>Members can use this code to find your gym</p>
             </div>
@@ -465,6 +698,7 @@ const SettingsPanel: React.FC<Props> = ({ gymName }) => {
         </button>
       </div>
 
+      <UpgradePlanModal />
       {showAddDevice && (
         <div style={overlayStyle}>
           <div className="gym-card" style={{ maxWidth: 440, width: "100%", padding: "32px" }}>

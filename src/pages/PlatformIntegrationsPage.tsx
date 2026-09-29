@@ -2,28 +2,74 @@ import React, { useEffect, useState } from 'react';
 import { Navbar, Footer } from './Home';
 import { ArrowRight, CheckCircle2, Cloud, Fingerprint, Calendar, MessageCircle, Video, CreditCard, Mail, Database, Globe } from 'lucide-react';
 import './PlatformIntegrationsPage.css';
-
-const INTEGRATIONS = [
-  { id: 'whatsapp', name: 'WhatsApp', desc: 'Automate payment reminders, check-in alerts, and birthday wishes directly to members\' phones.', icon: <MessageCircle />, color: '#25D366', category: 'Communication' },
-  { id: 'stripe', name: 'Stripe', desc: 'Accept international payments, set up recurring subscriptions, and handle refunds seamlessly.', icon: <CreditCard />, color: '#635BFF', category: 'Payments' },
-  { id: 'razorpay', name: 'Razorpay', desc: 'Optimized for Indian businesses. Accept UPI, cards, and net banking with zero setup.', icon: <CreditCard />, color: '#0753FF', category: 'Payments' },
-  { id: 'biometrics', name: 'Biometric Devices', desc: 'Connect essl, ZKTeco, and other fingerprint/face scanners for real-time attendance.', icon: <Fingerprint />, color: '#4F46E5', category: 'Hardware' },
-  { id: 'zoom', name: 'Zoom', desc: 'Host live virtual fitness classes and automatically email join links to enrolled members.', icon: <Video />, color: '#2D8CFF', category: 'Classes' },
-  { id: 'mailchimp', name: 'Mailchimp', desc: 'Sync your leads and members for powerful email marketing campaigns.', icon: <Mail />, color: '#FFE01B', category: 'Marketing' },
-  { id: 'gcal', name: 'Google Calendar', desc: 'Two-way sync for PT sessions, classes, and gym events.', icon: <Calendar />, color: '#4285F4', category: 'Productivity' },
-  { id: 'api', name: 'Custom REST API', desc: 'Build your own custom integrations or connect with your existing website.', icon: <Database />, color: '#10B981', category: 'Developers' },
-];
-
+const INTEGRATIONS = [{
+  id: 'whatsapp',
+  name: 'WhatsApp',
+  desc: 'Automate payment reminders, check-in alerts, and birthday wishes directly to members\' phones.',
+  icon: <MessageCircle />,
+  color: '#25D366',
+  category: 'Communication'
+}, {
+  id: 'stripe',
+  name: 'Stripe',
+  desc: 'Accept international payments, set up recurring subscriptions, and handle refunds seamlessly.',
+  icon: <CreditCard />,
+  color: '#635BFF',
+  category: 'Payments'
+}, {
+  id: 'razorpay',
+  name: 'Razorpay',
+  desc: 'Optimized for Indian businesses. Accept UPI, cards, and net banking with zero setup.',
+  icon: <CreditCard />,
+  color: '#0753FF',
+  category: 'Payments'
+}, {
+  id: 'biometrics',
+  name: 'Biometric Devices',
+  desc: 'Connect essl, ZKTeco, and other fingerprint/face scanners for real-time attendance.',
+  icon: <Fingerprint />,
+  color: '#4F46E5',
+  category: 'Hardware'
+}, {
+  id: 'zoom',
+  name: 'Zoom',
+  desc: 'Host live virtual fitness classes and automatically email join links to enrolled members.',
+  icon: <Video />,
+  color: '#2D8CFF',
+  category: 'Classes'
+}, {
+  id: 'mailchimp',
+  name: 'Mailchimp',
+  desc: 'Sync your leads and members for powerful email marketing campaigns.',
+  icon: <Mail />,
+  color: '#FFE01B',
+  category: 'Marketing'
+}, {
+  id: 'gcal',
+  name: 'Google Calendar',
+  desc: 'Two-way sync for PT sessions, classes, and gym events.',
+  icon: <Calendar />,
+  color: '#4285F4',
+  category: 'Productivity'
+}, {
+  id: 'api',
+  name: 'Custom REST API',
+  desc: 'Build your own custom integrations or connect with your existing website.',
+  icon: <Database />,
+  color: '#10B981',
+  category: 'Developers'
+}];
 const CATEGORIES = ['All', 'Payments', 'Communication', 'Hardware', 'Classes', 'Marketing'];
-
-export const PlatformIntegrations: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+export const PlatformIntegrations: React.FC<{
+  onBack: () => void;
+}> = ({
+  onBack
+}) => {
   const [activeCat, setActiveCat] = useState('All');
   const [filtered, setFiltered] = useState(INTEGRATIONS);
-
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-
   useEffect(() => {
     if (activeCat === 'All') {
       setFiltered(INTEGRATIONS);
@@ -31,10 +77,10 @@ export const PlatformIntegrations: React.FC<{ onBack: () => void }> = ({ onBack 
       setFiltered(INTEGRATIONS.filter(i => i.category === activeCat));
     }
   }, [activeCat]);
-
-  return (
-    <div className="pi-page">
-      <Navbar onLogin={() => { window.location.href = '/login'; }} />
+  return <div className="pi-page">
+      <Navbar onLogin={() => {
+      window.location.href = '/login';
+    }} />
 
       {/* Hero Section */}
       <section className="pi-hero">
@@ -83,28 +129,25 @@ export const PlatformIntegrations: React.FC<{ onBack: () => void }> = ({ onBack 
           </div>
 
           <div className="pi-filter-bar">
-            {CATEGORIES.map(cat => (
-              <button 
-                key={cat} 
-                className={`pi-filter-btn ${activeCat === cat ? 'pi-filter-btn-active' : ''}`}
-                onClick={() => setActiveCat(cat)}
-              >
+            {CATEGORIES.map(cat => <button key={cat} className={`pi-filter-btn ${activeCat === cat ? 'pi-filter-btn-active' : ''}`} onClick={() => setActiveCat(cat)}>
                 {cat}
-              </button>
-            ))}
+              </button>)}
           </div>
 
           <div className="pi-grid">
-            {filtered.map(int => (
-              <div className="pi-card" key={int.id}>
-                <div className="pi-card-icon-wrap" style={{ backgroundColor: `${int.color}15`, color: int.color }}>
+            {filtered.map(int => <div className="pi-card" key={int.id}>
+                <div className="pi-card-icon-wrap" style={{
+              backgroundColor: `${int.color}15`,
+              color: int.color
+            }}>
                   {int.icon}
                 </div>
                 <h3 className="pi-card-title">{int.name}</h3>
                 <p className="pi-card-desc">{int.desc}</p>
-                <a href="#" className="pi-card-link" style={{ color: int.color }}>Learn more <ArrowRight size={14} /></a>
-              </div>
-            ))}
+                <a href="#" className="pi-card-link" style={{
+              color: int.color
+            }}>Learn more <ArrowRight size={14} /></a>
+              </div>)}
           </div>
         </div>
       </section>
@@ -121,7 +164,7 @@ export const PlatformIntegrations: React.FC<{ onBack: () => void }> = ({ onBack 
                 <li><CheckCircle2 color="#10B981" /> Automatic access control for unpaid members</li>
                 <li><CheckCircle2 color="#10B981" /> Support for fingerprint, face, and RFID</li>
               </ul>
-              <button className="pi-btn pi-btn-primary" style={{ marginTop: '24px' }}>Download Bridge App</button>
+              <button className="pi-btn pi-btn-primary platform-integrations-page-inline-1">Download Bridge App</button>
             </div>
             <div className="pi-highlight-image">
               <div className="pi-scanner-mockup">
@@ -145,7 +188,7 @@ export const PlatformIntegrations: React.FC<{ onBack: () => void }> = ({ onBack 
             <p>Need something custom? Our robust REST API and Webhooks allow developers to connect Trainix with virtually any software platform.</p>
             <div className="pi-api-code">
               <code>
-                <span className="code-method">GET</span> /api/v1/members<br/>
+                <span className="code-method">GET</span> /api/v1/members<br />
                 <span className="code-header">Authorization:</span> Bearer YOUR_API_KEY
               </code>
             </div>
@@ -154,8 +197,6 @@ export const PlatformIntegrations: React.FC<{ onBack: () => void }> = ({ onBack 
       </section>
 
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default PlatformIntegrations;

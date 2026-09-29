@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { LogOut, Activity, Dumbbell, BarChart3, Clock, Play, Square, Loader, Menu, X, Moon, Sun, LayoutDashboard, CreditCard, ChevronRight, CheckCircle2, User, Sparkles, ShoppingCart, FileText, Target, ClipboardList, ShieldCheck, PenLine, Eye, Trash2, BookOpen, UserCheck, Calendar, Salad, Ruler, ChevronDown, ChevronUp, Flame, Upload, Download, CheckCircle, Bell } from "lucide-react";
 import { useNavigate, useLocation, Navigate } from "react-router-dom";
 import UserProfileModal from "../components/UserProfileModal/UserProfileModal";
@@ -17,93 +17,226 @@ import { getWeeklyStatsApi, getStreakStatsApi, completeChallengeApi } from "../s
 import { getLatestBmiReportApi, uploadBmiReportApi } from "../services/apis/bmiApis";
 import { getMemberDietHistoryApi, generateDietPlanApi, generateDietPlanFromWorkoutApi } from "../services/apis/dietApis";
 import WorkoutLibraryPage from "../components/WorkoutLibrary/WorkoutLibraryPage";
-import {
-  fetchMemberPtInfoAction,
-  fetchPtWorkoutPlansAction,
-  fetchPtDietPlansAction,
-  fetchPtMeasurementsAction,
-  acceptPtAssignmentAction,
-  rejectPtAssignmentAction,
-} from "../redux/actions/ptActions";
+import { fetchMemberPtInfoAction, fetchPtWorkoutPlansAction, fetchPtDietPlansAction, fetchPtMeasurementsAction, acceptPtAssignmentAction, rejectPtAssignmentAction } from "../redux/actions/ptActions";
 import BMICalculator from "../components/BMICalculator/BMICalculator";
 import CaloriesCalculator from "../components/CaloriesCalculator/CaloriesCalculator";
 import WaterReminder from "../components/WaterReminder/WaterReminder";
 import EventsViewPanel from "../components/DashboardPanels/EventsViewPanel";
 import MemberPlanInvoicesPanel from "../components/DashboardPanels/MemberPlanInvoicesPanel";
-
-const DEFAULT_WORKOUTS = [
-  { _id: "def_chest_1", name: "Bench Press", bodyPart: "Chest" },
-  { _id: "def_chest_2", name: "Incline Dumbbell Press", bodyPart: "Chest" },
-  { _id: "def_chest_3", name: "Cable Crossovers", bodyPart: "Chest" },
-  { _id: "def_shoulder_1", name: "Shoulder Press", bodyPart: "Shoulder" },
-  { _id: "def_shoulder_2", name: "Lateral Raises", bodyPart: "Shoulder" },
-  { _id: "def_shoulder_3", name: "Front Raises", bodyPart: "Shoulder" },
-  { _id: "def_legs_1", name: "Squats", bodyPart: "Legs" },
-  { _id: "def_legs_2", name: "Leg Press", bodyPart: "Legs" },
-  { _id: "def_legs_3", name: "Leg Extensions", bodyPart: "Legs" },
-  { _id: "def_back_1", name: "Pull-ups", bodyPart: "Back" },
-  { _id: "def_back_2", name: "Deadlifts", bodyPart: "Back" },
-  { _id: "def_back_3", name: "Lat Pulldowns", bodyPart: "Back" },
-  { _id: "def_core_1", name: "Crunches", bodyPart: "Core" },
-  { _id: "def_core_2", name: "Plank", bodyPart: "Core" },
-  { _id: "def_cardio_1", name: "Treadmill", bodyPart: "Cardio" },
-  { _id: "def_cardio_2", name: "Cycling", bodyPart: "Cardio" },
-  { _id: "def_forearm_1", name: "Wrist Curls", bodyPart: "Forearm" }
-];
-
-export const genericDietPlan = [
-  { dayNumber: 1, calories: 2850, protein: 165, carbs: 355, fats: 72, morningSnack: "150g Oats + 1 Scoop Whey", breakfast: "2 Brown Bread + Peanut Butter + 1 Banana", lunch: "200g Rice + 100g Veggies + 100g Paneer", eveningSnack: "1 Apple + 20 Almonds", preWorkout: "2 Bananas", postWorkout: "1 Scoop Whey + 200g Rice", dinner: "Dal + 2 Roti + 100g Veggies + 100g Paneer", bedtimeSnack: "250ml Milk" },
-  { dayNumber: 2, calories: 2780, protein: 160, carbs: 345, fats: 70, morningSnack: "150g Poha + 1 Scoop Whey", breakfast: "2 Multigrain Toast + Peanut Butter + Apple", lunch: "3 Roti + 100g Paneer + Veggies", eveningSnack: "Mixed Fruits + 20 Peanuts", preWorkout: "2 Bananas", postWorkout: "1 Scoop Whey + 200g Rice", dinner: "Dal + Rice + Salad", bedtimeSnack: "250ml Milk" },
-  { dayNumber: 3, calories: 2900, protein: 168, carbs: 360, fats: 73, morningSnack: "150g Upma + 1 Scoop Whey", breakfast: "Vegetable Sandwich + 1 Banana", lunch: "200g Rice + Dal + Veggies", eveningSnack: "Apple + 15 Cashews", preWorkout: "Banana + Black Coffee", postWorkout: "1 Scoop Whey + 200g Sweet Potato", dinner: "2 Roti + Paneer + Veggies", bedtimeSnack: "250ml Milk" },
-  { dayNumber: 4, calories: 2820, protein: 162, carbs: 350, fats: 71, morningSnack: "150g Oats + 1 Scoop Whey", breakfast: "Oats Chilla + Peanut Butter", lunch: "3 Roti + Soya Chunks + Veggies", eveningSnack: "Orange + Roasted Chana", preWorkout: "2 Bananas", postWorkout: "1 Scoop Whey + 200g Rice", dinner: "Dal + 2 Roti + Mixed Veg", bedtimeSnack: "250ml Milk" },
-  { dayNumber: 5, calories: 2870, protein: 166, carbs: 355, fats: 72, morningSnack: "150g Poha + 1 Scoop Whey", breakfast: "2 Brown Bread + Almond Butter + Banana", lunch: "200g Rice + Rajma + Veggies", eveningSnack: "Banana + Almonds", preWorkout: "Banana + Dates", postWorkout: "1 Scoop Whey + 200g Rice", dinner: "Paneer Bhurji + 2 Roti", bedtimeSnack: "250ml Milk" },
-  { dayNumber: 6, calories: 2750, protein: 158, carbs: 340, fats: 69, morningSnack: "150g Dalia + 1 Scoop Whey", breakfast: "Vegetable Poha + Apple", lunch: "3 Roti + Paneer Bhurji + Veggies", eveningSnack: "Fruit Bowl", preWorkout: "2 Bananas", postWorkout: "1 Scoop Whey + 200g Sweet Potato", dinner: "Khichdi + Curd", bedtimeSnack: "250ml Milk" },
-  { dayNumber: 7, calories: 2800, protein: 160, carbs: 345, fats: 70, morningSnack: "150g Oats + 1 Scoop Whey", breakfast: "Paneer Sandwich + Banana", lunch: "Rice + Chole + Salad", eveningSnack: "Apple + Walnuts", preWorkout: "Banana + Peanut Butter", postWorkout: "1 Scoop Whey + 200g Rice", dinner: "Dal + 2 Roti + Paneer", bedtimeSnack: "250ml Milk" },
-];
+import "./MemberDashboard.css";
+const DEFAULT_WORKOUTS = [{
+  _id: "def_chest_1",
+  name: "Bench Press",
+  bodyPart: "Chest"
+}, {
+  _id: "def_chest_2",
+  name: "Incline Dumbbell Press",
+  bodyPart: "Chest"
+}, {
+  _id: "def_chest_3",
+  name: "Cable Crossovers",
+  bodyPart: "Chest"
+}, {
+  _id: "def_shoulder_1",
+  name: "Shoulder Press",
+  bodyPart: "Shoulder"
+}, {
+  _id: "def_shoulder_2",
+  name: "Lateral Raises",
+  bodyPart: "Shoulder"
+}, {
+  _id: "def_shoulder_3",
+  name: "Front Raises",
+  bodyPart: "Shoulder"
+}, {
+  _id: "def_legs_1",
+  name: "Squats",
+  bodyPart: "Legs"
+}, {
+  _id: "def_legs_2",
+  name: "Leg Press",
+  bodyPart: "Legs"
+}, {
+  _id: "def_legs_3",
+  name: "Leg Extensions",
+  bodyPart: "Legs"
+}, {
+  _id: "def_back_1",
+  name: "Pull-ups",
+  bodyPart: "Back"
+}, {
+  _id: "def_back_2",
+  name: "Deadlifts",
+  bodyPart: "Back"
+}, {
+  _id: "def_back_3",
+  name: "Lat Pulldowns",
+  bodyPart: "Back"
+}, {
+  _id: "def_core_1",
+  name: "Crunches",
+  bodyPart: "Core"
+}, {
+  _id: "def_core_2",
+  name: "Plank",
+  bodyPart: "Core"
+}, {
+  _id: "def_cardio_1",
+  name: "Treadmill",
+  bodyPart: "Cardio"
+}, {
+  _id: "def_cardio_2",
+  name: "Cycling",
+  bodyPart: "Cardio"
+}, {
+  _id: "def_forearm_1",
+  name: "Wrist Curls",
+  bodyPart: "Forearm"
+}];
+export const genericDietPlan = [{
+  dayNumber: 1,
+  calories: 2850,
+  protein: 165,
+  carbs: 355,
+  fats: 72,
+  morningSnack: "150g Oats + 1 Scoop Whey",
+  breakfast: "2 Brown Bread + Peanut Butter + 1 Banana",
+  lunch: "200g Rice + 100g Veggies + 100g Paneer",
+  eveningSnack: "1 Apple + 20 Almonds",
+  preWorkout: "2 Bananas",
+  postWorkout: "1 Scoop Whey + 200g Rice",
+  dinner: "Dal + 2 Roti + 100g Veggies + 100g Paneer",
+  bedtimeSnack: "250ml Milk"
+}, {
+  dayNumber: 2,
+  calories: 2780,
+  protein: 160,
+  carbs: 345,
+  fats: 70,
+  morningSnack: "150g Poha + 1 Scoop Whey",
+  breakfast: "2 Multigrain Toast + Peanut Butter + Apple",
+  lunch: "3 Roti + 100g Paneer + Veggies",
+  eveningSnack: "Mixed Fruits + 20 Peanuts",
+  preWorkout: "2 Bananas",
+  postWorkout: "1 Scoop Whey + 200g Rice",
+  dinner: "Dal + Rice + Salad",
+  bedtimeSnack: "250ml Milk"
+}, {
+  dayNumber: 3,
+  calories: 2900,
+  protein: 168,
+  carbs: 360,
+  fats: 73,
+  morningSnack: "150g Upma + 1 Scoop Whey",
+  breakfast: "Vegetable Sandwich + 1 Banana",
+  lunch: "200g Rice + Dal + Veggies",
+  eveningSnack: "Apple + 15 Cashews",
+  preWorkout: "Banana + Black Coffee",
+  postWorkout: "1 Scoop Whey + 200g Sweet Potato",
+  dinner: "2 Roti + Paneer + Veggies",
+  bedtimeSnack: "250ml Milk"
+}, {
+  dayNumber: 4,
+  calories: 2820,
+  protein: 162,
+  carbs: 350,
+  fats: 71,
+  morningSnack: "150g Oats + 1 Scoop Whey",
+  breakfast: "Oats Chilla + Peanut Butter",
+  lunch: "3 Roti + Soya Chunks + Veggies",
+  eveningSnack: "Orange + Roasted Chana",
+  preWorkout: "2 Bananas",
+  postWorkout: "1 Scoop Whey + 200g Rice",
+  dinner: "Dal + 2 Roti + Mixed Veg",
+  bedtimeSnack: "250ml Milk"
+}, {
+  dayNumber: 5,
+  calories: 2870,
+  protein: 166,
+  carbs: 355,
+  fats: 72,
+  morningSnack: "150g Poha + 1 Scoop Whey",
+  breakfast: "2 Brown Bread + Almond Butter + Banana",
+  lunch: "200g Rice + Rajma + Veggies",
+  eveningSnack: "Banana + Almonds",
+  preWorkout: "Banana + Dates",
+  postWorkout: "1 Scoop Whey + 200g Rice",
+  dinner: "Paneer Bhurji + 2 Roti",
+  bedtimeSnack: "250ml Milk"
+}, {
+  dayNumber: 6,
+  calories: 2750,
+  protein: 158,
+  carbs: 340,
+  fats: 69,
+  morningSnack: "150g Dalia + 1 Scoop Whey",
+  breakfast: "Vegetable Poha + Apple",
+  lunch: "3 Roti + Paneer Bhurji + Veggies",
+  eveningSnack: "Fruit Bowl",
+  preWorkout: "2 Bananas",
+  postWorkout: "1 Scoop Whey + 200g Sweet Potato",
+  dinner: "Khichdi + Curd",
+  bedtimeSnack: "250ml Milk"
+}, {
+  dayNumber: 7,
+  calories: 2800,
+  protein: 160,
+  carbs: 345,
+  fats: 70,
+  morningSnack: "150g Oats + 1 Scoop Whey",
+  breakfast: "Paneer Sandwich + Banana",
+  lunch: "Rice + Chole + Salad",
+  eveningSnack: "Apple + Walnuts",
+  preWorkout: "Banana + Peanut Butter",
+  postWorkout: "1 Scoop Whey + 200g Rice",
+  dinner: "Dal + 2 Roti + Paneer",
+  bedtimeSnack: "250ml Milk"
+}];
 
 // ── Route map for member panels ───────────────────────────────────────────────
 const MEMBER_PANEL_ROUTES: Record<string, string> = {
-  overview:       "/member/overview",
-  my_plan:        "/member/plan-invoices",
+  overview: "/member/overview",
+  my_plan: "/member/plan-invoices",
   health_monitor: "/member/health-monitor",
-  workouts:       "/member/workouts",
-  library:        "/member/workout-video",
-  reports:        "/member/reports",
-  diet:           "/member/diet",
-  plans:          "/member/plans",
-  challenges:     "/member/challenges",
-  events:         "/member/announcements",
-  pt:             "/member/personal-trainer",
+  workouts: "/member/workouts",
+  library: "/member/workout-video",
+  reports: "/member/reports",
+  diet: "/member/diet",
+  plans: "/member/plans",
+  challenges: "/member/challenges",
+  events: "/member/announcements",
+  pt: "/member/personal-trainer"
 };
-
 function getMemberPanelFromPath(pathname: string): string {
   const seg = pathname.replace("/member/", "").split("/")[0];
   const map: Record<string, string> = {
-    overview:           "overview",
-    "plan-invoices":    "my_plan",
-    "health-monitor":   "health_monitor",
-    workouts:           "workouts",
-    "workout-video":    "library",
-    reports:            "reports",
-    diet:               "diet",
-    plans:              "plans",
-    challenges:         "challenges",
-    announcements:      "events",
-    "personal-trainer": "pt",
+    overview: "overview",
+    "plan-invoices": "my_plan",
+    "health-monitor": "health_monitor",
+    workouts: "workouts",
+    "workout-video": "library",
+    reports: "reports",
+    diet: "diet",
+    plans: "plans",
+    challenges: "challenges",
+    announcements: "events",
+    "personal-trainer": "pt"
   };
   if (pathname === "/member" || pathname === "/member/") return "overview";
   return map[seg] || "not_found";
 }
-
 type Tab = "overview" | "health_monitor" | "workouts" | "reports" | "plans" | "diet" | "library" | "pt" | "challenges" | "events" | "my_plan";
-
 export const MemberDashboard: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useAppDispatch();
-  const { user } = useAppSelector((state) => state.auth);
-  const ptState = useAppSelector((s) => s.pt);
-  const { branding } = useSelector((state: RootState) => state.whiteLabel);
+  const {
+    user
+  } = useAppSelector(state => state.auth);
+  const ptState = useAppSelector(s => s.pt);
+  const {
+    branding
+  } = useSelector((state: RootState) => state.whiteLabel);
 
   // Read user info from localStorage
   const localUserStr = localStorage.getItem("dashUser");
@@ -113,7 +246,6 @@ export const MemberDashboard: React.FC = () => {
 
   // Derive active tab from URL
   const activeTab = getMemberPanelFromPath(location.pathname);
-
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarDietExpanded, setSidebarDietExpanded] = useState(false);
   const [sidebarHealthExpanded, setSidebarHealthExpanded] = useState(false);
@@ -124,22 +256,25 @@ export const MemberDashboard: React.FC = () => {
   // Redirect /member root to /member/overview and handle subroutes
   useEffect(() => {
     if (location.pathname === "/member" || location.pathname === "/member/") {
-      navigate("/member/overview", { replace: true });
+      navigate("/member/overview", {
+        replace: true
+      });
       return;
     }
-
     const parts = location.pathname.split("/");
     if (parts.length > 3) {
       const subPath = parts[3];
       if (activeTab === "health_monitor") {
-        if (subPath === "bmi") setHealthMonitorSection("bmi");
-        else if (subPath === "calories") setHealthMonitorSection("calories");
-        else if (subPath === "water-reminder") setHealthMonitorSection("water");
-        else if (subPath === "health-kit") setHealthMonitorSection("health_kit");
+        if (subPath === "bmi") setHealthMonitorSection("bmi");else if (subPath === "calories") setHealthMonitorSection("calories");else if (subPath === "water-reminder") setHealthMonitorSection("water");else if (subPath === "health-kit") setHealthMonitorSection("health_kit");
         setSidebarHealthExpanded(true);
       } else if (activeTab === "diet") {
-        if (subPath === "normal") setExpandedMainSections({ normalDiet: true, aiDiet: false });
-        else if (subPath === "premium") setExpandedMainSections({ normalDiet: false, aiDiet: true });
+        if (subPath === "normal") setExpandedMainSections({
+          normalDiet: true,
+          aiDiet: false
+        });else if (subPath === "premium") setExpandedMainSections({
+          normalDiet: false,
+          aiDiet: true
+        });
         setSidebarDietExpanded(true);
       }
     }
@@ -154,14 +289,19 @@ export const MemberDashboard: React.FC = () => {
     navigate(path);
     setSidebarOpen(false);
   };
-
   const handleLogout = async () => {
-    const { removeFcmToken } = await import("../utils/firebase");
+    const {
+      removeFcmToken
+    } = await import("../utils/firebase");
     await removeFcmToken().catch(() => {});
-    const { logoutAction } = await import("../redux/actions/authActions");
+    const {
+      logoutAction
+    } = await import("../redux/actions/authActions");
     await dispatch(logoutAction());
     localStorage.removeItem("dashUser");
-    navigate("/login", { replace: true });
+    navigate("/login", {
+      replace: true
+    });
   };
 
   // Daily Log / Overview state
@@ -169,14 +309,23 @@ export const MemberDashboard: React.FC = () => {
   const [attendanceHistory, setAttendanceHistory] = useState<any[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [loadingAttendance, setLoadingAttendance] = useState(false);
-  const [weeklyStats, setWeeklyStats] = useState<{ dailyData: any[]; trends: any[] } | null>(null);
-  const [streakStats, setStreakStats] = useState<{ currentStreak: number; milestones: any[] } | null>(null);
+  const [weeklyStats, setWeeklyStats] = useState<{
+    dailyData: any[];
+    trends: any[];
+  } | null>(null);
+  const [streakStats, setStreakStats] = useState<{
+    currentStreak: number;
+    milestones: any[];
+  } | null>(null);
 
   // Workouts state
   const [workouts, setWorkouts] = useState<any[]>([]);
   const [loadingWorkouts, setLoadingWorkouts] = useState(false);
   const [showAddWorkout, setShowAddWorkout] = useState(false);
-  const [newWorkout, setNewWorkout] = useState({ name: "", bodyPart: "Chest" });
+  const [newWorkout, setNewWorkout] = useState({
+    name: "",
+    bodyPart: "Chest"
+  });
   const [workoutToDelete, setWorkoutToDelete] = useState<any>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deletedDefaults, setDeletedDefaults] = useState<string[]>(() => {
@@ -222,16 +371,13 @@ export const MemberDashboard: React.FC = () => {
     normalDiet: true,
     aiDiet: false
   });
-
   const [expandedDietMeals, setExpandedDietMeals] = useState<Record<string, boolean>>({});
-
   const toggleDietMeal = (key: string) => {
     setExpandedDietMeals(prev => ({
       ...prev,
       [key]: !prev[key]
     }));
   };
-
   const [dietGoal, setDietGoal] = useState("Weight Loss");
   const [showAiModal, setShowAiModal] = useState(false);
 
@@ -256,13 +402,23 @@ export const MemberDashboard: React.FC = () => {
   };
 
   // Challenges state
-  const [dailyChallenges, setDailyChallenges] = useState([
-    { id: 1, text: "Complete a workout session today", xp: 10, completed: false },
-    { id: 2, text: "Generate a Diet Plan", xp: 20, completed: false },
-    { id: 3, text: "Maintain a 30-day streak", xp: 80, completed: false }
-  ]);
+  const [dailyChallenges, setDailyChallenges] = useState([{
+    id: 1,
+    text: "Complete a workout session today",
+    xp: 10,
+    completed: false
+  }, {
+    id: 2,
+    text: "Generate a Diet Plan",
+    xp: 20,
+    completed: false
+  }, {
+    id: 3,
+    text: "Maintain a 30-day streak",
+    xp: 80,
+    completed: false
+  }]);
   const [generatedDietPlanToday, setGeneratedDietPlanToday] = useState(false);
-
   useEffect(() => {
     fetchProfile();
     if (activeTab === "overview") {
@@ -281,7 +437,6 @@ export const MemberDashboard: React.FC = () => {
       dispatch(fetchPtMeasurementsAction(profile._id, ptDate));
     }
   }, [activeTab, reportType, reportDate, profile?._id]);
-
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
     if (activeWorkout && workoutStartTime) {
@@ -293,14 +448,12 @@ export const MemberDashboard: React.FC = () => {
     }
     return () => clearInterval(interval);
   }, [activeWorkout, workoutStartTime]);
-
   const formatTime = (totalSeconds: number) => {
     const h = Math.floor(totalSeconds / 3600);
-    const m = Math.floor((totalSeconds % 3600) / 60);
+    const m = Math.floor(totalSeconds % 3600 / 60);
     const s = totalSeconds % 60;
     return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
-
   const fetchProfile = async () => {
     try {
       const res = await getMeApi();
@@ -313,10 +466,8 @@ export const MemberDashboard: React.FC = () => {
       console.error(err);
     }
   };
-
   const fetchAttendance = async () => {
     setLoadingAttendance(true);
-
     try {
       const resAtt = await getTodayAttendanceApi();
       if (resAtt.data?.attendance) {
@@ -324,12 +475,16 @@ export const MemberDashboard: React.FC = () => {
       }
     } catch (err) {
       console.error("Attendance fetch error", err);
-      setAttendance([
-        { id: 1, time: "07:30 AM", status: "SUCCESS" },
-        { id: 2, time: "09:00 AM", status: "SUCCESS" },
-      ]);
+      setAttendance([{
+        id: 1,
+        time: "07:30 AM",
+        status: "SUCCESS"
+      }, {
+        id: 2,
+        time: "09:00 AM",
+        status: "SUCCESS"
+      }]);
     }
-
     try {
       const historyRes = await getMemberAttendanceHistoryApi();
       if (historyRes.data?.attendance) {
@@ -338,7 +493,6 @@ export const MemberDashboard: React.FC = () => {
     } catch (err) {
       console.error("History fetch error", err);
     }
-
     try {
       const resStats = await getWeeklyStatsApi();
       if (resStats.data) {
@@ -347,7 +501,6 @@ export const MemberDashboard: React.FC = () => {
     } catch (err) {
       console.error("Weekly stats fetch error", err);
     }
-
     try {
       const resStreak = await getStreakStatsApi();
       if (resStreak.data) {
@@ -356,16 +509,13 @@ export const MemberDashboard: React.FC = () => {
     } catch (err) {
       console.error("Streak stats fetch error", err);
     }
-
     setLoadingAttendance(false);
   };
-
   const fetchWorkouts = async () => {
     setLoadingWorkouts(true);
     try {
       const res = await getWorkoutsApi();
       const customWorkouts = res.data.workouts || [];
-
       const mergedWorkouts = [...DEFAULT_WORKOUTS.filter(dw => !deletedDefaults.includes(dw._id))];
       for (const cw of customWorkouts) {
         if (!mergedWorkouts.some(dw => dw.name.toLowerCase() === cw.name.toLowerCase() && dw.bodyPart === cw.bodyPart)) {
@@ -380,7 +530,6 @@ export const MemberDashboard: React.FC = () => {
       setLoadingWorkouts(false);
     }
   };
-
   const fetchPlans = async () => {
     setLoadingPlans(true);
     try {
@@ -392,15 +541,11 @@ export const MemberDashboard: React.FC = () => {
       setLoadingPlans(false);
     }
   };
-
   const fetchDietData = async () => {
     if (!profile?._id) return;
     setLoadingDiet(true);
     try {
-      const [dietRes, bmiRes] = await Promise.all([
-        getMemberDietHistoryApi(profile._id),
-        getLatestBmiReportApi(profile._id)
-      ]);
+      const [dietRes, bmiRes] = await Promise.all([getMemberDietHistoryApi(profile._id), getLatestBmiReportApi(profile._id)]);
       setDietPlans(dietRes.data.dietPlans || []);
       setLatestBmiPhoto(bmiRes.data.report || null);
     } catch (err) {
@@ -409,7 +554,6 @@ export const MemberDashboard: React.FC = () => {
       setLoadingDiet(false);
     }
   };
-
   const handleDownloadReport = async (url: string) => {
     try {
       if (url.includes('cloudinary.com')) {
@@ -425,7 +569,6 @@ export const MemberDashboard: React.FC = () => {
           return;
         }
       }
-      
       const response = await fetch(url);
       const blob = await response.blob();
       const blobUrl = window.URL.createObjectURL(blob);
@@ -441,7 +584,6 @@ export const MemberDashboard: React.FC = () => {
       window.open(url, '_blank');
     }
   };
-
   const handleUploadBmi = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
     if (!profile?._id) return;
@@ -450,120 +592,167 @@ export const MemberDashboard: React.FC = () => {
     formData.append("image", file);
     formData.append("memberId", profile._id);
     formData.append("goal", dietGoal);
-
     setUploadingBmi(true);
     try {
       await uploadBmiReportApi(formData);
-      dispatch(showSnackbar({ message: "BMI Report uploaded successfully!", type: "success" }));
+      dispatch(showSnackbar({
+        message: "BMI Report uploaded successfully!",
+        type: "success"
+      }));
       fetchDietData();
     } catch (err: any) {
       const msg = err?.response?.data?.message || "Failed to upload BMI Report";
-      dispatch(showSnackbar({ message: msg, type: "error" }));
+      dispatch(showSnackbar({
+        message: msg,
+        type: "error"
+      }));
     } finally {
       setUploadingBmi(false);
     }
   };
-
   const handleGenerateDiet = async (bmiReportId: string) => {
     if ((profile?.aiCredits || 0) < 1) {
-      dispatch(showSnackbar({ message: "Not enough AI credits! Please purchase credits first.", type: "error" }));
+      dispatch(showSnackbar({
+        message: "Not enough AI credits! Please purchase credits first.",
+        type: "error"
+      }));
       setShowAiModal(true);
       return;
     }
-
     setIsGeneratingDiet(true);
     try {
-      const res = await generateDietPlanApi({ bmiReportId, goal: dietGoal });
-      dispatch(showSnackbar({ message: "Diet Plan Generated!", type: "success" }));
+      const res = await generateDietPlanApi({
+        bmiReportId,
+        goal: dietGoal
+      });
+      dispatch(showSnackbar({
+        message: "Diet Plan Generated!",
+        type: "success"
+      }));
       // Update credits locally
       if (res.data.remainingCredits !== undefined) {
-        setProfile((prev: any) => ({ ...prev, aiCredits: res.data.remainingCredits }));
+        setProfile((prev: any) => ({
+          ...prev,
+          aiCredits: res.data.remainingCredits
+        }));
       }
       setGeneratedDietPlanToday(true);
       fetchDietData();
     } catch (err: any) {
-      dispatch(showSnackbar({ message: err?.response?.data?.message || "Failed to generate diet plan", type: "error" }));
+      dispatch(showSnackbar({
+        message: err?.response?.data?.message || "Failed to generate diet plan",
+        type: "error"
+      }));
     } finally {
       setIsGeneratingDiet(false);
     }
   };
-
   const handleGenerateWorkoutDiet = async () => {
     if (!memberAge || !memberHeight || !memberWeight) {
-      dispatch(showSnackbar({ message: "Please fill in age, height, and weight.", type: "error" }));
+      dispatch(showSnackbar({
+        message: "Please fill in age, height, and weight.",
+        type: "error"
+      }));
       return;
     }
     if ((profile?.aiCredits || 0) < 1) {
-      dispatch(showSnackbar({ message: "Not enough AI credits! Please purchase credits first.", type: "error" }));
+      dispatch(showSnackbar({
+        message: "Not enough AI credits! Please purchase credits first.",
+        type: "error"
+      }));
       setShowAiModal(true);
       return;
     }
-
     setIsGeneratingWorkoutDiet(true);
     try {
-      const res = await generateDietPlanFromWorkoutApi({ 
-        age: Number(memberAge), 
-        height: Number(memberHeight), 
-        weight: Number(memberWeight), 
-        goal: workoutDietGoal 
+      const res = await generateDietPlanFromWorkoutApi({
+        age: Number(memberAge),
+        height: Number(memberHeight),
+        weight: Number(memberWeight),
+        goal: workoutDietGoal
       });
-      dispatch(showSnackbar({ message: "Workout Diet Plan Generated!", type: "success" }));
+      dispatch(showSnackbar({
+        message: "Workout Diet Plan Generated!",
+        type: "success"
+      }));
       if (res.data.remainingCredits !== undefined) {
-        setProfile((prev: any) => ({ ...prev, aiCredits: res.data.remainingCredits }));
+        setProfile((prev: any) => ({
+          ...prev,
+          aiCredits: res.data.remainingCredits
+        }));
       }
       setGeneratedDietPlanToday(true);
       fetchDietData();
     } catch (err: any) {
-      dispatch(showSnackbar({ message: err?.response?.data?.message || "Failed to generate diet plan", type: "error" }));
+      dispatch(showSnackbar({
+        message: err?.response?.data?.message || "Failed to generate diet plan",
+        type: "error"
+      }));
     } finally {
       setIsGeneratingWorkoutDiet(false);
     }
   };
-
   const handleCreateWorkout = async () => {
     if (!newWorkout.name.trim()) {
-      dispatch(showSnackbar({ message: "Please enter a workout name", type: "error" }));
+      dispatch(showSnackbar({
+        message: "Please enter a workout name",
+        type: "error"
+      }));
       return;
     }
     try {
       await createWorkoutApi(newWorkout);
-      dispatch(showSnackbar({ message: "Workout created!", type: "success" }));
+      dispatch(showSnackbar({
+        message: "Workout created!",
+        type: "success"
+      }));
       setShowAddWorkout(false);
-      setNewWorkout({ name: "", bodyPart: "Chest" });
+      setNewWorkout({
+        name: "",
+        bodyPart: "Chest"
+      });
       fetchWorkouts();
     } catch (err: any) {
       const msg = err?.response?.data?.message || "Failed to create workout";
-      dispatch(showSnackbar({ message: msg, type: "error" }));
+      dispatch(showSnackbar({
+        message: msg,
+        type: "error"
+      }));
     }
   };
-
   const handleDeleteWorkout = async () => {
     if (!workoutToDelete) return;
-    
     if (workoutToDelete._id.startsWith("def_")) {
       const updated = [...deletedDefaults, workoutToDelete._id];
       setDeletedDefaults(updated);
       localStorage.setItem("deletedDefaults", JSON.stringify(updated));
-      dispatch(showSnackbar({ message: "Workout deleted successfully", type: "success" }));
+      dispatch(showSnackbar({
+        message: "Workout deleted successfully",
+        type: "success"
+      }));
       setWorkoutToDelete(null);
       // We don't necessarily need to call fetchWorkouts from backend here, 
       // but let's just manually update state for instant feedback.
       setWorkouts(prev => prev.filter(w => w._id !== workoutToDelete._id));
       return;
     }
-
     try {
       await deleteWorkoutApi(workoutToDelete._id);
-      dispatch(showSnackbar({ message: "Workout deleted successfully", type: "success" }));
+      dispatch(showSnackbar({
+        message: "Workout deleted successfully",
+        type: "success"
+      }));
       fetchWorkouts();
     } catch (err: any) {
       const msg = err?.response?.data?.message || "Failed to delete workout";
-      dispatch(showSnackbar({ message: msg, type: "error" }));
+      dispatch(showSnackbar({
+        message: msg,
+        type: "error"
+      }));
     } finally {
       setWorkoutToDelete(null);
     }
   };
-
   const handleStartWorkout = (workout: any) => {
     setActiveWorkout(workout);
     const startTime = new Date();
@@ -571,14 +760,11 @@ export const MemberDashboard: React.FC = () => {
     localStorage.setItem("activeWorkout", JSON.stringify(workout));
     localStorage.setItem("workoutStartTime", startTime.toISOString());
   };
-
   const handleStopWorkout = async () => {
     if (!activeWorkout || !workoutStartTime) return;
-
     const endTime = new Date();
     const durationMs = endTime.getTime() - workoutStartTime.getTime();
     const durationMins = Math.max(1, Math.round(durationMs / 60000));
-
     try {
       await logWorkoutApi({
         workoutName: activeWorkout.name,
@@ -588,24 +774,28 @@ export const MemberDashboard: React.FC = () => {
         endTime: endTime.toTimeString().split(" ")[0].slice(0, 5),
         duration: durationMins
       });
-      dispatch(showSnackbar({ message: `Logged ${durationMins} min of ${activeWorkout.name}`, type: "success" }));
+      dispatch(showSnackbar({
+        message: `Logged ${durationMins} min of ${activeWorkout.name}`,
+        type: "success"
+      }));
       setActiveWorkout(null);
       setWorkoutStartTime(null);
       setElapsedSeconds(0);
       localStorage.removeItem("activeWorkout");
       localStorage.removeItem("workoutStartTime");
     } catch (err) {
-      dispatch(showSnackbar({ message: "Failed to log workout", type: "error" }));
+      dispatch(showSnackbar({
+        message: "Failed to log workout",
+        type: "error"
+      }));
     }
   };
-
   const fetchReport = async () => {
     setLoadingReport(true);
     try {
       let formattedDate = reportDate;
       if (reportType === "monthly") formattedDate = reportDate.slice(0, 7);
       if (reportType === "yearly") formattedDate = reportDate.slice(0, 4);
-
       const res = await getWorkoutReportApi(reportType, formattedDate);
       setReportData(res.data);
     } catch (err) {
@@ -614,14 +804,15 @@ export const MemberDashboard: React.FC = () => {
       setLoadingReport(false);
     }
   };
-
   const downloadReportCSV = () => {
     if (!reportData || reportData.totalDuration === 0) {
-      dispatch(showSnackbar({ message: "No data to download", type: "info" }));
+      dispatch(showSnackbar({
+        message: "No data to download",
+        type: "info"
+      }));
       return;
     }
     let csvContent = "data:text/csv;charset=utf-8,";
-
     if (reportType === "daily") {
       csvContent += "Category,Workout Name,Minutes Logged\r\n";
       Object.entries(reportData.report || {}).forEach(([bodyPart, data]: [string, any]) => {
@@ -637,7 +828,6 @@ export const MemberDashboard: React.FC = () => {
         csvContent += `"${log.date}","${log.bodyPart}","${log.workoutName}","${log.duration}"\r\n`;
       });
     }
-
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
@@ -646,7 +836,6 @@ export const MemberDashboard: React.FC = () => {
     link.click();
     document.body.removeChild(link);
   };
-
   const toggleTheme = () => {
     const next = !isDark;
     setIsDark(next);
@@ -665,20 +854,16 @@ export const MemberDashboard: React.FC = () => {
   const getDaysInMonth = (year: number, month: number) => {
     return new Date(year, month + 1, 0).getDate();
   };
-  
   const getFirstDayOfMonth = (year: number, month: number) => {
     return new Date(year, month, 1).getDay();
   };
-
   const currentYear = selectedDate.getFullYear();
   const currentMonth = selectedDate.getMonth();
   const daysInMonth = getDaysInMonth(currentYear, currentMonth);
   const firstDay = getFirstDayOfMonth(currentYear, currentMonth);
-
   const prevMonth = () => {
     setSelectedDate(new Date(currentYear, currentMonth - 1, 1));
   };
-
   const nextMonth = () => {
     setSelectedDate(new Date(currentYear, currentMonth + 1, 1));
   };
@@ -689,9 +874,7 @@ export const MemberDashboard: React.FC = () => {
   // Get logs for the selected date
   const selectedDateString = selectedDate.toISOString().split("T")[0];
   const selectedDateLogs = attendanceHistory.filter(a => a.date === selectedDateString).sort((a, b) => a.time.localeCompare(b.time));
-
-  const OverviewPanel = (
-    <div className="page-container">
+  const OverviewPanel = <div className="page-container">
       <header className="page-header">
         <div>
           <h2 className="page-title">Welcome back, {userName.split(" ")[0]} 💪</h2>
@@ -699,130 +882,118 @@ export const MemberDashboard: React.FC = () => {
         </div>
       </header>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-        {profile?.planEndDate && (
-          <div className="gym-card" style={{ background: "var(--primary-light)", border: "1px solid var(--primary)" }}>
-            <h3 style={{ fontSize: "1.2rem", fontWeight: 700, color: "var(--primary)", marginBottom: 8 }}>My Active Plan</h3>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+      <div className="member-dashboard-inline-1">
+        {profile?.planEndDate && <div className="gym-card member-dashboard-inline-2">
+            <h3 className="member-dashboard-inline-3">My Active Plan</h3>
+            <div className="member-dashboard-inline-4">
               <div>
-                <div style={{ fontSize: "1.1rem", fontWeight: 600 }}>{profile.planId ? profile.planId.name : "Gym Membership"}</div>
-                <div style={{ fontSize: "0.875rem", color: "var(--text-secondary)" }}>Expires on: {new Date(profile.planEndDate).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" })}</div>
+                <div className="member-dashboard-inline-5">{profile.planId ? profile.planId.name : "Gym Membership"}</div>
+                <div className="member-dashboard-inline-6">Expires on: {new Date(profile.planEndDate).toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric"
+              })}</div>
               </div>
-              <div style={{ background: "var(--primary)", color: "#fff", padding: "6px 12px", borderRadius: 16, fontSize: "0.8rem", fontWeight: 600 }}>Active</div>
+              <div className="member-dashboard-inline-7">Active</div>
             </div>
-          </div>
-        )}
+          </div>}
 
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 20, alignItems: "flex-start" }}>
+        <div className="member-dashboard-inline-8">
           {/* Calendar side */}
-          <div style={{ flex: "1 1 350px", display: "flex", flexDirection: "column", gap: 20 }}>
+          <div className="member-dashboard-inline-9">
             <div className="gym-card">
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-                <h3 style={{ fontSize: "1.2rem", fontWeight: 700 }}>Attendance Calendar</h3>
-                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <button onClick={prevMonth} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-primary)" }}><ChevronRight size={20} style={{ transform: "rotate(180deg)" }} /></button>
-                  <span style={{ fontWeight: 600, fontSize: "0.9rem" }}>{selectedDate.toLocaleString('default', { month: 'short', year: 'numeric' })}</span>
-                  <button onClick={nextMonth} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-primary)" }}><ChevronRight size={20} /></button>
+              <div className="member-dashboard-inline-10">
+                <h3 className="member-dashboard-inline-11">Attendance Calendar</h3>
+                <div className="member-dashboard-inline-12">
+                  <button onClick={prevMonth} className="member-dashboard-inline-13"><ChevronRight size={20} className="member-dashboard-inline-14" /></button>
+                  <span className="member-dashboard-inline-15">{selectedDate.toLocaleString('default', {
+                    month: 'short',
+                    year: 'numeric'
+                  })}</span>
+                  <button onClick={nextMonth} className="member-dashboard-inline-16"><ChevronRight size={20} /></button>
                 </div>
               </div>
               
-              {loadingAttendance ? (
-                <div style={{ display: "flex", justifyContent: "center", padding: "20px" }}>
-                  <Loader size={24} style={{ animation: "spin 1s linear infinite", color: "var(--primary)" }} />
-                </div>
-              ) : (
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 4 }}>
-                  {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(day => (
-                    <div key={day} style={{ textAlign: "center", fontWeight: 600, fontSize: "0.75rem", color: "var(--text-secondary)", marginBottom: 4 }}>{day}</div>
-                  ))}
+              {loadingAttendance ? <div className="member-dashboard-inline-17">
+                  <Loader size={24} className="member-dashboard-inline-18" />
+                </div> : <div className="member-dashboard-inline-19">
+                  {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(day => <div key={day} className="member-dashboard-inline-20">{day}</div>)}
                   
-                  {Array.from({ length: firstDay }).map((_, i) => (
-                    <div key={`empty-${i}`} />
-                  ))}
+                  {Array.from({
+                length: firstDay
+              }).map((_, i) => <div key={`empty-${i}`} />)}
                   
-                  {Array.from({ length: daysInMonth }).map((_, i) => {
-                    const day = i + 1;
-                    const dateObj = new Date(currentYear, currentMonth, day);
-                    const localDate = new Date(dateObj.getTime() - (dateObj.getTimezoneOffset() * 60000)).toISOString().split("T")[0];
-                    const isAttended = attendedDates.has(localDate);
-                    const isSelected = selectedDateString === localDate;
-                    
-                    const isPastOrToday = new Date().toISOString().split("T")[0] >= localDate;
-                    let bg = "var(--bg-secondary)";
-                    let color = "var(--text-primary)";
-                    if (isAttended) {
-                      bg = "rgba(16,185,129,0.15)";
-                      color = "#10b981";
-                    } else if (isPastOrToday) {
-                      bg = "rgba(239,68,68,0.15)";
-                      color = "var(--danger)";
-                    }
-
-                    return (
-                      <div 
-                        key={day} 
-                        onClick={() => setSelectedDate(dateObj)}
-                        style={{ 
-                          padding: "8px 0",
-                          display: "flex", 
-                          alignItems: "center", 
-                          justifyContent: "center", 
-                          borderRadius: 6,
-                          background: bg,
-                          color: color,
-                          fontWeight: 600,
-                          cursor: "pointer",
-                          border: isSelected ? "2px solid var(--primary)" : "1px solid transparent",
-                          fontSize: "0.85rem"
-                        }}
-                      >
+                  {Array.from({
+                length: daysInMonth
+              }).map((_, i) => {
+                const day = i + 1;
+                const dateObj = new Date(currentYear, currentMonth, day);
+                const localDate = new Date(dateObj.getTime() - dateObj.getTimezoneOffset() * 60000).toISOString().split("T")[0];
+                const isAttended = attendedDates.has(localDate);
+                const isSelected = selectedDateString === localDate;
+                const isPastOrToday = new Date().toISOString().split("T")[0] >= localDate;
+                let bg = "var(--bg-secondary)";
+                let color = "var(--text-primary)";
+                if (isAttended) {
+                  bg = "rgba(16,185,129,0.15)";
+                  color = "#10b981";
+                } else if (isPastOrToday) {
+                  bg = "rgba(239,68,68,0.15)";
+                  color = "var(--danger)";
+                }
+                return <div key={day} onClick={() => setSelectedDate(dateObj)} style={{
+                  background: bg,
+                  color: color,
+                  border: isSelected ? "2px solid var(--primary)" : "1px solid transparent"
+                }} className="member-dashboard-inline-21">
                         {day}
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+                      </div>;
+              })}
+                </div>}
             </div>
 
-            {selectedDateLogs.length > 0 && (
-              <div className="gym-card">
-                <h3 style={{ fontSize: "1.1rem", fontWeight: 700, marginBottom: 12 }}>Logs for {selectedDate.toLocaleDateString('en-GB')}</h3>
-                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                  {selectedDateLogs.map((a: any, i) => (
-                    <div key={i} style={{ display: "flex", justifyContent: "space-between", background: "var(--bg-secondary)", padding: "10px 12px", borderRadius: 8, border: "1px solid var(--border-color)" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                        <div style={{ background: "var(--primary-light)", padding: 6, borderRadius: 6, color: "var(--primary)" }}>
+            {selectedDateLogs.length > 0 && <div className="gym-card">
+                <h3 className="member-dashboard-inline-22">Logs for {selectedDate.toLocaleDateString('en-GB')}</h3>
+                <div className="member-dashboard-inline-23">
+                  {selectedDateLogs.map((a: any, i) => <div key={i} className="member-dashboard-inline-24">
+                      <div className="member-dashboard-inline-25">
+                        <div className="member-dashboard-inline-26">
                           <CheckCircle2 size={16} />
                         </div>
                         <div>
-                          <span style={{ fontWeight: 600, color: "var(--text-primary)", display: "block", fontSize: "0.9rem" }}>
+                          <span className="member-dashboard-inline-27">
                             {i === 0 ? "Check In" : i === selectedDateLogs.length - 1 ? "Check Out" : "Log"}
                           </span>
-                          <span style={{ fontSize: "0.8rem", color: "var(--text-secondary)" }}>{a.time}</span>
+                          <span className="member-dashboard-inline-28">{a.time}</span>
                         </div>
                       </div>
-                      <div style={{ display: "flex", alignItems: "center" }}>
-                        <span style={{ color: a.status === "SUCCESS" ? "#10b981" : "var(--danger)", fontSize: "0.75rem", fontWeight: 700, padding: "2px 6px", background: a.status === "SUCCESS" ? "rgba(16,185,129,0.1)" : "rgba(239,68,68,0.1)", borderRadius: 10 }}>
+                      <div className="member-dashboard-inline-29">
+                        <span style={{
+                    color: a.status === "SUCCESS" ? "#10b981" : "var(--danger)",
+                    background: a.status === "SUCCESS" ? "rgba(16,185,129,0.1)" : "rgba(239,68,68,0.1)"
+                  }} className="member-dashboard-inline-30">
                           {a.status}
                         </span>
                       </div>
-                    </div>
-                  ))}
+                    </div>)}
                 </div>
-              </div>
-            )}
+              </div>}
           </div>
 
           {/* Weekly Stats side */}
-          {weeklyStats && (
-            <div className="gym-card" style={{ flex: "2 1 500px", padding: "24px" }}>
-              <h3 style={{ fontSize: "1.2rem", fontWeight: 700, marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
+          {weeklyStats && <div className="gym-card member-dashboard-inline-31">
+              <h3 className="member-dashboard-inline-32">
                 <BarChart3 size={20} color="var(--primary)" /> Weekly Overview
               </h3>
 
-              <div style={{ height: 300, width: "100%", marginBottom: 24 }}>
+              <div className="member-dashboard-inline-33">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={weeklyStats.dailyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <AreaChart data={weeklyStats.dailyData} margin={{
+                top: 10,
+                right: 10,
+                left: -20,
+                bottom: 0
+              }}>
                     <defs>
                       <linearGradient id="colorGym" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3} />
@@ -833,369 +1004,320 @@ export const MemberDashboard: React.FC = () => {
                         <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                       </linearGradient>
                     </defs>
-                    <XAxis dataKey="date" tickFormatter={(val) => new Date(val).toLocaleDateString(undefined, { weekday: 'short' })} style={{ fontSize: 12, fill: "var(--text-secondary)" }} axisLine={false} tickLine={false} />
-                    <YAxis style={{ fontSize: 12, fill: "var(--text-secondary)" }} axisLine={false} tickLine={false} />
+                    <XAxis dataKey="date" tickFormatter={val => new Date(val).toLocaleDateString(undefined, {
+                  weekday: 'short'
+                })} axisLine={false} tickLine={false} className="member-dashboard-inline-34" />
+                    <YAxis axisLine={false} tickLine={false} className="member-dashboard-inline-35" />
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color)" />
-                    <Tooltip contentStyle={{ borderRadius: 8, border: "none", boxShadow: "0 4px 12px rgba(0,0,0,0.1)", background: "var(--bg-primary)", color: "var(--text-primary)" }} />
+                    <Tooltip contentStyle={{
+                  borderRadius: 8,
+                  border: "none",
+                  boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                  background: "var(--bg-primary)",
+                  color: "var(--text-primary)"
+                }} />
                     <Area type="monotone" dataKey="gymMinutes" name="Gym Time (min)" stroke="var(--primary)" strokeWidth={2} fillOpacity={1} fill="url(#colorGym)" />
                     <Area type="monotone" dataKey="workoutMinutes" name="Workout Time (min)" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorWorkout)" />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
 
-              <h4 style={{ fontSize: "1rem", fontWeight: 600, marginBottom: 12 }}>Muscle Group Trends (vs Last Week)</h4>
-              {weeklyStats.trends.length === 0 ? (
-                <div style={{ fontSize: "0.9rem", color: "var(--text-muted)" }}>No trend data available yet.</div>
-              ) : (
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: 12 }}>
-                  {weeklyStats.trends.map((t: any) => (
-                    <div key={t.bodyPart} style={{ background: "var(--bg-secondary)", padding: 12, borderRadius: 12, border: "1px solid var(--border-color)" }}>
-                      <div style={{ fontSize: "0.85rem", color: "var(--text-secondary)", marginBottom: 4, fontWeight: 600 }}>{t.bodyPart}</div>
-                      <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-                        <span style={{ fontSize: "1.1rem", fontWeight: 700 }}>{t.currentWeekMins}m</span>
-                        {t.status === 'gain' ? (
-                          <span style={{ color: "#10b981", fontSize: "0.75rem", fontWeight: 600, display: "flex", alignItems: "center" }}>
-                            <ChevronRight size={14} style={{ transform: "rotate(-90deg)" }} /> +{t.currentWeekMins - t.lastWeekMins}m
-                          </span>
-                        ) : t.status === 'loss' ? (
-                          <span style={{ color: "var(--danger)", fontSize: "0.75rem", fontWeight: 600, display: "flex", alignItems: "center" }}>
-                            <ChevronRight size={14} style={{ transform: "rotate(90deg)" }} /> {t.currentWeekMins - t.lastWeekMins}m
-                          </span>
-                        ) : (
-                          <span style={{ color: "var(--text-muted)", fontSize: "0.75rem", fontWeight: 600 }}>No change</span>
-                        )}
+              <h4 className="member-dashboard-inline-36">Muscle Group Trends (vs Last Week)</h4>
+              {weeklyStats.trends.length === 0 ? <div className="member-dashboard-inline-37">No trend data available yet.</div> : <div className="member-dashboard-inline-38">
+                  {weeklyStats.trends.map((t: any) => <div key={t.bodyPart} className="member-dashboard-inline-39">
+                      <div className="member-dashboard-inline-40">{t.bodyPart}</div>
+                      <div className="member-dashboard-inline-41">
+                        <span className="member-dashboard-inline-42">{t.currentWeekMins}m</span>
+                        {t.status === 'gain' ? <span className="member-dashboard-inline-43">
+                            <ChevronRight size={14} className="member-dashboard-inline-44" /> +{t.currentWeekMins - t.lastWeekMins}m
+                          </span> : t.status === 'loss' ? <span className="member-dashboard-inline-45">
+                            <ChevronRight size={14} className="member-dashboard-inline-46" /> {t.currentWeekMins - t.lastWeekMins}m
+                          </span> : <span className="member-dashboard-inline-47">No change</span>}
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
+                    </div>)}
+                </div>}
+            </div>}
         </div>
       </div>
-    </div>
-  );
-
+    </div>;
   const WorkoutsPanel = (() => {
     const baseCategories = ["Chest", "Shoulder", "Legs", "Forearm", "Back", "Core", "Cardio", "Other"];
     const categories = Array.from(new Set([...baseCategories, ...customCategories, ...workouts.map(w => w.bodyPart)])).filter(Boolean);
-
-    return (
-      <div className="page-container">
-        <header className="page-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+    return <div className="page-container">
+        <header className="page-header member-dashboard-inline-48">
           <div>
             <h2 className="page-title">Your Workouts</h2>
             <p className="page-subtitle">Track your sets and reps</p>
           </div>
-          <div style={{ display: "flex", gap: 10 }}>
+          <div className="member-dashboard-inline-49">
             <button className="btn-blue-outline" onClick={() => setShowAddCategory(true)}>Add Category</button>
             <button className="btn-blue-outline" onClick={() => setShowAddWorkout(true)}>Create Custom</button>
           </div>
         </header>
 
-        {showAddCategory && (
-          <div className="gym-card" style={{ marginBottom: 24, border: "1px dashed var(--primary)" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-              <h4 style={{ fontWeight: 700, fontSize: "1.1rem" }}>Add New Category</h4>
-              <button onClick={() => setShowAddCategory(false)} style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer" }}><X size={20} /></button>
+        {showAddCategory && <div className="gym-card member-dashboard-inline-50">
+            <div className="member-dashboard-inline-51">
+              <h4 className="member-dashboard-inline-52">Add New Category</h4>
+              <button onClick={() => setShowAddCategory(false)} className="member-dashboard-inline-53"><X size={20} /></button>
             </div>
-            <div style={{ display: "flex", gap: 16, marginBottom: 16 }}>
-              <div style={{ flex: 1 }}>
+            <div className="member-dashboard-inline-54">
+              <div className="member-dashboard-inline-55">
                 <label className="form-label">Category Name</label>
                 <input type="text" className="form-input" placeholder="e.g. Plyometrics" value={newCategoryName} onChange={e => setNewCategoryName(e.target.value)} />
               </div>
             </div>
-            <div style={{ display: "flex", gap: 10 }}>
+            <div className="member-dashboard-inline-56">
               <button className="btn-blue" onClick={() => {
-                if (newCategoryName.trim()) {
-                  setCustomCategories([...customCategories, newCategoryName.trim()]);
-                  setNewCategoryName("");
-                  setShowAddCategory(false);
-                  dispatch(showSnackbar({ message: "Category added!", type: "success" }));
-                }
-              }}>Save Category</button>
+            if (newCategoryName.trim()) {
+              setCustomCategories([...customCategories, newCategoryName.trim()]);
+              setNewCategoryName("");
+              setShowAddCategory(false);
+              dispatch(showSnackbar({
+                message: "Category added!",
+                type: "success"
+              }));
+            }
+          }}>Save Category</button>
               <button className="btn-blue-outline" onClick={() => setShowAddCategory(false)}>Cancel</button>
             </div>
-          </div>
-        )}
+          </div>}
 
-        {activeWorkout && (
-          <div className="gym-card" style={{ background: "var(--primary-light)", borderColor: "var(--primary)", borderStyle: "solid", borderWidth: 1, marginBottom: 24 }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        {activeWorkout && <div className="gym-card member-dashboard-inline-57">
+            <div className="member-dashboard-inline-58">
               <div>
-                <h4 style={{ color: "var(--primary)", marginBottom: 4, fontWeight: 700, fontSize: "1.1rem" }}>Active Session: {activeWorkout.name}</h4>
-                <div style={{ color: "var(--primary)", fontSize: "1.1rem", fontWeight: 700, display: "flex", alignItems: "center", gap: 6 }}>
+                <h4 className="member-dashboard-inline-59">Active Session: {activeWorkout.name}</h4>
+                <div className="member-dashboard-inline-60">
                   <Clock size={16} /> {formatTime(elapsedSeconds)}
                 </div>
               </div>
-              <button className="btn-blue" style={{ background: "var(--danger)", borderColor: "var(--danger)", padding: "10px 16px" }} onClick={handleStopWorkout}>
+              <button className="btn-blue member-dashboard-inline-61" onClick={handleStopWorkout}>
                 <Square size={16} fill="currentColor" /> Stop & Log
               </button>
             </div>
-          </div>
-        )}
+          </div>}
 
-        {showAddWorkout && (
-          <div className="gym-card" style={{ marginBottom: 24, border: "1px dashed var(--primary)" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-              <h4 style={{ fontWeight: 700, fontSize: "1.1rem" }}>New Custom Workout</h4>
-              <button onClick={() => setShowAddWorkout(false)} style={{ background: "none", border: "none", color: "var(--text-muted)", cursor: "pointer" }}><X size={20} /></button>
+        {showAddWorkout && <div className="gym-card member-dashboard-inline-62">
+            <div className="member-dashboard-inline-63">
+              <h4 className="member-dashboard-inline-64">New Custom Workout</h4>
+              <button onClick={() => setShowAddWorkout(false)} className="member-dashboard-inline-65"><X size={20} /></button>
             </div>
-            <div style={{ display: "flex", gap: 16, marginBottom: 16, flexWrap: "wrap" }}>
-              <div style={{ flex: 2, minWidth: 200 }}>
+            <div className="member-dashboard-inline-66">
+              <div className="member-dashboard-inline-67">
                 <label className="form-label">Workout Name</label>
-                <input type="text" className="form-input" placeholder="e.g. Incline Dumbbell Press" value={newWorkout.name} onChange={e => setNewWorkout({ ...newWorkout, name: e.target.value })} />
+                <input type="text" className="form-input" placeholder="e.g. Incline Dumbbell Press" value={newWorkout.name} onChange={e => setNewWorkout({
+              ...newWorkout,
+              name: e.target.value
+            })} />
               </div>
-              <div style={{ flex: 1, minWidth: 150 }}>
+              <div className="member-dashboard-inline-68">
                 <label className="form-label">Category</label>
-                <select className="form-input" value={newWorkout.bodyPart} onChange={e => setNewWorkout({ ...newWorkout, bodyPart: e.target.value })}>
+                <select className="form-input" value={newWorkout.bodyPart} onChange={e => setNewWorkout({
+              ...newWorkout,
+              bodyPart: e.target.value
+            })}>
                   {categories.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
             </div>
-            <div style={{ display: "flex", gap: 10 }}>
+            <div className="member-dashboard-inline-69">
               <button className="btn-blue" onClick={handleCreateWorkout}>Save Workout</button>
               <button className="btn-blue-outline" onClick={() => setShowAddWorkout(false)}>Cancel</button>
             </div>
-          </div>
-        )}
+          </div>}
 
-        {loadingWorkouts ? (
-          <div style={{ display: "flex", justifyContent: "center", padding: "40px" }}>
-            <Loader size={32} style={{ animation: "spin 1s linear infinite", color: "var(--primary)" }} />
-          </div>
-        ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 20 }}>
+        {loadingWorkouts ? <div className="member-dashboard-inline-70">
+            <Loader size={32} className="member-dashboard-inline-71" />
+          </div> : <div className="member-dashboard-inline-72">
             {categories.map(cat => {
-              const catWorkouts = workouts.filter(w => w.bodyPart === cat);
-              if (catWorkouts.length === 0) return null;
-              return (
-                <div key={cat} className="gym-card" style={{ padding: 0, overflow: "hidden" }}>
-                  <div style={{ background: "var(--bg-secondary)", padding: "16px 20px", borderBottom: "1px solid var(--border-color)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <h4 style={{ fontWeight: 700, color: "var(--text-primary)", fontSize: "1.1rem" }}>{cat}</h4>
-                    <span style={{ fontSize: "0.75rem", background: "var(--bg-primary)", padding: "2px 8px", borderRadius: 12, fontWeight: 600, color: "var(--text-secondary)", border: "1px solid var(--border-color)" }}>{catWorkouts.length}</span>
+          const catWorkouts = workouts.filter(w => w.bodyPart === cat);
+          if (catWorkouts.length === 0) return null;
+          return <div key={cat} className="gym-card member-dashboard-inline-73">
+                  <div className="member-dashboard-inline-74">
+                    <h4 className="member-dashboard-inline-75">{cat}</h4>
+                    <span className="member-dashboard-inline-76">{catWorkouts.length}</span>
                   </div>
-                  <div style={{ display: "flex", flexDirection: "column" }}>
-                    {catWorkouts.map((w, idx) => (
-                      <div key={w._id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 20px", borderBottom: idx < catWorkouts.length - 1 ? "1px solid var(--border-color)" : "none", transition: "background 0.2s" }} className="hover-bg-secondary">
-                        <span style={{ fontSize: "0.95rem", fontWeight: 500 }}>{w.name}</span>
-                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                          <button
-                            className="btn-blue-outline"
-                            onClick={() => {
-                              setWorkoutToDelete(w);
-                              setShowDeleteModal(true);
-                            }}
-                            style={{ padding: "8px", width: 36, height: 36, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", border: "1px solid var(--danger)", color: "var(--danger)" }}>
+                  <div className="member-dashboard-inline-77">
+                    {catWorkouts.map((w, idx) => <div key={w._id} style={{
+                borderBottom: idx < catWorkouts.length - 1 ? "1px solid var(--border-color)" : "none"
+              }} className="hover-bg-secondary member-dashboard-inline-78">
+                        <span className="member-dashboard-inline-79">{w.name}</span>
+                        <div className="member-dashboard-inline-80">
+                          <button className="btn-blue-outline member-dashboard-inline-81" onClick={() => {
+                    setWorkoutToDelete(w);
+                    setShowDeleteModal(true);
+                  }}>
                             <Trash2 size={16} />
                           </button>
-                          <button
-                            className="btn-blue"
-                            disabled={!!activeWorkout}
-                            onClick={() => handleStartWorkout(w)}
-                            style={{ padding: "8px", width: 36, height: 36, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", opacity: activeWorkout ? 0.5 : 1 }}>
-                            <Play size={16} fill="currentColor" style={{ marginLeft: 2 }} />
+                          <button className="btn-blue member-dashboard-inline-82" disabled={!!activeWorkout} onClick={() => handleStartWorkout(w)} style={{
+                    opacity: activeWorkout ? 0.5 : 1
+                  }}>
+                            <Play size={16} fill="currentColor" className="member-dashboard-inline-83" />
                           </button>
                         </div>
-                      </div>
-                    ))}
+                      </div>)}
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
+                </div>;
+        })}
+          </div>}
 
-        <ConfirmationModal
-          isOpen={showDeleteModal}
-          onClose={() => {
-            setShowDeleteModal(false);
-            setWorkoutToDelete(null);
-          }}
-          onConfirm={handleDeleteWorkout}
-          title="Delete Workout"
-          message={`Are you sure you want to delete the workout "${workoutToDelete?.name}"? This action cannot be undone.`}
-          confirmText="Delete"
-          isDestructive={true}
-        />
-      </div>
-    );
+        <ConfirmationModal isOpen={showDeleteModal} onClose={() => {
+        setShowDeleteModal(false);
+        setWorkoutToDelete(null);
+      }} onConfirm={handleDeleteWorkout} title="Delete Workout" message={`Are you sure you want to delete the workout "${workoutToDelete?.name}"? This action cannot be undone.`} confirmText="Delete" isDestructive={true} />
+      </div>;
   })();
-
-  const ReportsPanel = (
-    <div className="page-container">
-      <header className="page-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 16 }}>
+  const ReportsPanel = <div className="page-container">
+      <header className="page-header member-dashboard-inline-84">
         <div>
           <h2 className="page-title">Workout Reports</h2>
           <p className="page-subtitle">Analyze your training volume</p>
         </div>
-        <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-          <select className="form-input" style={{ width: 140, cursor: "pointer" }} value={reportType} onChange={e => setReportType(e.target.value as any)}>
+        <div className="member-dashboard-inline-85">
+          <select className="form-input member-dashboard-inline-86" value={reportType} onChange={e => setReportType(e.target.value as any)}>
             <option value="daily">Daily Report</option>
             <option value="monthly">Monthly Report</option>
             <option value="yearly">Yearly Report</option>
           </select>
-          <input
-            type={reportType === "yearly" ? "number" : reportType === "monthly" ? "month" : "date"}
-            className="form-input"
-            style={{ width: 160 }}
-            value={reportDate}
-            onChange={e => setReportDate(e.target.value)}
-          />
+          <input type={reportType === "yearly" ? "number" : reportType === "monthly" ? "month" : "date"} className="form-input member-dashboard-inline-87" value={reportDate} onChange={e => setReportDate(e.target.value)} />
           <button className="btn-blue-outline" onClick={downloadReportCSV}>Download CSV</button>
         </div>
       </header>
 
-      {loadingReport ? (
-        <div style={{ display: "flex", justifyContent: "center", padding: "40px" }}>
-          <Loader size={32} style={{ animation: "spin 1s linear infinite", color: "var(--primary)" }} />
-        </div>
-      ) : !reportData || reportData.totalDuration === 0 ? (
-        <div className="gym-card" style={{ textAlign: "center", padding: "60px 20px" }}>
-          <BarChart3 size={48} style={{ color: "var(--border-color)", margin: "0 auto 16px" }} />
-          <h3 style={{ fontSize: "1.2rem", fontWeight: 700, marginBottom: 8 }}>No data available</h3>
-          <p style={{ color: "var(--text-muted)" }}>You haven't logged any workouts for this period.</p>
-        </div>
-      ) : (
-        <div>
-          <div className="gym-card" style={{ marginBottom: 24, padding: "24px 32px", background: "linear-gradient(135deg, var(--primary), #1e40af)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      {loadingReport ? <div className="member-dashboard-inline-88">
+          <Loader size={32} className="member-dashboard-inline-89" />
+        </div> : !reportData || reportData.totalDuration === 0 ? <div className="gym-card member-dashboard-inline-90">
+          <BarChart3 size={48} className="member-dashboard-inline-91" />
+          <h3 className="member-dashboard-inline-92">No data available</h3>
+          <p className="member-dashboard-inline-93">You haven't logged any workouts for this period.</p>
+        </div> : <div>
+          <div className="gym-card member-dashboard-inline-94">
             <div>
-              <h4 style={{ color: "rgba(255,255,255,0.8)", fontWeight: 600, fontSize: "0.95rem", marginBottom: 4 }}>Total Training Time</h4>
-              <div style={{ fontSize: "2.5rem", fontWeight: 800 }}>{reportData.totalDuration} <span style={{ fontSize: "1.2rem", fontWeight: 600, opacity: 0.8 }}>mins</span></div>
+              <h4 className="member-dashboard-inline-95">Total Training Time</h4>
+              <div className="member-dashboard-inline-96">{reportData.totalDuration} <span className="member-dashboard-inline-97">mins</span></div>
             </div>
-            <Activity size={48} style={{ opacity: 0.2 }} />
+            <Activity size={48} className="member-dashboard-inline-98" />
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 20 }}>
-            {Object.entries(reportData.report || {}).map(([bodyPart, data]: [string, any]) => (
-              <div key={bodyPart} className="gym-card">
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, borderBottom: "1px solid var(--border-color)", paddingBottom: 12 }}>
-                  <h4 style={{ fontWeight: 700, fontSize: "1.1rem", display: "flex", alignItems: "center", gap: 8 }}>
-                    <div style={{ width: 12, height: 12, borderRadius: "50%", background: "var(--primary)" }}></div>
+          <div className="member-dashboard-inline-99">
+            {Object.entries(reportData.report || {}).map(([bodyPart, data]: [string, any]) => <div key={bodyPart} className="gym-card">
+                <div className="member-dashboard-inline-100">
+                  <h4 className="member-dashboard-inline-101">
+                    <div className="member-dashboard-inline-102"></div>
                     {bodyPart}
                   </h4>
-                  <span style={{ fontWeight: 800, color: "var(--primary)" }}>{data.totalMinutes} min</span>
+                  <span className="member-dashboard-inline-103">{data.totalMinutes} min</span>
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                  {Object.entries(data.workouts).map(([name, mins]: [string, any]) => (
-                    <div key={name} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "0.95rem" }}>
-                      <span style={{ color: "var(--text-secondary)" }}>{name}</span>
-                      <span style={{ fontWeight: 600 }}>{mins} m</span>
-                    </div>
-                  ))}
+                <div className="member-dashboard-inline-104">
+                  {Object.entries(data.workouts).map(([name, mins]: [string, any]) => <div key={name} className="member-dashboard-inline-105">
+                      <span className="member-dashboard-inline-106">{name}</span>
+                      <span className="member-dashboard-inline-107">{mins} m</span>
+                    </div>)}
                 </div>
-              </div>
-            ))}
+              </div>)}
           </div>
 
-          {reportType !== "daily" && reportData.logs && reportData.logs.length > 0 && (
-            <div style={{ marginTop: 32 }}>
-              <h3 style={{ fontSize: "1.2rem", fontWeight: 700, marginBottom: 16 }}>Day-wise Breakdown</h3>
-              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                {Object.entries(
-                  reportData.logs.reduce((acc: any, log: any) => {
-                    if (!acc[log.date]) acc[log.date] = [];
-                    acc[log.date].push(log);
-                    return acc;
-                  }, {})
-                ).sort((a: any, b: any) => b[0].localeCompare(a[0]))
-                  .map(([date, logs]: [string, any]) => (
-                    <div key={date} className="gym-card" style={{ padding: "16px 20px" }}>
-                      <h4 style={{ fontSize: "1rem", fontWeight: 700, color: "var(--primary)", borderBottom: "1px solid var(--border-color)", paddingBottom: 8, marginBottom: 12 }}>
-                        {new Date(date).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" })}
+          {reportType !== "daily" && reportData.logs && reportData.logs.length > 0 && <div className="member-dashboard-inline-108">
+              <h3 className="member-dashboard-inline-109">Day-wise Breakdown</h3>
+              <div className="member-dashboard-inline-110">
+                {Object.entries(reportData.logs.reduce((acc: any, log: any) => {
+            if (!acc[log.date]) acc[log.date] = [];
+            acc[log.date].push(log);
+            return acc;
+          }, {})).sort((a: any, b: any) => b[0].localeCompare(a[0])).map(([date, logs]: [string, any]) => <div key={date} className="gym-card member-dashboard-inline-111">
+                      <h4 className="member-dashboard-inline-112">
+                        {new Date(date).toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric"
+              })}
                       </h4>
-                      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                        {logs.map((log: any, idx: number) => (
-                          <div key={idx} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: "0.95rem" }}>
-                            <span style={{ color: "var(--text-primary)" }}>
-                              {log.workoutName} <span style={{ color: "var(--text-muted)", fontSize: "0.8rem", marginLeft: 4 }}>({log.bodyPart})</span>
+                      <div className="member-dashboard-inline-113">
+                        {logs.map((log: any, idx: number) => <div key={idx} className="member-dashboard-inline-114">
+                            <span className="member-dashboard-inline-115">
+                              {log.workoutName} <span className="member-dashboard-inline-116">({log.bodyPart})</span>
                             </span>
-                            <span style={{ fontWeight: 600 }}>{log.duration} m</span>
-                          </div>
-                        ))}
+                            <span className="member-dashboard-inline-117">{log.duration} m</span>
+                          </div>)}
                       </div>
-                    </div>
-                  ))}
+                    </div>)}
               </div>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-
-  const PlansPanel = (
-    <div className="page-container">
+            </div>}
+        </div>}
+    </div>;
+  const PlansPanel = <div className="page-container">
       <header className="page-header">
         <h2 className="page-title">Available Gym Plans</h2>
         <p className="page-subtitle">Discover memberships crafted for your goals.</p>
       </header>
 
-      {loadingPlans ? (
-        <div style={{ display: "flex", justifyContent: "center", padding: "40px" }}>
-          <Loader size={32} style={{ animation: "spin 1s linear infinite", color: "var(--primary)" }} />
-        </div>
-      ) : plans.length === 0 ? (
-        <div className="gym-card" style={{ textAlign: "center", padding: "60px 20px" }}>
-          <CreditCard size={48} style={{ color: "var(--border-color)", margin: "0 auto 16px" }} />
-          <h3 style={{ fontSize: "1.2rem", fontWeight: 700, marginBottom: 8 }}>No plans available</h3>
-          <p style={{ color: "var(--text-muted)" }}>The gym owner hasn't created any plans yet.</p>
-        </div>
-      ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 24 }}>
-          {plans.map(p => (
-            <div key={p._id} className="gym-card" style={{ display: "flex", flexDirection: "column", padding: 0, overflow: "hidden", border: "1px solid var(--border-color)" }}>
-              <div style={{ padding: "24px", background: "var(--bg-secondary)", borderBottom: "1px solid var(--border-color)", textAlign: "center" }}>
-                <h3 style={{ fontSize: "1.5rem", fontWeight: 800, color: "var(--text-primary)", marginBottom: 8 }}>{p.name}</h3>
-                <div style={{ display: "flex", alignItems: "baseline", justifyContent: "center", gap: 4 }}>
-                  <span style={{ fontSize: "2rem", fontWeight: 800, color: "var(--primary)" }}>₹{p.basePrice}</span>
-                  <span style={{ color: "var(--text-muted)", fontWeight: 500 }}>/ {p.durationMonths} mo</span>
+      {loadingPlans ? <div className="member-dashboard-inline-118">
+          <Loader size={32} className="member-dashboard-inline-119" />
+        </div> : plans.length === 0 ? <div className="gym-card member-dashboard-inline-120">
+          <CreditCard size={48} className="member-dashboard-inline-121" />
+          <h3 className="member-dashboard-inline-122">No plans available</h3>
+          <p className="member-dashboard-inline-123">The gym owner hasn't created any plans yet.</p>
+        </div> : <div className="member-dashboard-inline-124">
+          {plans.map(p => <div key={p._id} className="gym-card member-dashboard-inline-125">
+              <div className="member-dashboard-inline-126">
+                <h3 className="member-dashboard-inline-127">{p.name}</h3>
+                <div className="member-dashboard-inline-128">
+                  <span className="member-dashboard-inline-129">₹{p.basePrice}</span>
+                  <span className="member-dashboard-inline-130">/ {p.durationMonths} mo</span>
                 </div>
               </div>
-              <div style={{ padding: "24px", flex: 1, display: "flex", flexDirection: "column" }}>
-                <div style={{ flex: 1 }}>
-                  <h4 style={{ fontSize: "0.85rem", textTransform: "uppercase", letterSpacing: "0.5px", fontWeight: 700, color: "var(--text-muted)", marginBottom: 16 }}>Includes</h4>
-                  <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 12 }}>
-                    {(Array.isArray(p.features) ? p.features.join(",").split(/[\n,]/) : (p.features || "").split(/[\n,]/)).filter((f: string) => f.trim() && !f.trim().toLowerCase().startsWith('features:')).map((f: string, i: number) => (
-                      <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, fontSize: "0.95rem", color: "var(--text-primary)" }}>
-                        <CheckCircle2 size={16} style={{ color: "#10b981", flexShrink: 0, marginTop: 2 }} />
-                        <span style={{ lineHeight: 1.4 }}>{f.trim()}</span>
-                      </li>
-                    ))}
+              <div className="member-dashboard-inline-131">
+                <div className="member-dashboard-inline-132">
+                  <h4 className="member-dashboard-inline-133">Includes</h4>
+                  <ul className="member-dashboard-inline-134">
+                    {(Array.isArray(p.features) ? p.features.join(",").split(/[\n,]/) : (p.features || "").split(/[\n,]/)).filter((f: string) => f.trim() && !f.trim().toLowerCase().startsWith('features:')).map((f: string, i: number) => <li key={i} className="member-dashboard-inline-135">
+                        <CheckCircle2 size={16} className="member-dashboard-inline-136" />
+                        <span className="member-dashboard-inline-137">{f.trim()}</span>
+                      </li>)}
                   </ul>
                 </div>
-                <button className="btn-blue-outline" style={{ width: "100%", marginTop: 24, justifyContent: "center" }} onClick={() => dispatch(showSnackbar({ message: "Contact gym admin to enroll in this plan.", type: "info" }))}>
+                <button className="btn-blue-outline member-dashboard-inline-138" onClick={() => dispatch(showSnackbar({
+            message: "Contact gym admin to enroll in this plan.",
+            type: "info"
+          }))}>
                   Inquire Now
                 </button>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-
+            </div>)}
+        </div>}
+    </div>;
   const handleCompleteChallenge = async (challengeId: number, xp: number) => {
     try {
-      const res = await completeChallengeApi({ xp });
-      dispatch(showSnackbar({ message: `+${xp} XP Earned!`, type: "success" }));
-      setProfile((prev: any) => ({ ...prev, xp: res.data.xp, level: res.data.level }));
-      setDailyChallenges(prev => prev.map(c => c.id === challengeId ? { ...c, completed: true } : c));
+      const res = await completeChallengeApi({
+        xp
+      });
+      dispatch(showSnackbar({
+        message: `+${xp} XP Earned!`,
+        type: "success"
+      }));
+      setProfile((prev: any) => ({
+        ...prev,
+        xp: res.data.xp,
+        level: res.data.level
+      }));
+      setDailyChallenges(prev => prev.map(c => c.id === challengeId ? {
+        ...c,
+        completed: true
+      } : c));
     } catch (err: any) {
-      dispatch(showSnackbar({ message: "Failed to claim XP", type: "error" }));
+      dispatch(showSnackbar({
+        message: "Failed to claim XP",
+        type: "error"
+      }));
     }
   };
-
   const currentLevel = profile?.level || 1;
   const currentXp = profile?.xp || 0;
   const nextLevelXp = currentLevel * 500;
-  const progressPercent = Math.min(100, (currentXp / nextLevelXp) * 100);
-
-  const ChallengesPanel = (
-    <div className="page-container">
-      <header className="page-header" style={{ marginBottom: 24 }}>
+  const progressPercent = Math.min(100, currentXp / nextLevelXp * 100);
+  const ChallengesPanel = <div className="page-container">
+      <header className="page-header member-dashboard-inline-139">
         <div>
-          <h2 className="page-title" style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <h2 className="page-title member-dashboard-inline-140">
             <ShieldCheck size={24} color="#6366f1" /> Challenges & Rewards
           </h2>
           <p className="page-subtitle">Complete tasks to earn XP and level up!</p>
@@ -1203,154 +1325,172 @@ export const MemberDashboard: React.FC = () => {
       </header>
 
       {/* Level Progress */}
-      <div className="gym-card" style={{ marginBottom: 24, padding: "24px 32px", background: "linear-gradient(135deg, #4f46e5, #3730a3)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "space-between", position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "absolute", right: -30, top: -30, opacity: 0.1, transform: "scale(2)" }}>
+      <div className="gym-card member-dashboard-inline-141">
+        <div style={{
+        right: -30,
+        top: -30
+      }} className="member-dashboard-inline-142">
           <ShieldCheck size={120} />
         </div>
-        <div style={{ width: "100%", zIndex: 1 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 12 }}>
+        <div className="member-dashboard-inline-143">
+          <div className="member-dashboard-inline-144">
             <div>
-              <span style={{ fontSize: "0.9rem", opacity: 0.8, fontWeight: 600 }}>Current Level</span>
-              <h3 style={{ fontSize: "2.5rem", fontWeight: 800, margin: 0, lineHeight: 1 }}>{currentLevel}</h3>
+              <span className="member-dashboard-inline-145">Current Level</span>
+              <h3 className="member-dashboard-inline-146">{currentLevel}</h3>
             </div>
-            <div style={{ textAlign: "right" }}>
-              <span style={{ fontSize: "1.2rem", fontWeight: 700 }}>{currentXp}</span>
-              <span style={{ opacity: 0.7, fontSize: "0.9rem" }}> / {nextLevelXp} XP</span>
+            <div className="member-dashboard-inline-147">
+              <span className="member-dashboard-inline-148">{currentXp}</span>
+              <span className="member-dashboard-inline-149"> / {nextLevelXp} XP</span>
             </div>
           </div>
-          <div style={{ width: "100%", height: 12, background: "rgba(0,0,0,0.2)", borderRadius: 6, overflow: "hidden" }}>
-            <div style={{ width: `${progressPercent}%`, height: "100%", background: "#f59e0b", transition: "width 0.5s ease-out" }} />
+          <div className="member-dashboard-inline-150">
+            <div style={{
+            width: `${progressPercent}%`
+          }} className="member-dashboard-inline-151" />
           </div>
-          <p style={{ margin: "12px 0 0", fontSize: "0.85rem", opacity: 0.8, fontWeight: 500 }}>
+          <p className="member-dashboard-inline-152">
             {nextLevelXp - currentXp} XP needed for Level {currentLevel + 1}
           </p>
         </div>
       </div>
 
-      {streakStats && (
-        <div className="gym-card" style={{ marginBottom: 24, border: "2px solid rgba(245, 158, 11, 0.3)", position: "relative", overflow: "hidden" }}>
-          <div style={{ position: "absolute", right: -20, top: -20, opacity: 0.05, transform: "scale(3)" }}><Flame size={100} color="#f59e0b" /></div>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20, zIndex: 1, position: "relative" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <div style={{ background: "rgba(245, 158, 11, 0.1)", padding: 12, borderRadius: 12, color: "#f59e0b" }}>
+      {streakStats && <div className="gym-card member-dashboard-inline-153">
+          <div style={{
+        right: -20,
+        top: -20
+      }} className="member-dashboard-inline-154"><Flame size={100} color="#f59e0b" /></div>
+          <div className="member-dashboard-inline-155">
+            <div className="member-dashboard-inline-156">
+              <div className="member-dashboard-inline-157">
                 <Flame size={24} />
               </div>
               <div>
-                <h3 style={{ fontSize: "1.2rem", fontWeight: 800, margin: 0, color: "var(--text-primary)" }}>Daily Streak</h3>
-                <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", margin: 0 }}>Keep showing up to unlock rewards!</p>
+                <h3 className="member-dashboard-inline-158">Daily Streak</h3>
+                <p className="member-dashboard-inline-159">Keep showing up to unlock rewards!</p>
               </div>
             </div>
-            <div style={{ textAlign: "right" }}>
-              <span style={{ fontSize: "2rem", fontWeight: 900, color: "#f59e0b", lineHeight: 1 }}>{streakStats.currentStreak || 0}</span>
-              <span style={{ fontSize: "0.9rem", color: "var(--text-muted)", marginLeft: 6, fontWeight: 700 }}>Days</span>
+            <div className="member-dashboard-inline-160">
+              <span className="member-dashboard-inline-161">{streakStats.currentStreak || 0}</span>
+              <span className="member-dashboard-inline-162">Days</span>
             </div>
           </div>
 
-          <div style={{ display: "flex", gap: 12, overflowX: "auto", overflowY: "hidden", zIndex: 1, position: "relative", padding: "8px 8px 16px 8px" }}>
-            {streakStats.milestones?.map((m: any, i: number) => (
-              <div key={i} style={{ 
-                flex: "0 0 auto", 
-                width: 110, 
-                padding: "16px 12px", 
-                borderRadius: 16, 
-                background: m.achieved ? "var(--bg-card)" : "var(--bg-secondary)", 
-                border: `2px solid ${m.achieved ? "#f59e0b" : "var(--border-color)"}`,
-                display: "flex", 
-                flexDirection: "column", 
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 8,
-                boxShadow: m.achieved ? "0 4px 12px rgba(245, 158, 11, 0.15)" : "none",
-                opacity: m.achieved ? 1 : 0.5,
-                transition: "all 0.3s"
-              }}>
-                <div style={{ background: m.achieved ? "linear-gradient(135deg, #fcd34d, #f59e0b)" : "var(--border-color)", padding: 10, borderRadius: "50%", color: m.achieved ? "white" : "var(--text-muted)", display: "flex", alignItems: "center", justifyContent: "center", width: 44, height: 44 }}>
-                  <span style={{ fontSize: "1.5rem", lineHeight: 1 }}>
-                    {m.name === "Bronze" ? "🥉" : 
-                     m.name === "Silver" ? "🥈" : 
-                     m.name === "Gold" ? "🥇" : 
-                     m.name === "Platinum" ? "🏆" : 
-                     m.name === "Diamond" ? "💎" : 
-                     m.name === "Champion" ? "👑" : "🏅"}
+          <div className="member-dashboard-inline-163">
+            {streakStats.milestones?.map((m: any, i: number) => <div key={i} style={{
+          background: m.achieved ? "var(--bg-card)" : "var(--bg-secondary)",
+          border: `2px solid ${m.achieved ? "#f59e0b" : "var(--border-color)"}`,
+          boxShadow: m.achieved ? "0 4px 12px rgba(245, 158, 11, 0.15)" : "none",
+          opacity: m.achieved ? 1 : 0.5
+        }} className="member-dashboard-inline-164">
+                <div style={{
+            background: m.achieved ? "linear-gradient(135deg, #fcd34d, #f59e0b)" : "var(--border-color)",
+            color: m.achieved ? "white" : "var(--text-muted)"
+          }} className="member-dashboard-inline-165">
+                  <span className="member-dashboard-inline-166">
+                    {m.name === "Bronze" ? "🥉" : m.name === "Silver" ? "🥈" : m.name === "Gold" ? "🥇" : m.name === "Platinum" ? "🏆" : m.name === "Diamond" ? "💎" : m.name === "Champion" ? "👑" : "🏅"}
                   </span>
                 </div>
-                <div style={{ textAlign: "center" }}>
-                  <div style={{ fontSize: "0.8rem", fontWeight: 800, color: m.achieved ? "var(--text-primary)" : "var(--text-muted)" }}>{m.name}</div>
-                  <div style={{ fontSize: "0.7rem", fontWeight: 600, color: "var(--text-secondary)" }}>{m.target} Days</div>
+                <div className="member-dashboard-inline-167">
+                  <div style={{
+              color: m.achieved ? "var(--text-primary)" : "var(--text-muted)"
+            }} className="member-dashboard-inline-168">{m.name}</div>
+                  <div className="member-dashboard-inline-169">{m.target} Days</div>
                 </div>
-              </div>
-            ))}
+              </div>)}
           </div>
-        </div>
-      )}
+        </div>}
 
       {/* Daily Challenges */}
-      <div className="gym-card" style={{ marginBottom: 24 }}>
-        <h3 style={{ fontSize: "1.2rem", fontWeight: 700, marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
+      <div className="gym-card member-dashboard-inline-170">
+        <h3 className="member-dashboard-inline-171">
           <Target size={20} color="var(--primary)" /> Daily Challenges
         </h3>
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          {dailyChallenges.map((c) => {
-            const isEligible = 
-              c.id === 1 ? attendance.length > 0 :
-              c.id === 2 ? generatedDietPlanToday :
-              c.id === 3 ? (streakStats?.currentStreak || 0) >= 30 : false;
-            
-            const btnDisabled = c.completed || !isEligible;
-            
-            return (
-              <div key={c.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", background: "var(--bg-secondary)", padding: "16px 20px", borderRadius: 12, border: "1px solid var(--border-color)", opacity: c.completed ? 0.6 : 1 }}>
+        <div className="member-dashboard-inline-172">
+          {dailyChallenges.map(c => {
+          const isEligible = c.id === 1 ? attendance.length > 0 : c.id === 2 ? generatedDietPlanToday : c.id === 3 ? (streakStats?.currentStreak || 0) >= 30 : false;
+          const btnDisabled = c.completed || !isEligible;
+          return <div key={c.id} style={{
+            opacity: c.completed ? 0.6 : 1
+          }} className="member-dashboard-inline-173">
                 <div>
-                  <h4 style={{ margin: "0 0 4px", fontSize: "1rem", fontWeight: 700, color: c.completed ? "var(--text-muted)" : "var(--text-primary)" }}>{c.text}</h4>
-                  <span style={{ color: "#f59e0b", fontWeight: 700, fontSize: "0.85rem" }}>+{c.xp} XP</span>
-                  {!c.completed && !isEligible && <span style={{ color: "var(--text-muted)", fontSize: "0.75rem", marginLeft: 12 }}>Not completed yet</span>}
+                  <h4 style={{
+                color: c.completed ? "var(--text-muted)" : "var(--text-primary)"
+              }} className="member-dashboard-inline-174">{c.text}</h4>
+                  <span className="member-dashboard-inline-175">+{c.xp} XP</span>
+                  {!c.completed && !isEligible && <span className="member-dashboard-inline-176">Not completed yet</span>}
                 </div>
-                <button
-                  className={c.completed ? "btn-blue-outline" : "btn-blue"}
-                  disabled={btnDisabled}
-                  onClick={() => handleCompleteChallenge(c.id, c.xp)}
-                  style={{ padding: "8px 16px", borderRadius: 8, opacity: btnDisabled ? 0.5 : 1, cursor: btnDisabled ? "not-allowed" : "pointer", border: c.completed ? "1px solid var(--border-color)" : "" }}
-                >
+                <button className={`${c.completed ? "btn-blue-outline" : "btn-blue"} member-dashboard-inline-177`} disabled={btnDisabled} onClick={() => handleCompleteChallenge(c.id, c.xp)} style={{
+              opacity: btnDisabled ? 0.5 : 1,
+              cursor: btnDisabled ? "not-allowed" : "pointer",
+              border: c.completed ? "1px solid var(--border-color)" : ""
+            }}>
                   {c.completed ? "Claimed" : "Claim"}
                 </button>
-              </div>
-            );
-          })}
+              </div>;
+        })}
         </div>
       </div>
-    </div>
-  );
-
-  const navItems: { id: Tab; label: string; icon: React.FC<{ size?: number }> }[] = [
-    { id: "overview",  label: "Overview",   icon: LayoutDashboard as any },
-    { id: "my_plan",   label: "My Plan & Invoices", icon: CreditCard as any },
-    { id: "health_monitor", label: "Health Monitor", icon: ClipboardList as any },
-    { id: "workouts",  label: "Workouts",   icon: Dumbbell as any },
-    { id: "library",   label: "Workout Video",    icon: BookOpen as any },
-    { id: "reports",   label: "Reports",    icon: BarChart3 as any },
-    { id: "diet",      label: "My Diet",    icon: Activity as any },
-    { id: "plans",     label: "Gym Plans",  icon: CreditCard as any },
-    { id: "challenges",label: "Challenges", icon: ShieldCheck as any },
-    { id: "events",    label: "Announcements", icon: Bell as any },
-    { id: "pt" as Tab, label: "Personal Trainer", icon: UserCheck as any },
-  ];
-
-  const Sidebar = (
-    <>
+    </div>;
+  const navItems: {
+    id: Tab;
+    label: string;
+    icon: React.FC<{
+      size?: number;
+    }>;
+  }[] = [{
+    id: "overview",
+    label: "Overview",
+    icon: LayoutDashboard as any
+  }, {
+    id: "my_plan",
+    label: "My Plan & Invoices",
+    icon: CreditCard as any
+  }, {
+    id: "health_monitor",
+    label: "Health Monitor",
+    icon: ClipboardList as any
+  }, {
+    id: "workouts",
+    label: "Workouts",
+    icon: Dumbbell as any
+  }, {
+    id: "library",
+    label: "Workout Video",
+    icon: BookOpen as any
+  }, {
+    id: "reports",
+    label: "Reports",
+    icon: BarChart3 as any
+  }, {
+    id: "diet",
+    label: "My Diet",
+    icon: Activity as any
+  }, {
+    id: "plans",
+    label: "Gym Plans",
+    icon: CreditCard as any
+  }, {
+    id: "challenges",
+    label: "Challenges",
+    icon: ShieldCheck as any
+  }, {
+    id: "events",
+    label: "Announcements",
+    icon: Bell as any
+  }, {
+    id: "pt" as Tab,
+    label: "Personal Trainer",
+    icon: UserCheck as any
+  }];
+  const Sidebar = <>
       {/* Mobile overlay */}
-      {sidebarOpen && (
-        <div
-          className="sidebar-overlay show"
-          style={{ display: "block" }}
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
+      {sidebarOpen && <div className="sidebar-overlay show member-dashboard-inline-178" onClick={() => setSidebarOpen(false)} />}
 
       <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
         {/* Brand */}
         <div className="sidebar-brand">
-          <div className="brand-icon-wrapper" style={{ background: 'none', boxShadow: 'none', padding: 0 }}>
-            <img src="/logo.png" alt="Trainix Logo" style={{ width: 44, height: 44, objectFit: 'contain', borderRadius: 10 }} />
+          <div className="brand-icon-wrapper member-dashboard-inline-179">
+            <img src="/logo.png" alt="Trainix Logo" className="member-dashboard-inline-180" />
           </div>
           <div>
             <h1 className="brand-name">TRAINIX</h1>
@@ -1359,131 +1499,88 @@ export const MemberDashboard: React.FC = () => {
         </div>
 
         {/* Nav */}
-        <nav style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
+        <nav className="member-dashboard-inline-181">
           <ul className="sidebar-menu">
-            {navItems.map(({ id, label, icon: Icon }) => {
-              if (id === "health_monitor") {
-                return (
-                  <li key={id} style={{ display: "flex", flexDirection: "column" }}>
-                    <a
-                      className={`sidebar-menu-item ${activeTab === id ? "active" : ""}`}
-                      onClick={() => { setSidebarHealthExpanded(!sidebarHealthExpanded); }}
-                      style={{ justifyContent: "space-between", cursor: "pointer" }}
-                    >
-                      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+            {navItems.map(({
+            id,
+            label,
+            icon: Icon
+          }) => {
+            if (id === "health_monitor") {
+              return <li key={id} className="member-dashboard-inline-182">
+                    <a className={`sidebar-menu-item ${activeTab === id ? "active" : ""} member-dashboard-inline-183`} onClick={() => {
+                  setSidebarHealthExpanded(!sidebarHealthExpanded);
+                }}>
+                      <div className="member-dashboard-inline-184">
                         <Icon size={20} />
                         <span>{label}</span>
                       </div>
                       {sidebarHealthExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                     </a>
-                    {sidebarHealthExpanded && (
-                      <div style={{ display: "flex", flexDirection: "column", paddingLeft: "42px", gap: "4px", marginTop: "4px", marginBottom: "8px" }}>
-                        {[
-                          { key: "bmi", label: "BMI", path: "bmi" },
-                          { key: "calories", label: "Calories", path: "calories" },
-                          { key: "water", label: "Water Reminder", path: "water-reminder" },
-                          { key: "health_kit", label: "Health Kit", path: "health-kit" }
-                        ].map(sub => (
-                          <a
-                            key={sub.key}
-                            style={{
-                              padding: "8px 12px",
-                              borderRadius: "8px",
-                              cursor: "pointer",
-                              fontSize: "0.9rem",
-                              fontWeight: 600,
-                              color: activeTab === "health_monitor" && healthMonitorSection === sub.key ? "var(--primary)" : "var(--text-secondary)",
-                              background: activeTab === "health_monitor" && healthMonitorSection === sub.key ? "rgba(99, 102, 241, 0.1)" : "transparent",
-                              transition: "all 0.2s"
-                            }}
-                            onClick={() => {
-                              goToPanel("health_monitor", sub.path);
-                            }}
-                            onMouseOver={(e) => e.currentTarget.style.color = "var(--primary)"}
-                            onMouseOut={(e) => e.currentTarget.style.color = activeTab === "health_monitor" && healthMonitorSection === sub.key ? "var(--primary)" : "var(--text-secondary)"}
-                          >
+                    {sidebarHealthExpanded && <div className="member-dashboard-inline-185">
+                        {[{
+                    key: "bmi",
+                    label: "BMI",
+                    path: "bmi"
+                  }, {
+                    key: "calories",
+                    label: "Calories",
+                    path: "calories"
+                  }, {
+                    key: "water",
+                    label: "Water Reminder",
+                    path: "water-reminder"
+                  }, {
+                    key: "health_kit",
+                    label: "Health Kit",
+                    path: "health-kit"
+                  }].map(sub => <a key={sub.key} style={{
+                    color: activeTab === "health_monitor" && healthMonitorSection === sub.key ? "var(--primary)" : "var(--text-secondary)",
+                    background: activeTab === "health_monitor" && healthMonitorSection === sub.key ? "rgba(99, 102, 241, 0.1)" : "transparent"
+                  }} onClick={() => {
+                    goToPanel("health_monitor", sub.path);
+                  }} onMouseOver={e => e.currentTarget.style.color = "var(--primary)"} onMouseOut={e => e.currentTarget.style.color = activeTab === "health_monitor" && healthMonitorSection === sub.key ? "var(--primary)" : "var(--text-secondary)"} className="member-dashboard-inline-186">
                             {sub.label}
-                          </a>
-                        ))}
-                      </div>
-                    )}
-                  </li>
-                );
-              }
-
-              if (id === "diet") {
-                return (
-                  <li key={id} style={{ display: "flex", flexDirection: "column" }}>
-                    <a
-                      className={`sidebar-menu-item ${activeTab === id ? "active" : ""}`}
-                      onClick={() => setSidebarDietExpanded(!sidebarDietExpanded)}
-                      style={{ justifyContent: "space-between", cursor: "pointer" }}
-                    >
-                      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                          </a>)}
+                      </div>}
+                  </li>;
+            }
+            if (id === "diet") {
+              return <li key={id} className="member-dashboard-inline-187">
+                    <a className={`sidebar-menu-item ${activeTab === id ? "active" : ""} member-dashboard-inline-188`} onClick={() => setSidebarDietExpanded(!sidebarDietExpanded)}>
+                      <div className="member-dashboard-inline-189">
                         <Icon size={20} />
                         <span>{label}</span>
                       </div>
                       {sidebarDietExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                     </a>
-                    {sidebarDietExpanded && (
-                      <div style={{ display: "flex", flexDirection: "column", paddingLeft: "42px", gap: "4px", marginTop: "4px", marginBottom: "8px" }}>
-                        <a
-                          style={{
-                            padding: "8px 12px",
-                            borderRadius: "8px",
-                            cursor: "pointer",
-                            fontSize: "0.9rem",
-                            fontWeight: 600,
-                            color: activeTab === "diet" && expandedMainSections.normalDiet ? "var(--primary)" : "var(--text-secondary)",
-                            background: activeTab === "diet" && expandedMainSections.normalDiet ? "rgba(99, 102, 241, 0.1)" : "transparent",
-                            transition: "all 0.2s"
-                          }}
-                          onClick={() => {
-                            goToPanel("diet", "normal");
-                          }}
-                          onMouseOver={(e) => e.currentTarget.style.color = "var(--primary)"}
-                          onMouseOut={(e) => e.currentTarget.style.color = activeTab === "diet" && expandedMainSections.normalDiet ? "var(--primary)" : "var(--text-secondary)"}
-                        >
+                    {sidebarDietExpanded && <div className="member-dashboard-inline-190">
+                        <a style={{
+                    color: activeTab === "diet" && expandedMainSections.normalDiet ? "var(--primary)" : "var(--text-secondary)",
+                    background: activeTab === "diet" && expandedMainSections.normalDiet ? "rgba(99, 102, 241, 0.1)" : "transparent"
+                  }} onClick={() => {
+                    goToPanel("diet", "normal");
+                  }} onMouseOver={e => e.currentTarget.style.color = "var(--primary)"} onMouseOut={e => e.currentTarget.style.color = activeTab === "diet" && expandedMainSections.normalDiet ? "var(--primary)" : "var(--text-secondary)"} className="member-dashboard-inline-191">
                           Normal Diet Plan
                         </a>
-                        <a
-                          style={{
-                            padding: "8px 12px",
-                            borderRadius: "8px",
-                            cursor: "pointer",
-                            fontSize: "0.9rem",
-                            fontWeight: 600,
-                            color: activeTab === "diet" && expandedMainSections.aiDiet ? "var(--primary)" : "var(--text-secondary)",
-                            background: activeTab === "diet" && expandedMainSections.aiDiet ? "rgba(99, 102, 241, 0.1)" : "transparent",
-                            transition: "all 0.2s"
-                          }}
-                          onClick={() => {
-                            goToPanel("diet", "premium");
-                          }}
-                          onMouseOver={(e) => e.currentTarget.style.color = "var(--primary)"}
-                          onMouseOut={(e) => e.currentTarget.style.color = activeTab === "diet" && expandedMainSections.aiDiet ? "var(--primary)" : "var(--text-secondary)"}
-                        >
+                        <a style={{
+                    color: activeTab === "diet" && expandedMainSections.aiDiet ? "var(--primary)" : "var(--text-secondary)",
+                    background: activeTab === "diet" && expandedMainSections.aiDiet ? "rgba(99, 102, 241, 0.1)" : "transparent"
+                  }} onClick={() => {
+                    goToPanel("diet", "premium");
+                  }} onMouseOver={e => e.currentTarget.style.color = "var(--primary)"} onMouseOut={e => e.currentTarget.style.color = activeTab === "diet" && expandedMainSections.aiDiet ? "var(--primary)" : "var(--text-secondary)"} className="member-dashboard-inline-192">
                           Premium Diet Plan
                         </a>
-                      </div>
-                    )}
-                  </li>
-                );
-              }
-
-              return (
-                <li key={id}>
-                  <a
-                    className={`sidebar-menu-item ${activeTab === id ? "active" : ""}`}
-                    onClick={() => goToPanel(id)}
-                    style={{ cursor: "pointer" }}
-                  >
+                      </div>}
+                  </li>;
+            }
+            return <li key={id}>
+                  <a className={`sidebar-menu-item ${activeTab === id ? "active" : ""} member-dashboard-inline-193`} onClick={() => goToPanel(id)}>
                     <Icon size={20} />
                     <span>{label}</span>
                   </a>
-                </li>
-              );
-            })}
+                </li>;
+          })}
           </ul>
         </nav>
 
@@ -1502,322 +1599,291 @@ export const MemberDashboard: React.FC = () => {
           </div>
 
           {/* Profile */}
-          <div className="profile-card" style={{ justifyContent: "space-between" }}>
-            <div
-              style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}
-              onClick={() => setShowChangePassword(true)}
-              title="Click to change password"
-            >
+          <div className="profile-card member-dashboard-inline-194">
+            <div onClick={() => setShowChangePassword(true)} title="Click to change password" className="member-dashboard-inline-195">
               <div className="profile-avatar">
                 {userName.slice(0, 2).toUpperCase()}
               </div>
               <div className="profile-info">
                 <span className="profile-name">{userName}</span>
-                <span className="profile-email" style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                <span className="profile-email member-dashboard-inline-196">
                   <User size={10} /> View Profile
                 </span>
               </div>
             </div>
-            <button
-              onClick={handleLogout}
-              title="Logout"
-              style={{ background: "none", border: "none", cursor: "pointer", color: "var(--text-muted)", padding: 4, borderRadius: 6, transition: "color 0.15s" }}
-            >
+            <button onClick={handleLogout} title="Logout" className="member-dashboard-inline-197">
               <LogOut size={16} />
             </button>
           </div>
         </div>
       </aside>
-    </>
-  );
-
+    </>;
   const downloadDietPDF = () => {
     const element = document.getElementById('diet-plan-container');
     if (!element) return;
-
-    const loadHtml2Pdf = () => new Promise((resolve) => {
+    const loadHtml2Pdf = () => new Promise(resolve => {
       if ((window as any).html2pdf) return resolve((window as any).html2pdf);
       const script = document.createElement("script");
       script.src = "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
       script.onload = () => resolve((window as any).html2pdf);
       document.body.appendChild(script);
     });
-
     loadHtml2Pdf().then((html2pdf: any) => {
       const opt = {
         margin: 10,
         filename: 'My_7_Day_Diet_Plan.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        image: {
+          type: 'jpeg',
+          quality: 0.98
+        },
+        html2canvas: {
+          scale: 2,
+          useCORS: true
+        },
+        jsPDF: {
+          unit: 'mm',
+          format: 'a4',
+          orientation: 'portrait'
+        }
       };
       html2pdf().set(opt).from(element).save();
     });
   };
-
-  const DietPanel = (
-    <div className="page-container" style={{ padding: "16px 24px", maxWidth: "1200px", margin: "0 auto" }}>
+  const DietPanel = <div className="page-container member-dashboard-inline-198">
       {/* Header */}
-      <header className="page-header" style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: "16px", alignItems: "center", marginBottom: "24px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <div style={{ background: "var(--bg-card)", padding: "10px", borderRadius: "12px", boxShadow: "0 2px 8px rgba(0,0,0,0.05)", border: "1px solid var(--border-color)" }}>
-            <Activity size={24} style={{ color: "#10b981" }} />
+      <header className="page-header member-dashboard-inline-199">
+        <div className="member-dashboard-inline-200">
+          <div className="member-dashboard-inline-201">
+            <Activity size={24} className="member-dashboard-inline-202" />
           </div>
           <div>
-            <h2 className="page-title" style={{ marginBottom: "2px", fontSize: "1.4rem", fontWeight: 800, color: "var(--text-primary)" }}>My Diet & Health</h2>
-            <p className="page-subtitle" style={{ fontSize: "0.85rem", color: "var(--text-secondary)", margin: 0 }}>Track your nutrition and physical progress.</p>
+            <h2 className="page-title member-dashboard-inline-203">My Diet & Health</h2>
+            <p className="page-subtitle member-dashboard-inline-204">Track your nutrition and physical progress.</p>
           </div>
         </div>
-        {expandedMainSections.aiDiet && (
-          <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-            <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", padding: "8px 16px", borderRadius: "10px", display: "flex", alignItems: "center", gap: "10px", boxShadow: "0 2px 4px rgba(0,0,0,0.02)" }}>
-              <Sparkles size={18} style={{ color: "#f59e0b" }} />
-              <div style={{ display: "flex", flexDirection: "column", lineHeight: 1.2 }}>
-                <span style={{ fontSize: "0.7rem", color: "var(--primary)", fontWeight: 700 }}>AI Credits</span>
-                <span style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--text-primary)" }}>{profile?.aiCredits || 0} credit{profile?.aiCredits !== 1 ? 's' : ''}</span>
+        {expandedMainSections.aiDiet && <div className="member-dashboard-inline-205">
+            <div className="member-dashboard-inline-206">
+              <Sparkles size={18} className="member-dashboard-inline-207" />
+              <div className="member-dashboard-inline-208">
+                <span className="member-dashboard-inline-209">AI Credits</span>
+                <span className="member-dashboard-inline-210">{profile?.aiCredits || 0} credit{profile?.aiCredits !== 1 ? 's' : ''}</span>
               </div>
             </div>
-            <button className="btn-blue" onClick={() => setShowAiModal(true)} style={{ display: "flex", alignItems: "center", gap: "8px", padding: "10px 20px", borderRadius: "10px", background: "linear-gradient(135deg, #6366f1, #4f46e5)", color: "white", fontWeight: 600, border: "none", cursor: "pointer", boxShadow: "0 4px 10px rgba(99, 102, 241, 0.3)", fontSize: "0.9rem" }}>
+            <button className="btn-blue member-dashboard-inline-211" onClick={() => setShowAiModal(true)}>
               <ShoppingCart size={16} /> Buy Credits
             </button>
-          </div>
-        )}
+          </div>}
       </header>
 
-      {loadingDiet ? (
-        <div style={{ display: "flex", justifyContent: "center", padding: "40px" }}><Loader size={32} style={{ animation: "spin 1s linear infinite", color: "var(--primary)" }} /></div>
-      ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: "24px" }}>
+      {loadingDiet ? <div className="member-dashboard-inline-212"><Loader size={32} className="member-dashboard-inline-213" /></div> : <div className="member-dashboard-inline-214">
 
-          {expandedMainSections.normalDiet && (
-            <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: "20px", overflow: "hidden", boxShadow: "0 4px 12px rgba(0,0,0,0.03)" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "24px 32px", background: "var(--bg-secondary)", borderBottom: "1px solid var(--border-color)" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-                  <div style={{ background: "rgba(16, 185, 129, 0.1)", color: "#10b981", padding: "12px", borderRadius: "12px" }}>
+          {expandedMainSections.normalDiet && <div className="member-dashboard-inline-215">
+              <div className="member-dashboard-inline-216">
+                <div className="member-dashboard-inline-217">
+                  <div className="member-dashboard-inline-218">
                     <CheckCircle size={24} />
                   </div>
-                  <h3 style={{ fontSize: "1.3rem", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>Normal Diet Plan (Free)</h3>
+                  <h3 className="member-dashboard-inline-219">Normal Diet Plan (Free)</h3>
                 </div>
                 <button onClick={() => {
-                  const element = document.getElementById('normal-diet-plan-container');
-                  if (!element) return;
-                  const loadHtml2Pdf = () => new Promise((resolve) => {
-                    if ((window as any).html2pdf) return resolve((window as any).html2pdf);
-                    const script = document.createElement("script");
-                    script.src = "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
-                    script.onload = () => resolve((window as any).html2pdf);
-                    document.body.appendChild(script);
-                  });
-                  loadHtml2Pdf().then((html2pdf: any) => {
-                    html2pdf().set({
-                      margin: 10, filename: 'My_Normal_Diet_Plan.pdf', image: { type: 'jpeg', quality: 0.98 },
-                      html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-                    }).from(element).save();
-                  });
-                }} style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", padding: "8px 16px", borderRadius: "10px", color: "var(--text-primary)", fontWeight: 600, cursor: "pointer", fontSize: "0.85rem", boxShadow: "0 1px 2px rgba(0,0,0,0.05)", transition: "all 0.2s" }} onMouseOver={(e) => e.currentTarget.style.background = "var(--bg-hover)"} onMouseOut={(e) => e.currentTarget.style.background = "var(--bg-card)"}>
+            const element = document.getElementById('normal-diet-plan-container');
+            if (!element) return;
+            const loadHtml2Pdf = () => new Promise(resolve => {
+              if ((window as any).html2pdf) return resolve((window as any).html2pdf);
+              const script = document.createElement("script");
+              script.src = "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
+              script.onload = () => resolve((window as any).html2pdf);
+              document.body.appendChild(script);
+            });
+            loadHtml2Pdf().then((html2pdf: any) => {
+              html2pdf().set({
+                margin: 10,
+                filename: 'My_Normal_Diet_Plan.pdf',
+                image: {
+                  type: 'jpeg',
+                  quality: 0.98
+                },
+                html2canvas: {
+                  scale: 2,
+                  useCORS: true
+                },
+                jsPDF: {
+                  unit: 'mm',
+                  format: 'a4',
+                  orientation: 'portrait'
+                }
+              }).from(element).save();
+            });
+          }} onMouseOver={e => e.currentTarget.style.background = "var(--bg-hover)"} onMouseOut={e => e.currentTarget.style.background = "var(--bg-card)"} className="member-dashboard-inline-220">
                   Download PDF
                 </button>
               </div>
-              <div id="normal-diet-plan-container" style={{ padding: "32px" }}>
-                <div style={{ marginBottom: "24px" }}>
-                  <div style={{ display: "flex", gap: "8px", overflowX: "auto", marginBottom: "24px", paddingBottom: "8px", msOverflowStyle: "none", scrollbarWidth: "none" }}>
+              <div id="normal-diet-plan-container" className="member-dashboard-inline-221">
+                <div className="member-dashboard-inline-222">
+                  <div className="member-dashboard-inline-223">
                     {genericDietPlan.map((day: any, i: number) => {
-                      const dayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-                      const label = dayLabels[i];
-                      const isSelected = selectedGenericDay === day.dayNumber;
-                      return (
-                        <button
-                          key={day.dayNumber}
-                          onClick={() => setSelectedGenericDay(day.dayNumber)}
-                          style={{
-                            padding: "12px 24px",
-                            borderRadius: "16px",
-                            border: "none",
-                            background: isSelected ? "#2d3748" : "var(--bg-secondary)",
-                            color: isSelected ? "#fff" : "var(--text-primary)",
-                            fontWeight: 700,
-                            cursor: "pointer",
-                            minWidth: "80px",
-                            transition: "all 0.2s",
-                            boxShadow: isSelected ? "0 4px 12px rgba(0,0,0,0.1)" : "none"
-                          }}
-                        >
+                const dayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+                const label = dayLabels[i];
+                const isSelected = selectedGenericDay === day.dayNumber;
+                return <button key={day.dayNumber} onClick={() => setSelectedGenericDay(day.dayNumber)} style={{
+                  background: isSelected ? "#2d3748" : "var(--bg-secondary)",
+                  color: isSelected ? "#fff" : "var(--text-primary)",
+                  boxShadow: isSelected ? "0 4px 12px rgba(0,0,0,0.1)" : "none"
+                }} className="member-dashboard-inline-224">
                           {label}
-                        </button>
-                      );
-                    })}
+                        </button>;
+              })}
                   </div>
 
-                  {genericDietPlan.filter((d: any) => d.dayNumber === selectedGenericDay).map((day: any) => (
-                    <div key={day.dayNumber}>
+                  {genericDietPlan.filter((d: any) => d.dayNumber === selectedGenericDay).map((day: any) => <div key={day.dayNumber}>
                       {/* Macros */}
-                      <div style={{ display: "flex", gap: "12px", marginBottom: "24px", flexWrap: "wrap" }}>
-                        <div style={{ background: "var(--bg-secondary)", padding: "12px 16px", borderRadius: "12px", border: "1px solid var(--border-color)", display: "flex", flexDirection: "column", flex: 1, minWidth: "120px" }}>
-                          <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 700, marginBottom: "4px" }}>Calories</span>
-                          <span style={{ fontSize: "1.1rem", fontWeight: 800, color: "#f59e0b" }}>🔥 {day.calories}</span>
+                      <div className="member-dashboard-inline-225">
+                        <div className="member-dashboard-inline-226">
+                          <span className="member-dashboard-inline-227">Calories</span>
+                          <span className="member-dashboard-inline-228">🔥 {day.calories}</span>
                         </div>
-                        <div style={{ background: "var(--bg-secondary)", padding: "12px 16px", borderRadius: "12px", border: "1px solid var(--border-color)", display: "flex", flexDirection: "column", flex: 1, minWidth: "120px" }}>
-                          <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 700, marginBottom: "4px" }}>Protein</span>
-                          <span style={{ fontSize: "1.1rem", fontWeight: 800, color: "#3b82f6" }}>🥩 {day.protein}g</span>
+                        <div className="member-dashboard-inline-229">
+                          <span className="member-dashboard-inline-230">Protein</span>
+                          <span className="member-dashboard-inline-231">🥩 {day.protein}g</span>
                         </div>
-                        <div style={{ background: "var(--bg-secondary)", padding: "12px 16px", borderRadius: "12px", border: "1px solid var(--border-color)", display: "flex", flexDirection: "column", flex: 1, minWidth: "120px" }}>
-                          <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 700, marginBottom: "4px" }}>Carbs</span>
-                          <span style={{ fontSize: "1.1rem", fontWeight: 800, color: "#10b981" }}>🍞 {day.carbs}g</span>
+                        <div className="member-dashboard-inline-232">
+                          <span className="member-dashboard-inline-233">Carbs</span>
+                          <span className="member-dashboard-inline-234">🍞 {day.carbs}g</span>
                         </div>
-                        <div style={{ background: "var(--bg-secondary)", padding: "12px 16px", borderRadius: "12px", border: "1px solid var(--border-color)", display: "flex", flexDirection: "column", flex: 1, minWidth: "120px" }}>
-                          <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 700, marginBottom: "4px" }}>Fats</span>
-                          <span style={{ fontSize: "1.1rem", fontWeight: 800, color: "#8b5cf6" }}>🥑 {day.fats}g</span>
+                        <div className="member-dashboard-inline-235">
+                          <span className="member-dashboard-inline-236">Fats</span>
+                          <span className="member-dashboard-inline-237">🥑 {day.fats}g</span>
                         </div>
                       </div>
 
                       {/* Meals Accordion */}
-                      <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                        {[
-                          { key: "morningSnack", label: "9:00 AM - Morning Snack", icon: "🥣" },
-                          { key: "breakfast", label: "10:15 AM - Breakfast", icon: "🥛" },
-                          { key: "lunch", label: "2:00 PM - Lunch", icon: "🍛" },
-                          { key: "eveningSnack", label: "5:30 PM - Evening Snack", icon: "🥗" },
-                          { key: "preWorkout", label: "6:00 PM - Pre-Workout", icon: "🍌" },
-                          { key: "postWorkout", label: "8:00 PM - Post-Workout", icon: "💪" },
-                          { key: "dinner", label: "9:00 PM - Dinner", icon: "🍲" },
-                          { key: "bedtimeSnack", label: "10:30 PM - Before Bed", icon: "🥙" }
-                        ].filter(meal => day[meal.key]).map(meal => {
-                          const mealKey = `${day.dayNumber}-${meal.key}`;
-                          const isExpanded = expandedDietMeals[mealKey];
-                          return (
-                            <div key={meal.key} style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: "12px", padding: "10px 14px", display: "flex", flexDirection: "column", gap: "6px", boxShadow: "0 1px 3px rgba(0,0,0,0.02)", transition: "all 0.2s ease-in-out" }}>
-                              <div 
-                                style={{ display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer" }}
-                                onClick={() => toggleDietMeal(mealKey)}
-                              >
-                                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                                  <div style={{ background: "var(--bg-secondary)", padding: "6px", borderRadius: "8px", boxShadow: "0 1px 4px rgba(0,0,0,0.05)" }}>
-                                    <span style={{ fontSize: "1.2rem", display: "flex" }}>{meal.icon}</span>
+                      <div className="member-dashboard-inline-238">
+                        {[{
+                  key: "morningSnack",
+                  label: "9:00 AM - Morning Snack",
+                  icon: "🥣"
+                }, {
+                  key: "breakfast",
+                  label: "10:15 AM - Breakfast",
+                  icon: "🥛"
+                }, {
+                  key: "lunch",
+                  label: "2:00 PM - Lunch",
+                  icon: "🍛"
+                }, {
+                  key: "eveningSnack",
+                  label: "5:30 PM - Evening Snack",
+                  icon: "🥗"
+                }, {
+                  key: "preWorkout",
+                  label: "6:00 PM - Pre-Workout",
+                  icon: "🍌"
+                }, {
+                  key: "postWorkout",
+                  label: "8:00 PM - Post-Workout",
+                  icon: "💪"
+                }, {
+                  key: "dinner",
+                  label: "9:00 PM - Dinner",
+                  icon: "🍲"
+                }, {
+                  key: "bedtimeSnack",
+                  label: "10:30 PM - Before Bed",
+                  icon: "🥙"
+                }].filter(meal => day[meal.key]).map(meal => {
+                  const mealKey = `${day.dayNumber}-${meal.key}`;
+                  const isExpanded = expandedDietMeals[mealKey];
+                  return <div key={meal.key} className="member-dashboard-inline-239">
+                              <div onClick={() => toggleDietMeal(mealKey)} className="member-dashboard-inline-240">
+                                <div className="member-dashboard-inline-241">
+                                  <div className="member-dashboard-inline-242">
+                                    <span className="member-dashboard-inline-243">{meal.icon}</span>
                                   </div>
-                                  <span style={{ fontWeight: 600, color: "var(--text-primary)", fontSize: "0.95rem" }}>{meal.label}</span>
+                                  <span className="member-dashboard-inline-244">{meal.label}</span>
                                 </div>
-                                <div style={{ display: "flex", alignItems: "center", color: "var(--text-muted)", transition: "transform 0.2s" }}>
+                                <div className="member-dashboard-inline-245">
                                   {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
                                 </div>
                               </div>
-                              {isExpanded && (
-                                <div style={{ paddingLeft: "42px", color: "var(--text-secondary)", fontSize: "0.9rem", lineHeight: 1.4, marginTop: "4px", animation: "fadeIn 0.3s" }}>
+                              {isExpanded && <div className="member-dashboard-inline-246">
                                   {day[meal.key]}
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })}
+                                </div>}
+                            </div>;
+                })}
                       </div>
-                    </div>
-                  ))}
+                    </div>)}
                 </div>
               </div>
-            </div>
-          )}
+            </div>}
 
-          {expandedMainSections.aiDiet && (
-            <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: "20px", overflow: "hidden", boxShadow: "0 4px 12px rgba(0,0,0,0.03)" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "24px 32px", background: "var(--bg-secondary)", borderBottom: "1px solid var(--border-color)" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-                  <div style={{ background: "rgba(99, 102, 241, 0.1)", color: "#6366f1", padding: "12px", borderRadius: "12px" }}>
+          {expandedMainSections.aiDiet && <div className="member-dashboard-inline-247">
+              <div className="member-dashboard-inline-248">
+                <div className="member-dashboard-inline-249">
+                  <div className="member-dashboard-inline-250">
                     <Sparkles size={24} />
                   </div>
-                  <h3 style={{ fontSize: "1.3rem", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>AI Based Diet Plan (Premium)</h3>
+                  <h3 className="member-dashboard-inline-251">AI Based Diet Plan (Premium)</h3>
                 </div>
               </div>
-              <div style={{ padding: "32px", display: "flex", flexDirection: "column", gap: "24px" }}>
+              <div className="member-dashboard-inline-252">
 
           {/* Hero Banner */}
-          <div style={{ background: "var(--bg-card)", borderRadius: "20px", padding: "32px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", position: "relative", overflow: "hidden", border: "1px solid var(--border-color)", boxShadow: "0 2px 10px rgba(139, 92, 246, 0.05)" }}>
-            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%)" }} />
-            <div style={{ position: "absolute", top: "20px", left: "60%", color: "#fcd34d", opacity: 0.8, fontSize: "1.2rem" }}>✨</div>
-            <div style={{ position: "absolute", bottom: "30px", left: "55%", color: "#fcd34d", opacity: 0.8, fontSize: "1.5rem" }}>✨</div>
-            <div style={{ position: "absolute", top: "10%", left: "75%", color: "#fcd34d", opacity: 0.8, fontSize: "1rem" }}>✨</div>
+          <div className="member-dashboard-inline-253">
+            <div className="member-dashboard-inline-254" />
+            <div className="member-dashboard-inline-255">✨</div>
+            <div className="member-dashboard-inline-256">✨</div>
+            <div className="member-dashboard-inline-257">✨</div>
 
-            <div style={{ zIndex: 1, flex: 1, maxWidth: "60%" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
-                <div style={{ background: "linear-gradient(135deg, #6366f1, #4f46e5)", padding: "10px", borderRadius: "50%", color: "white", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 12px rgba(99,102,241,0.3)" }}>
+            <div className="member-dashboard-inline-258">
+              <div className="member-dashboard-inline-259">
+                <div className="member-dashboard-inline-260">
                   <Sparkles size={20} />
                 </div>
-                <h3 style={{ fontSize: "1.6rem", fontWeight: 800, color: "var(--text-primary)", margin: 0, letterSpacing: "-0.5px" }}>Generate Your Diet Plan</h3>
+                <h3 className="member-dashboard-inline-261">Generate Your Diet Plan</h3>
               </div>
-              <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", marginBottom: "24px", fontWeight: 500, lineHeight: 1.5 }}>Get a personalized 7-day diet plan tailored to your goals using your latest BMI report.</p>
+              <p className="member-dashboard-inline-262">Get a personalized 7-day diet plan tailored to your goals using your latest BMI report.</p>
 
-              <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", alignItems: "flex-start" }}>
-                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                  <div style={{ display: "flex", gap: "16px" }}>
+              <div className="member-dashboard-inline-263">
+                <div className="member-dashboard-inline-264">
+                  <div className="member-dashboard-inline-265">
                     {/* Latest BMI Report Card */}
-                    <div style={{ background: "var(--bg-secondary)", padding: "12px 16px", borderRadius: "12px", display: "flex", alignItems: "center", gap: "12px", border: "1px solid var(--border-color)", boxShadow: "0 2px 4px rgba(0,0,0,0.02)", minWidth: "320px", width: "fit-content", position: "relative" }}>
-                      {latestBmiPhoto ? (
-                        <div style={{ width: "36px", height: "36px", borderRadius: "8px", overflow: "hidden", border: "1px solid var(--border-color)", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg-card)" }}>
-                          {latestBmiPhoto.reportImageUrl.toLowerCase().endsWith(".pdf") ? (
-                            <FileText size={20} color="#ef4444" />
-                          ) : latestBmiPhoto.reportImageUrl.toLowerCase().endsWith(".csv") || latestBmiPhoto.reportImageUrl.toLowerCase().includes(".xls") ? (
-                            <FileText size={20} color="#10b981" />
-                          ) : (
-                            <img src={latestBmiPhoto.reportImageUrl.startsWith("http") ? latestBmiPhoto.reportImageUrl : `http://localhost:5000${latestBmiPhoto.reportImageUrl}`} alt="BMI Report" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                          )}
-                        </div>
-                      ) : (
-                        <div style={{ background: "rgba(16, 185, 129, 0.15)", padding: "8px", borderRadius: "8px", color: "#10b981", flexShrink: 0 }}>
+                    <div className="member-dashboard-inline-266">
+                      {latestBmiPhoto ? <div className="member-dashboard-inline-267">
+                          {latestBmiPhoto.reportImageUrl.toLowerCase().endsWith(".pdf") ? <FileText size={20} color="#ef4444" /> : latestBmiPhoto.reportImageUrl.toLowerCase().endsWith(".csv") || latestBmiPhoto.reportImageUrl.toLowerCase().includes(".xls") ? <FileText size={20} color="#10b981" /> : <img src={latestBmiPhoto.reportImageUrl.startsWith("http") ? latestBmiPhoto.reportImageUrl : `http://localhost:5000${latestBmiPhoto.reportImageUrl}`} alt="BMI Report" className="member-dashboard-inline-268" />}
+                        </div> : <div className="member-dashboard-inline-269">
                           <FileText size={20} />
-                        </div>
-                      )}
-                      <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
-                        <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--text-primary)", marginBottom: "2px", whiteSpace: "nowrap" }}>Latest BMI Report</span>
-                        {latestBmiPhoto ? (
-                          <span style={{ fontSize: "0.7rem", color: "var(--text-muted)", fontWeight: 500 }}>Uploaded on <strong style={{ color: "var(--text-secondary)" }}>{new Date(latestBmiPhoto.createdAt).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" })}</strong></span>
-                        ) : (
-                          <span style={{ fontSize: "0.7rem", color: "#ef4444", fontWeight: 500 }}>No report uploaded</span>
-                        )}
+                        </div>}
+                      <div className="member-dashboard-inline-270">
+                        <span className="member-dashboard-inline-271">Latest BMI Report</span>
+                        {latestBmiPhoto ? <span className="member-dashboard-inline-272">Uploaded on <strong className="member-dashboard-inline-273">{new Date(latestBmiPhoto.createdAt).toLocaleDateString("en-GB", {
+                              day: "2-digit",
+                              month: "2-digit",
+                              year: "numeric"
+                            })}</strong></span> : <span className="member-dashboard-inline-274">No report uploaded</span>}
                       </div>
-                      <div style={{ display: "flex", gap: "8px" }}>
-                        <label
-                          style={{ background: "var(--bg-hover)", border: "none", padding: "6px", borderRadius: "6px", color: "var(--text-muted)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.2s" }}
-                          onMouseOver={(e) => e.currentTarget.style.background = "var(--border-color)"}
-                          onMouseOut={(e) => e.currentTarget.style.background = "var(--bg-hover)"}
-                          title="Upload Report (PDF, CSV, Excel, Image)"
-                        >
-                          {uploadingBmi ? <Loader size={16} style={{ animation: "spin 1s linear infinite" }} /> : <Upload size={16} />}
-                          <input type="file" style={{ display: "none" }} onChange={handleUploadBmi} accept=".pdf,.csv,.xls,.xlsx,image/*" />
+                      <div className="member-dashboard-inline-275">
+                        <label onMouseOver={e => e.currentTarget.style.background = "var(--border-color)"} onMouseOut={e => e.currentTarget.style.background = "var(--bg-hover)"} title="Upload Report (PDF, CSV, Excel, Image)" className="member-dashboard-inline-276">
+                          {uploadingBmi ? <Loader size={16} className="member-dashboard-inline-277" /> : <Upload size={16} />}
+                          <input type="file" onChange={handleUploadBmi} accept=".pdf,.csv,.xls,.xlsx,image/*" className="member-dashboard-inline-278" />
                         </label>
-                        {latestBmiPhoto && (
-                          <button
-                            onClick={() => {
-                              const url = latestBmiPhoto.reportImageUrl.startsWith("http") ? latestBmiPhoto.reportImageUrl : `http://localhost:5000${latestBmiPhoto.reportImageUrl}`;
-                              // Cloudinary free tier blocks inline PDF viewing. By changing the extension to .jpg, Cloudinary automatically renders it as an image.
-                              const finalUrl = (url.toLowerCase().endsWith(".pdf") && url.includes("cloudinary.com")) 
-                                ? url.replace(/\.pdf$/i, ".jpg") 
-                                : url;
-                              window.open(finalUrl, "_blank");
-                            }}
-                            style={{ background: "var(--bg-hover)", border: "none", padding: "6px", borderRadius: "6px", color: "var(--text-muted)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.2s" }}
-                            onMouseOver={(e) => e.currentTarget.style.background = "var(--border-color)"}
-                            onMouseOut={(e) => e.currentTarget.style.background = "var(--bg-hover)"}
-                            title="View Report"
-                          >
+                        {latestBmiPhoto && <button onClick={() => {
+                          const url = latestBmiPhoto.reportImageUrl.startsWith("http") ? latestBmiPhoto.reportImageUrl : `http://localhost:5000${latestBmiPhoto.reportImageUrl}`;
+                          // Cloudinary free tier blocks inline PDF viewing. By changing the extension to .jpg, Cloudinary automatically renders it as an image.
+                          const finalUrl = url.toLowerCase().endsWith(".pdf") && url.includes("cloudinary.com") ? url.replace(/\.pdf$/i, ".jpg") : url;
+                          window.open(finalUrl, "_blank");
+                        }} onMouseOver={e => e.currentTarget.style.background = "var(--border-color)"} onMouseOut={e => e.currentTarget.style.background = "var(--bg-hover)"} title="View Report" className="member-dashboard-inline-279">
                             <Eye size={16} />
-                          </button>
-                        )}
-                        {latestBmiPhoto && (
-                          <button
-                            onClick={() => handleDownloadReport(latestBmiPhoto.reportImageUrl.startsWith("http") ? latestBmiPhoto.reportImageUrl : `http://localhost:5000${latestBmiPhoto.reportImageUrl}`)}
-                            style={{ background: "var(--bg-hover)", border: "none", padding: "6px", borderRadius: "6px", color: "var(--text-muted)", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", transition: "background 0.2s" }}
-                            onMouseOver={(e) => e.currentTarget.style.background = "var(--border-color)"}
-                            onMouseOut={(e) => e.currentTarget.style.background = "var(--bg-hover)"}
-                            title="Download Report"
-                          >
+                          </button>}
+                        {latestBmiPhoto && <button onClick={() => handleDownloadReport(latestBmiPhoto.reportImageUrl.startsWith("http") ? latestBmiPhoto.reportImageUrl : `http://localhost:5000${latestBmiPhoto.reportImageUrl}`)} onMouseOver={e => e.currentTarget.style.background = "var(--border-color)"} onMouseOut={e => e.currentTarget.style.background = "var(--bg-hover)"} title="Download Report" className="member-dashboard-inline-280">
                             <Download size={16} />
-                          </button>
-                        )}
+                          </button>}
                       </div>
                     </div>
 
                     {/* Goal Dropdown */}
-                    <div style={{ background: "var(--bg-secondary)", padding: "8px 16px", borderRadius: "12px", border: "1px solid var(--border-color)", display: "flex", flexDirection: "column", justifyContent: "center", width: "160px", boxShadow: "0 2px 4px rgba(0,0,0,0.02)" }}>
-                      <span style={{ fontSize: "0.65rem", color: "var(--text-muted)", marginBottom: "2px", fontWeight: 600 }}>Your Goal</span>
-                      <select value={dietGoal} onChange={e => setDietGoal(e.target.value)} style={{ border: "none", background: "transparent", fontSize: "0.85rem", fontWeight: 700, color: "var(--text-primary)", outline: "none", cursor: "pointer", padding: 0 }}>
+                    <div className="member-dashboard-inline-281">
+                      <span className="member-dashboard-inline-282">Your Goal</span>
+                      <select value={dietGoal} onChange={e => setDietGoal(e.target.value)} className="member-dashboard-inline-283">
                         <option>Weight Loss</option>
                         <option>Weight Gain</option>
                         <option>Maintain Weight</option>
@@ -1826,264 +1892,220 @@ export const MemberDashboard: React.FC = () => {
                   </div>
 
                   {/* Generate Button */}
-                  <button
-                    disabled={isGeneratingDiet || !latestBmiPhoto}
-                    onClick={() => handleGenerateDiet(latestBmiPhoto?._id)}
-                    style={{
-                      background: "linear-gradient(135deg, #8b5cf6, #6366f1)",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "20px",
-                      padding: "8px 16px",
-                      fontWeight: 600,
-                      fontSize: "0.8rem",
-                      cursor: (isGeneratingDiet || !latestBmiPhoto) ? "not-allowed" : "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "6px",
-                      width: "fit-content",
-                      boxShadow: "0 4px 12px rgba(139, 92, 246, 0.3)",
-                      opacity: (!latestBmiPhoto) ? 0.6 : 1,
-                      transition: "all 0.2s"
-                    }}
-                    onMouseOver={(e) => { if (!isGeneratingDiet && latestBmiPhoto) e.currentTarget.style.transform = "translateY(-1px)" }}
-                    onMouseOut={(e) => { if (!isGeneratingDiet && latestBmiPhoto) e.currentTarget.style.transform = "translateY(0)" }}
-                  >
-                    {isGeneratingDiet ? <Loader size={14} style={{ animation: "spin 1s linear infinite" }} /> : <><Sparkles size={14} /> Generate 7-Day Plan (1 Credit)</>}
+                  <button disabled={isGeneratingDiet || !latestBmiPhoto} onClick={() => handleGenerateDiet(latestBmiPhoto?._id)} style={{
+                    cursor: isGeneratingDiet || !latestBmiPhoto ? "not-allowed" : "pointer",
+                    opacity: !latestBmiPhoto ? 0.6 : 1
+                  }} onMouseOver={e => {
+                    if (!isGeneratingDiet && latestBmiPhoto) e.currentTarget.style.transform = "translateY(-1px)";
+                  }} onMouseOut={e => {
+                    if (!isGeneratingDiet && latestBmiPhoto) e.currentTarget.style.transform = "translateY(0)";
+                  }} className="member-dashboard-inline-284">
+                    {isGeneratingDiet ? <Loader size={14} className="member-dashboard-inline-285" /> : <><Sparkles size={14} /> Generate 7-Day Plan (1 Credit)</>}
                   </button>
                 </div>
               </div>
             </div>
 
-            <div style={{ zIndex: 1, width: "35%", display: "flex", justifyContent: "flex-end", paddingRight: "20px" }}>
-              <img src="/hero_diet_illustration.png" alt="Diet Plan Illustration" style={{ width: "100%", maxWidth: "250px", objectFit: "contain", filter: "drop-shadow(0 10px 20px rgba(0,0,0,0.1))" }} />
+            <div className="member-dashboard-inline-286">
+              <img src="/hero_diet_illustration.png" alt="Diet Plan Illustration" className="member-dashboard-inline-287" />
             </div>
           </div>
 
 
 
           {/* Hero Banner 2 (Workout Diet) */}
-          <div style={{ background: "var(--bg-card)", borderRadius: "20px", padding: "32px 40px", display: "flex", justifyContent: "space-between", alignItems: "center", position: "relative", overflow: "hidden", border: "1px solid var(--border-color)", boxShadow: "0 2px 10px rgba(16, 185, 129, 0.05)" }}>
-            <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(5, 150, 105, 0.05) 100%)" }} />
-            <div style={{ position: "absolute", top: "20px", left: "60%", color: "#34d399", opacity: 0.8, fontSize: "1.2rem" }}>✨</div>
-            <div style={{ position: "absolute", bottom: "30px", left: "55%", color: "#34d399", opacity: 0.8, fontSize: "1.5rem" }}>✨</div>
+          <div className="member-dashboard-inline-288">
+            <div className="member-dashboard-inline-289" />
+            <div className="member-dashboard-inline-290">✨</div>
+            <div className="member-dashboard-inline-291">✨</div>
 
-            <div style={{ zIndex: 1, flex: 1, maxWidth: "60%" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "12px" }}>
-                <div style={{ background: "linear-gradient(135deg, #10b981, #059669)", padding: "10px", borderRadius: "50%", color: "white", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 12px rgba(16,185,129,0.3)" }}>
+            <div className="member-dashboard-inline-292">
+              <div className="member-dashboard-inline-293">
+                <div className="member-dashboard-inline-294">
                   <Dumbbell size={20} />
                 </div>
-                <h3 style={{ fontSize: "1.6rem", fontWeight: 800, color: "var(--text-primary)", margin: 0, letterSpacing: "-0.5px" }}>Post-Workout Diet Plan</h3>
+                <h3 className="member-dashboard-inline-295">Post-Workout Diet Plan</h3>
               </div>
-              <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem", marginBottom: "24px", fontWeight: 500, lineHeight: 1.5 }}>Get a personalized 1-day diet plan tailored to today's logged workouts.</p>
+              <p className="member-dashboard-inline-296">Get a personalized 1-day diet plan tailored to today's logged workouts.</p>
 
-              <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", alignItems: "flex-end" }}>
-                <div style={{ display: "flex", gap: "12px", flexDirection: "column" }}>
-                  <div style={{ display: "flex", gap: "12px" }}>
-                    <div style={{ background: "var(--bg-secondary)", padding: "8px 12px", borderRadius: "10px", border: "1px solid var(--border-color)", width: "100px" }}>
-                      <span style={{ fontSize: "0.65rem", color: "var(--text-muted)", fontWeight: 600, display: "block", marginBottom: "2px" }}>Age</span>
-                      <input type="number" placeholder="yrs" value={memberAge} onChange={e => setMemberAge(e.target.value ? Number(e.target.value) : "")} style={{ width: "100%", background: "transparent", border: "none", outline: "none", color: "var(--text-primary)", fontWeight: 700, fontSize: "0.85rem" }} />
+              <div className="member-dashboard-inline-297">
+                <div className="member-dashboard-inline-298">
+                  <div className="member-dashboard-inline-299">
+                    <div className="member-dashboard-inline-300">
+                      <span className="member-dashboard-inline-301">Age</span>
+                      <input type="number" placeholder="yrs" value={memberAge} onChange={e => setMemberAge(e.target.value ? Number(e.target.value) : "")} className="member-dashboard-inline-302" />
                     </div>
-                    <div style={{ background: "var(--bg-secondary)", padding: "8px 12px", borderRadius: "10px", border: "1px solid var(--border-color)", width: "100px" }}>
-                      <span style={{ fontSize: "0.65rem", color: "var(--text-muted)", fontWeight: 600, display: "block", marginBottom: "2px" }}>Height</span>
-                      <input type="number" placeholder="cm" value={memberHeight} onChange={e => setMemberHeight(e.target.value ? Number(e.target.value) : "")} style={{ width: "100%", background: "transparent", border: "none", outline: "none", color: "var(--text-primary)", fontWeight: 700, fontSize: "0.85rem" }} />
+                    <div className="member-dashboard-inline-303">
+                      <span className="member-dashboard-inline-304">Height</span>
+                      <input type="number" placeholder="cm" value={memberHeight} onChange={e => setMemberHeight(e.target.value ? Number(e.target.value) : "")} className="member-dashboard-inline-305" />
                     </div>
-                    <div style={{ background: "var(--bg-secondary)", padding: "8px 12px", borderRadius: "10px", border: "1px solid var(--border-color)", width: "100px" }}>
-                      <span style={{ fontSize: "0.65rem", color: "var(--text-muted)", fontWeight: 600, display: "block", marginBottom: "2px" }}>Weight</span>
-                      <input type="number" placeholder="kg" value={memberWeight} onChange={e => setMemberWeight(e.target.value ? Number(e.target.value) : "")} style={{ width: "100%", background: "transparent", border: "none", outline: "none", color: "var(--text-primary)", fontWeight: 700, fontSize: "0.85rem" }} />
+                    <div className="member-dashboard-inline-306">
+                      <span className="member-dashboard-inline-307">Weight</span>
+                      <input type="number" placeholder="kg" value={memberWeight} onChange={e => setMemberWeight(e.target.value ? Number(e.target.value) : "")} className="member-dashboard-inline-308" />
                     </div>
-                    <div style={{ background: "var(--bg-secondary)", padding: "8px 12px", borderRadius: "10px", border: "1px solid var(--border-color)", width: "140px" }}>
-                      <span style={{ fontSize: "0.65rem", color: "var(--text-muted)", fontWeight: 600, display: "block", marginBottom: "2px" }}>Goal</span>
-                      <select value={workoutDietGoal} onChange={e => setWorkoutDietGoal(e.target.value)} style={{ border: "none", background: "transparent", fontSize: "0.85rem", fontWeight: 700, color: "var(--text-primary)", outline: "none", cursor: "pointer", padding: 0, width: "100%" }}>
+                    <div className="member-dashboard-inline-309">
+                      <span className="member-dashboard-inline-310">Goal</span>
+                      <select value={workoutDietGoal} onChange={e => setWorkoutDietGoal(e.target.value)} className="member-dashboard-inline-311">
                         <option>Weight Loss</option>
                         <option>Weight Gain</option>
                         <option>Maintain Weight</option>
                       </select>
                     </div>
                   </div>
-                  <button
-                    disabled={isGeneratingWorkoutDiet}
-                    onClick={handleGenerateWorkoutDiet}
-                    style={{
-                      background: "linear-gradient(135deg, #10b981, #059669)",
-                      color: "white",
-                      border: "none",
-                      borderRadius: "20px",
-                      padding: "8px 16px",
-                      fontWeight: 600,
-                      fontSize: "0.8rem",
-                      cursor: isGeneratingWorkoutDiet ? "not-allowed" : "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "6px",
-                      width: "fit-content",
-                      boxShadow: "0 4px 12px rgba(16, 185, 129, 0.3)",
-                      transition: "all 0.2s"
-                    }}
-                  >
-                    {isGeneratingWorkoutDiet ? <Loader size={14} style={{ animation: "spin 1s linear infinite" }} /> : <><Sparkles size={14} /> Generate 1-Day Plan (1 Credit)</>}
+                  <button disabled={isGeneratingWorkoutDiet} onClick={handleGenerateWorkoutDiet} style={{
+                    cursor: isGeneratingWorkoutDiet ? "not-allowed" : "pointer"
+                  }} className="member-dashboard-inline-312">
+                    {isGeneratingWorkoutDiet ? <Loader size={14} className="member-dashboard-inline-313" /> : <><Sparkles size={14} /> Generate 1-Day Plan (1 Credit)</>}
                   </button>
                 </div>
               </div>
             </div>
             
-            <div style={{ zIndex: 1, width: "35%", display: "flex", justifyContent: "flex-end", paddingRight: "20px" }}>
-              <img src="/hero_diet_illustration.png" alt="Workout Diet Illustration" style={{ width: "100%", maxWidth: "220px", objectFit: "contain", filter: "drop-shadow(0 10px 20px rgba(0,0,0,0.1))" }} />
+            <div className="member-dashboard-inline-314">
+              <img src="/hero_diet_illustration.png" alt="Workout Diet Illustration" className="member-dashboard-inline-315" />
             </div>
           </div>
 
           {/* Current Diet Plan Card */}
-          <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: "20px", padding: "32px", boxShadow: "0 4px 12px rgba(0,0,0,0.03)" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "24px", borderBottom: "1px solid var(--border-color)", paddingBottom: "16px" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                <div style={{ background: "rgba(79, 70, 229, 0.1)", color: "#4f46e5", padding: "10px", borderRadius: "10px" }}><PenLine size={20} /></div>
-                <h3 style={{ fontSize: "1.2rem", fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>Current Diet Plan</h3>
+          <div className="member-dashboard-inline-316">
+            <div className="member-dashboard-inline-317">
+              <div className="member-dashboard-inline-318">
+                <div className="member-dashboard-inline-319"><PenLine size={20} /></div>
+                <h3 className="member-dashboard-inline-320">Current Diet Plan</h3>
               </div>
-              {dietPlans.length > 0 && dietPlans[0].days && (
-                <button onClick={downloadDietPDF} style={{ background: "var(--bg-secondary)", border: "1px solid var(--border-color)", padding: "8px 16px", borderRadius: "10px", color: "var(--text-primary)", fontWeight: 600, cursor: "pointer", fontSize: "0.85rem", boxShadow: "0 1px 2px rgba(0,0,0,0.05)", transition: "all 0.2s" }} onMouseOver={(e) => e.currentTarget.style.background = "var(--bg-hover)"} onMouseOut={(e) => e.currentTarget.style.background = "var(--bg-secondary)"}>
+              {dietPlans.length > 0 && dietPlans[0].days && <button onClick={downloadDietPDF} onMouseOver={e => e.currentTarget.style.background = "var(--bg-hover)"} onMouseOut={e => e.currentTarget.style.background = "var(--bg-secondary)"} className="member-dashboard-inline-321">
                   Download PDF
-                </button>
-              )}
+                </button>}
             </div>
 
-            {dietPlans.length > 0 && dietPlans[0].days ? (
-              <div id="diet-plan-container">
+            {dietPlans.length > 0 && dietPlans[0].days ? <div id="diet-plan-container">
                 {/* General Recommendations & Foods to Avoid */}
-                <div style={{ display: "flex", gap: "16px", flexWrap: "wrap", marginBottom: "24px" }}>
-                  {(dietPlans[0].foodsToAvoid?.length > 0) && (
-                    <div style={{ flex: 1, minWidth: "280px", background: "#fef2f2", border: "1px solid #fecaca", padding: "16px", borderRadius: "12px" }}>
-                      <h4 style={{ color: "#dc2626", fontWeight: 800, marginBottom: "8px", fontSize: "0.95rem", display: "flex", alignItems: "center", gap: "6px" }}>🚫 Foods to Avoid</h4>
-                      <ul style={{ paddingLeft: "20px", margin: 0, fontSize: "0.85rem", color: "#7f1d1d", lineHeight: 1.5 }}>
+                <div className="member-dashboard-inline-322">
+                  {dietPlans[0].foodsToAvoid?.length > 0 && <div className="member-dashboard-inline-323">
+                      <h4 className="member-dashboard-inline-324">🚫 Foods to Avoid</h4>
+                      <ul className="member-dashboard-inline-325">
                         {dietPlans[0].foodsToAvoid.map((food: string, i: number) => <li key={i}>{food}</li>)}
                       </ul>
-                    </div>
-                  )}
-                  {(dietPlans[0].generalRecommendations?.length > 0) && (
-                    <div style={{ flex: 1, minWidth: "280px", background: "#ecfdf5", border: "1px solid #a7f3d0", padding: "16px", borderRadius: "12px" }}>
-                      <h4 style={{ color: "#059669", fontWeight: 800, marginBottom: "8px", fontSize: "0.95rem", display: "flex", alignItems: "center", gap: "6px" }}>💡 General Recommendations</h4>
-                      <ul style={{ paddingLeft: "20px", margin: 0, fontSize: "0.85rem", color: "#065f46", lineHeight: 1.5 }}>
+                    </div>}
+                  {dietPlans[0].generalRecommendations?.length > 0 && <div className="member-dashboard-inline-326">
+                      <h4 className="member-dashboard-inline-327">💡 General Recommendations</h4>
+                      <ul className="member-dashboard-inline-328">
                         {dietPlans[0].generalRecommendations.map((rec: string, i: number) => <li key={i}>{rec}</li>)}
                       </ul>
-                    </div>
-                  )}
+                    </div>}
                 </div>
 
-                <div style={{ marginBottom: "24px" }}>
-                  {dietPlans[0].days.length > 1 && (
-                    <div style={{ display: "flex", gap: "8px", overflowX: "auto", marginBottom: "24px", paddingBottom: "8px", msOverflowStyle: "none", scrollbarWidth: "none" }}>
+                <div className="member-dashboard-inline-329">
+                  {dietPlans[0].days.length > 1 && <div className="member-dashboard-inline-330">
                       {dietPlans[0].days.map((day: any, i: number) => {
-                        const dayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-                        const label = dietPlans[0].days.length === 7 ? dayLabels[i] : `Day ${day.dayNumber}`;
-                        const isSelected = selectedDietDay === day.dayNumber;
-                        return (
-                          <button
-                            key={day.dayNumber}
-                            onClick={() => setSelectedDietDay(day.dayNumber)}
-                            style={{
-                              padding: "12px 24px",
-                              borderRadius: "16px",
-                              border: "none",
-                              background: isSelected ? "#2d3748" : "var(--bg-secondary)",
-                              color: isSelected ? "#fff" : "var(--text-primary)",
-                              fontWeight: 700,
-                              cursor: "pointer",
-                              minWidth: "80px",
-                              transition: "all 0.2s",
-                              boxShadow: isSelected ? "0 4px 12px rgba(0,0,0,0.1)" : "none"
-                            }}
-                          >
+                    const dayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+                    const label = dietPlans[0].days.length === 7 ? dayLabels[i] : `Day ${day.dayNumber}`;
+                    const isSelected = selectedDietDay === day.dayNumber;
+                    return <button key={day.dayNumber} onClick={() => setSelectedDietDay(day.dayNumber)} style={{
+                      background: isSelected ? "#2d3748" : "var(--bg-secondary)",
+                      color: isSelected ? "#fff" : "var(--text-primary)",
+                      boxShadow: isSelected ? "0 4px 12px rgba(0,0,0,0.1)" : "none"
+                    }} className="member-dashboard-inline-331">
                             {label}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
+                          </button>;
+                  })}
+                    </div>}
 
-                  {dietPlans[0].days.filter((d: any) => d.dayNumber === selectedDietDay).map((day: any) => (
-                    <div key={day.dayNumber}>
+                  {dietPlans[0].days.filter((d: any) => d.dayNumber === selectedDietDay).map((day: any) => <div key={day.dayNumber}>
                       {/* Macros */}
-                      <div style={{ display: "flex", gap: "12px", marginBottom: "24px", flexWrap: "wrap" }}>
-                        <div style={{ background: "var(--bg-secondary)", padding: "12px 16px", borderRadius: "12px", border: "1px solid var(--border-color)", display: "flex", flexDirection: "column", flex: 1, minWidth: "120px" }}>
-                          <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 700, marginBottom: "4px" }}>Calories</span>
-                          <span style={{ fontSize: "1.1rem", fontWeight: 800, color: "#f59e0b" }}>🔥 {day.calories}</span>
+                      <div className="member-dashboard-inline-332">
+                        <div className="member-dashboard-inline-333">
+                          <span className="member-dashboard-inline-334">Calories</span>
+                          <span className="member-dashboard-inline-335">🔥 {day.calories}</span>
                         </div>
-                        <div style={{ background: "var(--bg-secondary)", padding: "12px 16px", borderRadius: "12px", border: "1px solid var(--border-color)", display: "flex", flexDirection: "column", flex: 1, minWidth: "120px" }}>
-                          <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 700, marginBottom: "4px" }}>Protein</span>
-                          <span style={{ fontSize: "1.1rem", fontWeight: 800, color: "#3b82f6" }}>🥩 {day.protein}g</span>
+                        <div className="member-dashboard-inline-336">
+                          <span className="member-dashboard-inline-337">Protein</span>
+                          <span className="member-dashboard-inline-338">🥩 {day.protein}g</span>
                         </div>
-                        <div style={{ background: "var(--bg-secondary)", padding: "12px 16px", borderRadius: "12px", border: "1px solid var(--border-color)", display: "flex", flexDirection: "column", flex: 1, minWidth: "120px" }}>
-                          <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 700, marginBottom: "4px" }}>Carbs</span>
-                          <span style={{ fontSize: "1.1rem", fontWeight: 800, color: "#10b981" }}>🍞 {day.carbs}g</span>
+                        <div className="member-dashboard-inline-339">
+                          <span className="member-dashboard-inline-340">Carbs</span>
+                          <span className="member-dashboard-inline-341">🍞 {day.carbs}g</span>
                         </div>
-                        <div style={{ background: "var(--bg-secondary)", padding: "12px 16px", borderRadius: "12px", border: "1px solid var(--border-color)", display: "flex", flexDirection: "column", flex: 1, minWidth: "120px" }}>
-                          <span style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontWeight: 700, marginBottom: "4px" }}>Fats</span>
-                          <span style={{ fontSize: "1.1rem", fontWeight: 800, color: "#8b5cf6" }}>🥑 {day.fats}g</span>
+                        <div className="member-dashboard-inline-342">
+                          <span className="member-dashboard-inline-343">Fats</span>
+                          <span className="member-dashboard-inline-344">🥑 {day.fats}g</span>
                         </div>
                       </div>
 
                       {/* Meals Accordion */}
-                      <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                        {[
-                          { key: "morningSnack", label: "Morning Snacks", icon: "🥣" },
-                          { key: "breakfast", label: "Breakfast", icon: "🥛" },
-                          { key: "lunch", label: "Lunch", icon: "🍛" },
-                          { key: "eveningSnack", label: "Evening Snack", icon: "🥗" },
-                          { key: "dinner", label: "Dinner", icon: "🍗" },
-                          { key: "bedtimeSnack", label: "Bedtime", icon: "🥙" }
-                        ].filter(meal => day[meal.key]).map(meal => {
-                          return (
-                            <div key={meal.key} style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: "16px", padding: "16px 20px", display: "flex", flexDirection: "column", gap: "8px", boxShadow: "0 2px 4px rgba(0,0,0,0.02)" }}>
-                              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                                <div style={{ background: "var(--bg-secondary)", padding: "10px", borderRadius: "12px", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }}>
-                                  <span style={{ fontSize: "1.5rem", display: "flex" }}>{meal.icon}</span>
+                      <div className="member-dashboard-inline-345">
+                        {[{
+                      key: "morningSnack",
+                      label: "Morning Snacks",
+                      icon: "🥣"
+                    }, {
+                      key: "breakfast",
+                      label: "Breakfast",
+                      icon: "🥛"
+                    }, {
+                      key: "lunch",
+                      label: "Lunch",
+                      icon: "🍛"
+                    }, {
+                      key: "eveningSnack",
+                      label: "Evening Snack",
+                      icon: "🥗"
+                    }, {
+                      key: "dinner",
+                      label: "Dinner",
+                      icon: "🍗"
+                    }, {
+                      key: "bedtimeSnack",
+                      label: "Bedtime",
+                      icon: "🥙"
+                    }].filter(meal => day[meal.key]).map(meal => {
+                      return <div key={meal.key} className="member-dashboard-inline-346">
+                              <div className="member-dashboard-inline-347">
+                                <div className="member-dashboard-inline-348">
+                                  <span className="member-dashboard-inline-349">{meal.icon}</span>
                                 </div>
-                                <span style={{ fontWeight: 700, color: "var(--text-primary)", fontSize: "1.1rem" }}>{meal.label}</span>
+                                <span className="member-dashboard-inline-350">{meal.label}</span>
                               </div>
-                              <div style={{ paddingLeft: "58px", color: "var(--text-secondary)", fontSize: "0.95rem", lineHeight: 1.5 }}>
+                              <div className="member-dashboard-inline-351">
                                 {day[meal.key]}
                               </div>
-                            </div>
-                          );
-                        })}
+                            </div>;
+                    })}
                       </div>
-                    </div>
-                  ))}
+                    </div>)}
                 </div>
-              </div>
-            ) : (
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "40px 0" }}>
-                <img src="/empty_diet_plan_illustration.png" alt="No Diet Plan" style={{ width: "180px", marginBottom: "24px", opacity: 0.9, filter: "drop-shadow(0 10px 15px rgba(0,0,0,0.05))" }} />
-                <h4 style={{ fontSize: "1.3rem", fontWeight: 800, color: "var(--text-primary)", marginBottom: "8px", margin: 0 }}>No Diet Plan Yet</h4>
-                <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem", marginBottom: "24px", fontWeight: 500 }}>Generate your first AI diet plan to view it here.</p>
-                <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", justifyContent: "center" }}>
-                  <button
-                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                    style={{ background: "var(--bg-secondary)", border: "2px solid #6366f1", color: "#6366f1", padding: "10px 24px", borderRadius: "12px", fontWeight: 700, cursor: "pointer", fontSize: "0.9rem", transition: "all 0.2s", boxShadow: "0 4px 12px rgba(99,102,241,0.1)" }}
-                    onMouseOver={(e) => { e.currentTarget.style.background = "var(--bg-hover)"; e.currentTarget.style.transform = "translateY(-2px)" }}
-                    onMouseOut={(e) => { e.currentTarget.style.background = "var(--bg-secondary)"; e.currentTarget.style.transform = "translateY(0)" }}
-                  >
+              </div> : <div className="member-dashboard-inline-352">
+                <img src="/empty_diet_plan_illustration.png" alt="No Diet Plan" className="member-dashboard-inline-353" />
+                <h4 className="member-dashboard-inline-354">No Diet Plan Yet</h4>
+                <p className="member-dashboard-inline-355">Generate your first AI diet plan to view it here.</p>
+                <div className="member-dashboard-inline-356">
+                  <button onClick={() => window.scrollTo({
+                  top: 0,
+                  behavior: 'smooth'
+                })} onMouseOver={e => {
+                  e.currentTarget.style.background = "var(--bg-hover)";
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                }} onMouseOut={e => {
+                  e.currentTarget.style.background = "var(--bg-secondary)";
+                  e.currentTarget.style.transform = "translateY(0)";
+                }} className="member-dashboard-inline-357">
                     Generate Your Plan
                   </button>
                 </div>
-              </div>
-            )}
+              </div>}
           </div>
         </div>
-      </div>
-    )}
+      </div>}
 
-        </div>
-      )}
-    </div>
-  );
+        </div>}
+    </div>;
 
   // ── Personal Trainer Panel (member view) ────────────────────────────────
 
-  const PersonalTrainerPanel = (
-    <div className="page-container">
-      <header className="page-header" style={{ marginBottom: 24 }}>
+  const PersonalTrainerPanel = <div className="page-container">
+      <header className="page-header member-dashboard-inline-358">
         <div>
-          <h2 className="page-title" style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <h2 className="page-title member-dashboard-inline-359">
             <UserCheck size={24} color="#6366f1" /> Personal Trainer
           </h2>
           <p className="page-subtitle">Plans and measurements created by your assigned trainer</p>
@@ -2091,195 +2113,143 @@ export const MemberDashboard: React.FC = () => {
       </header>
 
       {/* Conditional PT State Rendering */}
-      {!ptState.memberPtInfo ? (
-        <div style={{ textAlign: "center", padding: "60px 20px", color: "var(--text-muted)", background: "var(--bg-card)", borderRadius: 16, border: "1px dashed var(--border-color)", marginBottom: 24 }}>
-          <UserCheck size={48} style={{ opacity: 0.3, marginBottom: 16, margin: "0 auto" }} />
-          <h3 style={{ fontSize: 18, color: "var(--text-primary)", marginBottom: 8, fontWeight: 700 }}>No Personal Trainer Assigned</h3>
-          <p style={{ margin: 0, fontSize: 14 }}>You have not been assigned a Personal Trainer yet. Any incoming requests will appear here.</p>
-        </div>
-      ) : ptState.memberPtInfo.status === 'pending' ? (
-        <div style={{ textAlign: "center", padding: "50px 20px", background: "rgba(245,158,11,0.05)", borderRadius: 16, border: "1.5px dashed rgba(245,158,11,0.4)", marginBottom: 24 }}>
-          <Bell size={48} style={{ color: "#f59e0b", marginBottom: 16, margin: "0 auto", opacity: 0.8 }} />
-          <h3 style={{ fontSize: 22, color: "var(--text-primary)", marginBottom: 12, fontWeight: 800 }}>Pending Training Request</h3>
-          <p style={{ margin: "0 auto 24px", fontSize: 15, color: "var(--text-secondary)", maxWidth: 500, lineHeight: 1.6 }}>
+      {!ptState.memberPtInfo ? <div className="member-dashboard-inline-360">
+          <UserCheck size={48} className="member-dashboard-inline-361" />
+          <h3 className="member-dashboard-inline-362">No Personal Trainer Assigned</h3>
+          <p className="member-dashboard-inline-363">You have not been assigned a Personal Trainer yet. Any incoming requests will appear here.</p>
+        </div> : ptState.memberPtInfo.status === 'pending' ? <div className="member-dashboard-inline-364">
+          <Bell size={48} className="member-dashboard-inline-365" />
+          <h3 className="member-dashboard-inline-366">Pending Training Request</h3>
+          <p className="member-dashboard-inline-367">
             <strong>{ptState.memberPtInfo.trainerId?.fullName || "A trainer"}</strong> has sent you a request to be your Personal Trainer. Do you want to accept this assignment?
           </p>
-          <div style={{ display: "flex", justifyContent: "center", gap: 16 }}>
-            <button 
-              onClick={() => dispatch(acceptPtAssignmentAction(ptState.memberPtInfo._id))} 
-              style={{ background: "#10b981", color: "#fff", padding: "12px 28px", borderRadius: 12, fontWeight: 700, border: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, boxShadow: "0 4px 12px rgba(16,185,129,0.2)", transition: "all 0.2s" }}
-              onMouseOver={(e) => { e.currentTarget.style.transform = "translateY(-2px)"; }}
-              onMouseOut={(e) => { e.currentTarget.style.transform = "translateY(0)"; }}
-            >
+          <div className="member-dashboard-inline-368">
+            <button onClick={() => dispatch(acceptPtAssignmentAction(ptState.memberPtInfo._id))} onMouseOver={e => {
+          e.currentTarget.style.transform = "translateY(-2px)";
+        }} onMouseOut={e => {
+          e.currentTarget.style.transform = "translateY(0)";
+        }} className="member-dashboard-inline-369">
               <CheckCircle size={18} /> Accept
             </button>
-            <button 
-              onClick={() => dispatch(rejectPtAssignmentAction(ptState.memberPtInfo._id))} 
-              style={{ background: "transparent", color: "#ef4444", padding: "12px 28px", borderRadius: 12, fontWeight: 700, border: "1.5px solid #ef4444", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, transition: "all 0.2s" }}
-              onMouseOver={(e) => { e.currentTarget.style.background = "rgba(239,68,68,0.1)"; }}
-              onMouseOut={(e) => { e.currentTarget.style.background = "transparent"; }}
-            >
+            <button onClick={() => dispatch(rejectPtAssignmentAction(ptState.memberPtInfo._id))} onMouseOver={e => {
+          e.currentTarget.style.background = "rgba(239,68,68,0.1)";
+        }} onMouseOut={e => {
+          e.currentTarget.style.background = "transparent";
+        }} className="member-dashboard-inline-370">
               <X size={18} /> Reject
             </button>
           </div>
-        </div>
-      ) : (
-        <>
+        </div> : <>
           {/* Trainer Info Card */}
-          <div style={{
-            background: "linear-gradient(135deg, rgba(99,102,241,0.12), rgba(139,92,246,0.08))",
-            border: "1.5px solid rgba(99,102,241,0.3)",
-            borderRadius: 16, padding: "20px 24px", marginBottom: 24,
-            display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap",
-          }}>
-            <div style={{
-              width: 56, height: 56, borderRadius: "50%",
-              background: "linear-gradient(135deg,#6366f1,#8b5cf6)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              color: "#fff", fontWeight: 800, fontSize: 20, flexShrink: 0,
-            }}>
+          <div className="member-dashboard-inline-371">
+            <div className="member-dashboard-inline-372">
               {(ptState.memberPtInfo.trainerId?.fullName || "PT").slice(0, 2).toUpperCase()}
             </div>
-            <div style={{ flex: 1 }}>
-              <p style={{ margin: 0, fontSize: 18, fontWeight: 800 }}>
+            <div className="member-dashboard-inline-373">
+              <p className="member-dashboard-inline-374">
                 {ptState.memberPtInfo.trainerId?.fullName || "Your Trainer"}
               </p>
-              <p style={{ margin: 0, fontSize: 13, color: "var(--text-muted)" }}>
+              <p className="member-dashboard-inline-375">
                 Your Personal Trainer · Assigned by {ptState.memberPtInfo.assignedBy?.fullName || "—"}
               </p>
             </div>
-            <div style={{ padding: "6px 14px", background: "rgba(99,102,241,0.15)", borderRadius: 20, color: "#6366f1", fontWeight: 700, fontSize: 13 }}>
+            <div className="member-dashboard-inline-376">
               Active PT
             </div>
           </div>
 
           {/* Date Picker */}
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 24 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "9px 16px", background: "var(--bg-card)", borderRadius: 12, border: "1.5px solid var(--border-color)" }}>
+          <div className="member-dashboard-inline-377">
+            <div className="member-dashboard-inline-378">
               <Calendar size={16} color="var(--text-muted)" />
-              <input
-                type="date"
-                value={ptDate}
-                onChange={e => handlePtDateChange(e.target.value)}
-                style={{ border: "none", background: "none", color: "var(--text-primary)", fontSize: 14, fontWeight: 600, cursor: "pointer" }}
-              />
+              <input type="date" value={ptDate} onChange={e => handlePtDateChange(e.target.value)} className="member-dashboard-inline-379" />
             </div>
-            {ptState.loading && <Loader size={18} style={{ animation: "spin 1s linear infinite", color: "var(--text-muted)" }} />}
+            {ptState.loading && <Loader size={18} className="member-dashboard-inline-380" />}
           </div>
 
           {/* Workout Plan Card */}
-          <div className="gym-card" style={{ marginBottom: 16 }}>
-            <h3 style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, fontSize: 16, fontWeight: 700 }}>
+          <div className="gym-card member-dashboard-inline-381">
+            <h3 className="member-dashboard-inline-382">
               <Dumbbell size={18} color="#6366f1" /> Today's Workout Plan
             </h3>
-            {ptState.workoutPlans.length === 0 ? (
-              <div style={{ textAlign: "center", padding: "24px 0", color: "var(--text-muted)" }}>
-                <Dumbbell size={32} style={{ opacity: 0.3, marginBottom: 8 }} />
-                <p style={{ margin: 0, fontSize: 14 }}>No workout plan for {ptDate}</p>
-              </div>
-            ) : ptState.workoutPlans.map((plan: any) => (
-              <div key={plan._id} style={{ marginBottom: 12 }}>
-                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+            {ptState.workoutPlans.length === 0 ? <div className="member-dashboard-inline-383">
+                <Dumbbell size={32} className="member-dashboard-inline-384" />
+                <p className="member-dashboard-inline-385">No workout plan for {ptDate}</p>
+              </div> : ptState.workoutPlans.map((plan: any) => <div key={plan._id} className="member-dashboard-inline-386">
+                <table className="member-dashboard-inline-387">
                   <thead>
-                    <tr style={{ color: "var(--text-muted)", fontSize: 12 }}>
-                      <th style={{ textAlign: "left", paddingBottom: 8, fontWeight: 600 }}>Exercise</th>
-                      <th style={{ textAlign: "center", paddingBottom: 8, fontWeight: 600 }}>Sets</th>
-                      <th style={{ textAlign: "center", paddingBottom: 8, fontWeight: 600 }}>Reps</th>
-                      <th style={{ textAlign: "center", paddingBottom: 8, fontWeight: 600 }}>Weight</th>
+                    <tr className="member-dashboard-inline-388">
+                      <th className="member-dashboard-inline-389">Exercise</th>
+                      <th className="member-dashboard-inline-390">Sets</th>
+                      <th className="member-dashboard-inline-391">Reps</th>
+                      <th className="member-dashboard-inline-392">Weight</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {plan.exercises?.map((ex: any, i: number) => (
-                      <tr key={i} style={{ borderTop: "1px solid var(--border-color)" }}>
-                        <td style={{ padding: "8px 0", fontWeight: 600 }}>{ex.name}</td>
-                        <td style={{ textAlign: "center", padding: "8px 0" }}>{ex.sets}</td>
-                        <td style={{ textAlign: "center", padding: "8px 0" }}>{ex.reps}</td>
-                        <td style={{ textAlign: "center", padding: "8px 0", color: "var(--text-muted)" }}>{ex.weight || "—"}</td>
-                      </tr>
-                    ))}
+                    {plan.exercises?.map((ex: any, i: number) => <tr key={i} className="member-dashboard-inline-393">
+                        <td className="member-dashboard-inline-394">{ex.name}</td>
+                        <td className="member-dashboard-inline-395">{ex.sets}</td>
+                        <td className="member-dashboard-inline-396">{ex.reps}</td>
+                        <td className="member-dashboard-inline-397">{ex.weight || "—"}</td>
+                      </tr>)}
                   </tbody>
                 </table>
-                {plan.generalNotes && <p style={{ margin: "10px 0 0", fontSize: 13, color: "var(--text-muted)", fontStyle: "italic" }}>Note: {plan.generalNotes}</p>}
-              </div>
-            ))}
+                {plan.generalNotes && <p className="member-dashboard-inline-398">Note: {plan.generalNotes}</p>}
+              </div>)}
           </div>
 
           {/* Diet Plan Card */}
-          <div className="gym-card" style={{ marginBottom: 16 }}>
-            <h3 style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, fontSize: 16, fontWeight: 700 }}>
+          <div className="gym-card member-dashboard-inline-399">
+            <h3 className="member-dashboard-inline-400">
               <Salad size={18} color="#22c55e" /> Today's Diet Plan
             </h3>
-            {ptState.dietPlans.length === 0 ? (
-              <div style={{ textAlign: "center", padding: "24px 0", color: "var(--text-muted)" }}>
-                <Salad size={32} style={{ opacity: 0.3, marginBottom: 8 }} />
-                <p style={{ margin: 0, fontSize: 14 }}>No diet plan for {ptDate}</p>
-              </div>
-            ) : ptState.dietPlans.map((plan: any) => (
-              <div key={plan._id}>
-                {plan.meals?.map((meal: any, i: number) => (
-                  <div key={i} style={{
-                    display: "flex", gap: 12, padding: "10px 0",
-                    borderTop: i === 0 ? "none" : "1px solid var(--border-color)",
-                    flexWrap: "wrap",
-                  }}>
-                    <span style={{ minWidth: 120, fontWeight: 700, fontSize: 13, color: "#22c55e" }}>{meal.mealType}</span>
-                    <span style={{ flex: 1, fontSize: 14, lineHeight: 1.5 }}>{meal.foodItems}</span>
-                    {meal.calories && <span style={{ fontSize: 12, color: "var(--text-muted)", whiteSpace: "nowrap", alignSelf: "center" }}>{meal.calories} kcal</span>}
-                  </div>
-                ))}
-                {plan.waterIntake && <p style={{ margin: "10px 0 0", fontSize: 13, color: "#06b6d4" }}>💧 Water intake: {plan.waterIntake}L</p>}
-                {plan.generalNotes && <p style={{ margin: "8px 0 0", fontSize: 13, color: "var(--text-muted)", fontStyle: "italic" }}>Note: {plan.generalNotes}</p>}
-              </div>
-            ))}
+            {ptState.dietPlans.length === 0 ? <div className="member-dashboard-inline-401">
+                <Salad size={32} className="member-dashboard-inline-402" />
+                <p className="member-dashboard-inline-403">No diet plan for {ptDate}</p>
+              </div> : ptState.dietPlans.map((plan: any) => <div key={plan._id}>
+                {plan.meals?.map((meal: any, i: number) => <div key={i} style={{
+            borderTop: i === 0 ? "none" : "1px solid var(--border-color)"
+          }} className="member-dashboard-inline-404">
+                    <span className="member-dashboard-inline-405">{meal.mealType}</span>
+                    <span className="member-dashboard-inline-406">{meal.foodItems}</span>
+                    {meal.calories && <span className="member-dashboard-inline-407">{meal.calories} kcal</span>}
+                  </div>)}
+                {plan.waterIntake && <p className="member-dashboard-inline-408">💧 Water intake: {plan.waterIntake}L</p>}
+                {plan.generalNotes && <p className="member-dashboard-inline-409">Note: {plan.generalNotes}</p>}
+              </div>)}
           </div>
 
           {/* Measurements Card */}
           <div className="gym-card">
-            <h3 style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16, fontSize: 16, fontWeight: 700 }}>
+            <h3 className="member-dashboard-inline-410">
               <Ruler size={18} color="#f59e0b" /> Measurements — {ptDate}
             </h3>
-            {ptState.measurements.length === 0 ? (
-              <div style={{ textAlign: "center", padding: "24px 0", color: "var(--text-muted)" }}>
-                <Ruler size={32} style={{ opacity: 0.3, marginBottom: 8 }} />
-                <p style={{ margin: 0, fontSize: 14 }}>No measurements recorded for {ptDate}</p>
-              </div>
-            ) : ptState.measurements.map((m: any) => (
-              <div key={m._id}>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))", gap: 10, marginBottom: 12 }}>
-                  {[
-                    ["Weight", m.weight, "kg"], ["Height", m.height, "cm"],
-                    ["Chest", m.chest, "cm"], ["Waist", m.waist, "cm"],
-                    ["Hips", m.hips, "cm"], ["Arms", m.arms, "cm"],
-                    ["Thighs", m.thighs, "cm"], ["Shoulders", m.shoulders, "cm"],
-                    ["Body Fat", m.bodyFat, "%"], ["BMI", m.bmi, ""],
-                  ].filter(([, val]) => val != null).map(([label, val, unit]) => (
-                    <div key={String(label)} style={{ background: "var(--bg-secondary)", borderRadius: 10, padding: "10px 14px", border: "1px solid var(--border-color)" }}>
-                      <p style={{ margin: 0, fontSize: 11, color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5 }}>{label}</p>
-                      <p style={{ margin: "4px 0 0", fontSize: 20, fontWeight: 800 }}>
-                        {val}<span style={{ fontSize: 12, color: "var(--text-muted)", marginLeft: 2 }}>{unit}</span>
+            {ptState.measurements.length === 0 ? <div className="member-dashboard-inline-411">
+                <Ruler size={32} className="member-dashboard-inline-412" />
+                <p className="member-dashboard-inline-413">No measurements recorded for {ptDate}</p>
+              </div> : ptState.measurements.map((m: any) => <div key={m._id}>
+                <div className="member-dashboard-inline-414">
+                  {[["Weight", m.weight, "kg"], ["Height", m.height, "cm"], ["Chest", m.chest, "cm"], ["Waist", m.waist, "cm"], ["Hips", m.hips, "cm"], ["Arms", m.arms, "cm"], ["Thighs", m.thighs, "cm"], ["Shoulders", m.shoulders, "cm"], ["Body Fat", m.bodyFat, "%"], ["BMI", m.bmi, ""]].filter(([, val]) => val != null).map(([label, val, unit]) => <div key={String(label)} className="member-dashboard-inline-415">
+                      <p className="member-dashboard-inline-416">{label}</p>
+                      <p className="member-dashboard-inline-417">
+                        {val}<span className="member-dashboard-inline-418">{unit}</span>
                       </p>
-                    </div>
-                  ))}
+                    </div>)}
                 </div>
-                {m.notes && <p style={{ margin: 0, fontSize: 13, color: "var(--text-muted)", fontStyle: "italic" }}>Note: {m.notes}</p>}
-              </div>
-            ))}
+                {m.notes && <p className="member-dashboard-inline-419">Note: {m.notes}</p>}
+              </div>)}
           </div>
-        </>
-      )}
-    </div>
-  );
-
-  const HealthMonitorPanel = (
-    <div className="page-container" style={{ padding: "16px 24px", maxWidth: "1200px", margin: "0 auto" }}>
-      <header className="page-header" style={{ marginBottom: "24px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <div style={{ background: "var(--bg-card)", padding: "10px", borderRadius: "12px", border: "1px solid var(--border-color)" }}>
-            <ClipboardList size={24} style={{ color: "var(--primary)" }} />
+        </>}
+    </div>;
+  const HealthMonitorPanel = <div className="page-container member-dashboard-inline-420">
+      <header className="page-header member-dashboard-inline-421">
+        <div className="member-dashboard-inline-422">
+          <div className="member-dashboard-inline-423">
+            <ClipboardList size={24} className="member-dashboard-inline-424" />
           </div>
           <div>
-            <h2 className="page-title" style={{ marginBottom: "2px", fontSize: "1.4rem", fontWeight: 800 }}>Health Monitor</h2>
-            <p className="page-subtitle" style={{ fontSize: "0.85rem", margin: 0 }}>
+            <h2 className="page-title member-dashboard-inline-425">Health Monitor</h2>
+            <p className="page-subtitle member-dashboard-inline-426">
               {healthMonitorSection === "bmi" && "Track your Body Mass Index."}
               {healthMonitorSection === "calories" && "Monitor your calorie intake and burn."}
               {healthMonitorSection === "water" && "Stay hydrated with water reminders."}
@@ -2289,26 +2259,16 @@ export const MemberDashboard: React.FC = () => {
         </div>
       </header>
 
-      {healthMonitorSection === "bmi" ? (
-        <BMICalculator />
-      ) : healthMonitorSection === "calories" ? (
-        <CaloriesCalculator />
-      ) : healthMonitorSection === "water" ? (
-        <WaterReminder />
-      ) : (
-        <div className="gym-card" style={{ padding: "32px", textAlign: "center", minHeight: "300px", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      {healthMonitorSection === "bmi" ? <BMICalculator /> : healthMonitorSection === "calories" ? <CaloriesCalculator /> : healthMonitorSection === "water" ? <WaterReminder /> : <div className="gym-card member-dashboard-inline-427">
           <div>
-            <ClipboardList size={48} style={{ color: "var(--border-color)", margin: "0 auto 16px" }} />
-            <h3 style={{ fontSize: "1.2rem", fontWeight: 700, marginBottom: "8px" }}>
+            <ClipboardList size={48} className="member-dashboard-inline-428" />
+            <h3 className="member-dashboard-inline-429">
               {healthMonitorSection === "health_kit" && "Health Kit Integration Coming Soon"}
             </h3>
-            <p style={{ color: "var(--text-muted)" }}>This feature is currently under development.</p>
+            <p className="member-dashboard-inline-430">This feature is currently under development.</p>
           </div>
-        </div>
-      )}
-    </div>
-  );
-
+        </div>}
+    </div>;
   const panels: Record<string, React.ReactNode> = {
     overview: OverviewPanel,
     health_monitor: HealthMonitorPanel,
@@ -2320,28 +2280,21 @@ export const MemberDashboard: React.FC = () => {
     library: <WorkoutLibraryPage />,
     pt: PersonalTrainerPanel,
     challenges: ChallengesPanel,
-    events: <EventsViewPanel />,
+    events: <EventsViewPanel />
   };
-
   if (activeTab === "not_found") {
     return <Navigate to="/404" replace />;
   }
-
-  return (
-    <div className="app-container">
-      {showChangePassword && (
-        <UserProfileModal
-          user={{ fullName: userName, email: (user?.email as string) || profile?.email || "", role: "member" }}
-          onClose={() => setShowChangePassword(false)}
-        />
-      )}
-      {showAiModal && (
-        <PurchaseAICreditsModal
-          userEmail={(user?.email as string) || profile?.email || ""}
-          onClose={() => setShowAiModal(false)}
-          onSuccess={(newTotalCredits) => setProfile((prev: any) => ({ ...prev, aiCredits: newTotalCredits }))}
-        />
-      )}
+  return <div className="app-container">
+      {showChangePassword && <UserProfileModal user={{
+      fullName: userName,
+      email: user?.email as string || profile?.email || "",
+      role: "member"
+    }} onClose={() => setShowChangePassword(false)} />}
+      {showAiModal && <PurchaseAICreditsModal userEmail={user?.email as string || profile?.email || ""} onClose={() => setShowAiModal(false)} onSuccess={newTotalCredits => setProfile((prev: any) => ({
+      ...prev,
+      aiCredits: newTotalCredits
+    }))} />}
       {Sidebar}
 
       <div className="main-content">
@@ -2350,23 +2303,16 @@ export const MemberDashboard: React.FC = () => {
           <button className="menu-toggle-btn" onClick={() => setSidebarOpen(true)} aria-label="Open menu">
             <Menu size={28} color="var(--text-primary)" />
           </button>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            {branding.logoUrl ? (
-              <img src={branding.logoUrl} alt={branding.gymName} style={{ width: 32, height: 32, objectFit: "contain", borderRadius: 8 }} />
-            ) : (
-              <img src="/logo.png" alt="Logo" style={{ width: 32, height: 32, objectFit: "contain", borderRadius: 8 }} />
-            )}
-            <span className="brand-name" style={{ fontSize: "1rem" }}>{branding.gymName.toUpperCase()}</span>
+          <div className="member-dashboard-inline-431">
+            {branding.logoUrl ? <img src={branding.logoUrl} alt={branding.gymName} className="member-dashboard-inline-432" /> : <img src="/logo.png" alt="Logo" className="member-dashboard-inline-433" />}
+            <span className="brand-name member-dashboard-inline-434">{branding.gymName.toUpperCase()}</span>
           </div>
-          <div style={{ width: 40 }} />
+          <div className="member-dashboard-inline-435" />
         </header>
 
         {/* Active panel */}
         {panels[activeTab]}
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default MemberDashboard;
-

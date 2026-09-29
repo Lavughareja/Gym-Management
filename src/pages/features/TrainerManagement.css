@@ -1,0 +1,946 @@
+.trainer-management-inline-1 {
+  background: #fff;
+  min-height: 100vh;
+  font-family: 'Inter','Segoe UI',sans-serif;
+}
+
+.trainer-management-inline-2 {
+  background: linear-gradient(135deg, #052e16 0%, #064e3b 55%, #0f766e 100%);
+  color: #fff;
+  padding-top: 140px;
+  padding-bottom: 100px;
+  position: relative;
+  overflow: hidden;
+}
+
+.trainer-management-inline-3 {
+  position: absolute;
+  top: -25%;
+  right: -8%;
+  width: 560px;
+  height: 560px;
+  border-radius: 50%;
+  background: rgba(16,185,129,0.18);
+  filter: blur(100px);
+  pointer-events: none;
+}
+
+.trainer-management-inline-4 {
+  position: absolute;
+  bottom: -15%;
+  left: 8%;
+  width: 380px;
+  height: 380px;
+  border-radius: 50%;
+  background: rgba(59,130,246,0.1);
+  filter: blur(80px);
+  pointer-events: none;
+}
+
+.trainer-management-inline-5 {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px;
+  position: relative;
+  z-index: 1;
+}
+
+.trainer-management-inline-6 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+
+.trainer-management-inline-7 {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.18);
+  padding: 6px 16px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 24px;
+  color: #a7f3d0;
+}
+
+.trainer-management-inline-8 {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #34d399;
+  display: inline-block;
+}
+
+.trainer-management-inline-9 {
+  font-size: 60px;
+  font-weight: 900;
+  line-height: 1.08;
+  margin: 0 0 24px;
+  color: #fff;
+}
+
+.trainer-management-inline-10 {
+  background: linear-gradient(90deg,#6ee7b7,#67e8f9);
+  webkit-background-clip: text;
+  webkit-text-fill-color: transparent;
+}
+
+.trainer-management-inline-11 {
+  font-size: 18px;
+  line-height: 1.7;
+  color: #a7f3d0;
+  margin-bottom: 40px;
+  max-width: 480px;
+}
+
+.trainer-management-inline-12 {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 36px;
+  flex-wrap: wrap;
+}
+
+.trainer-management-inline-13 {
+  padding: 14px 32px;
+  background: #059669;
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 8px 32px rgba(5,150,105,0.4);
+  transition: transform 0.2s;
+}
+
+.trainer-management-inline-14 {
+  padding: 14px 32px;
+  background: transparent;
+  color: #fff;
+  border: 1.5px solid rgba(255,255,255,0.28);
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.trainer-management-inline-15 {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.trainer-management-inline-16 {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #6ee7b7;
+}
+
+.trainer-management-inline-17 {
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
+.trainer-management-inline-18 {
+  width: 100%;
+  max-width: 380px;
+  background: #fff;
+  border-radius: 24px;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.4);
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.trainer-management-inline-19 {
+  background: linear-gradient(135deg,#059669,#0d9488);
+  padding: 20px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.trainer-management-inline-20 {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 4px;
+}
+
+.trainer-management-inline-21 {
+  font-size: 28px;
+  font-weight: 900;
+  color: #fff;
+}
+
+.trainer-management-inline-22 {
+  font-size: 12px;
+  color: rgba(255,255,255,0.7);
+  margin-top: 2px;
+}
+
+.trainer-management-inline-23 {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.trainer-management-inline-24 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+}
+
+.trainer-management-inline-25 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.trainer-management-inline-26 {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 13px;
+  color: #1e293b;
+}
+
+.trainer-management-inline-27 {
+  font-weight: 700;
+  font-size: 13px;
+  color: #0f172a;
+}
+
+.trainer-management-inline-28 {
+  font-size: 11px;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.trainer-management-inline-29 {
+  text-align: right;
+}
+
+.trainer-management-inline-30 {
+  font-weight: 800;
+  font-size: 14px;
+  color: #0f172a;
+}
+
+.trainer-management-inline-31 {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 100px;
+}
+
+.trainer-management-inline-32 {
+  padding: 14px 24px;
+  background: #f8fafc;
+  display: flex;
+  justify-content: center;
+}
+
+.trainer-management-inline-33 {
+  background: #059669;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 28px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.trainer-management-inline-34 {
+  position: absolute;
+  top: 20%;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  background: #34d399;
+  filter: blur(50px);
+  opacity: 0.3;
+}
+
+.trainer-management-inline-35 {
+  position: absolute;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: #0ea5e9;
+  filter: blur(60px);
+  opacity: 0.2;
+}
+
+.trainer-management-inline-36 {
+  background: #fff;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.trainer-management-inline-37 {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 32px;
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 0px;
+}
+
+.trainer-management-inline-38 {
+  padding: 32px 24px;
+  text-align: center;
+}
+
+.trainer-management-inline-39 {
+  font-size: 34px;
+  font-weight: 900;
+  color: #059669;
+}
+
+.trainer-management-inline-40 {
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.trainer-management-inline-41 {
+  background: #f8fafc;
+  padding: 96px 0;
+}
+
+.trainer-management-inline-42 {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+.trainer-management-inline-43 {
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto 64px;
+}
+
+.trainer-management-inline-44 {
+  background: #fee2e2;
+  color: #dc2626;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: 100px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  display: inline-block;
+  margin-bottom: 16px;
+}
+
+.trainer-management-inline-45 {
+  font-size: 44px;
+  font-weight: 900;
+  color: #0f172a;
+  margin: 0 0 16px;
+  line-height: 1.1;
+}
+
+.trainer-management-inline-46 {
+  font-size: 18px;
+  color: #64748b;
+  line-height: 1.7;
+}
+
+.trainer-management-inline-47 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.trainer-management-inline-48 {
+  background: #fff;
+  padding: 32px;
+  border-radius: 20px;
+  border: 1px solid #fee2e2;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+}
+
+.trainer-management-inline-49 {
+  width: 48px;
+  height: 48px;
+  background: #fff1f2;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.trainer-management-inline-50 {
+  font-size: 18px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 10px;
+}
+
+.trainer-management-inline-51 {
+  font-size: 15px;
+  color: #64748b;
+  line-height: 1.65;
+  margin: 0px;
+}
+
+.trainer-management-inline-52 {
+  background: #fff;
+  padding: 96px 0;
+  border-top: 1px solid #f1f5f9;
+}
+
+.trainer-management-inline-53 {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+.trainer-management-inline-54 {
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto 64px;
+}
+
+.trainer-management-inline-55 {
+  background: #d1fae5;
+  color: #059669;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: 100px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  display: inline-block;
+  margin-bottom: 16px;
+}
+
+.trainer-management-inline-56 {
+  font-size: 44px;
+  font-weight: 900;
+  color: #0f172a;
+  margin: 0 0 16px;
+  line-height: 1.1;
+}
+
+.trainer-management-inline-57 {
+  font-size: 18px;
+  color: #64748b;
+  line-height: 1.7;
+}
+
+.trainer-management-inline-58 {
+  background: #0f172a;
+  border-radius: 32px;
+  overflow: hidden;
+  max-width: 960px;
+  margin: 0 auto;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.3);
+}
+
+.trainer-management-inline-59 {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding: 16px;
+}
+
+.trainer-management-inline-60 {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 12px;
+  border-radius: 16px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.trainer-management-inline-61 {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.trainer-management-inline-62 {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.trainer-management-inline-63 {
+  font-size: 11px;
+  color: #475569;
+  font-weight: 500;
+}
+
+.trainer-management-inline-64 {
+  padding: 48px;
+  display: flex;
+  gap: 64px;
+  align-items: center;
+}
+
+.trainer-management-inline-65 {
+  flex: 1;
+}
+
+.trainer-management-inline-66 {
+  font-size: 30px;
+  font-weight: 900;
+  color: #fff;
+  margin-bottom: 16px;
+  line-height: 1.2;
+}
+
+.trainer-management-inline-67 {
+  font-size: 16px;
+  color: #94a3b8;
+  line-height: 1.7;
+  margin-bottom: 32px;
+}
+
+.trainer-management-inline-68 {
+  list-style: none;
+  padding: 0px;
+  margin: 0px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.trainer-management-inline-69 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+.trainer-management-inline-70 {
+  flex-shrink: 0px;
+}
+
+.trainer-management-inline-71 {
+  width: 240px;
+  flex-shrink: 0px;
+  aspect-ratio: 4/3;
+  background: #1e293b;
+  border-radius: 20px;
+  border: 5px solid #334155;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+}
+
+.trainer-management-inline-72 {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #475569;
+  text-align: center;
+  padding: 0 12px;
+  line-height: 1.5;
+}
+
+.trainer-management-inline-73 {
+  background: #f8fafc;
+  padding: 96px 0;
+  border-top: 1px solid #f1f5f9;
+}
+
+.trainer-management-inline-74 {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+.trainer-management-inline-75 {
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto 64px;
+}
+
+.trainer-management-inline-76 {
+  background: #d1fae5;
+  color: #059669;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: 100px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  display: inline-block;
+  margin-bottom: 16px;
+}
+
+.trainer-management-inline-77 {
+  font-size: 44px;
+  font-weight: 900;
+  color: #0f172a;
+  margin: 0px;
+  line-height: 1.1;
+}
+
+.trainer-management-inline-78 {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 24px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.trainer-management-inline-79 {
+  background: #fff;
+  padding: 28px;
+  border-radius: 20px;
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.02);
+}
+
+.trainer-management-inline-80 {
+  width: 40px;
+  height: 40px;
+  background: #f8fafc;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.trainer-management-inline-81 {
+  font-size: 15px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 8px;
+}
+
+.trainer-management-inline-82 {
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.65;
+  margin: 0px;
+}
+
+.trainer-management-inline-83 {
+  background: #fff;
+  padding: 96px 0;
+  border-top: 1px solid #f1f5f9;
+}
+
+.trainer-management-inline-84 {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+.trainer-management-inline-85 {
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto 64px;
+}
+
+.trainer-management-inline-86 {
+  background: #d1fae5;
+  color: #059669;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: 100px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  display: inline-block;
+  margin-bottom: 16px;
+}
+
+.trainer-management-inline-87 {
+  font-size: 44px;
+  font-weight: 900;
+  color: #0f172a;
+  margin: 0px;
+  line-height: 1.1;
+}
+
+.trainer-management-inline-88 {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 24px;
+  max-width: 1100px;
+  margin: 0 auto 48px;
+}
+
+.trainer-management-inline-89 {
+  background: #fff;
+  padding: 32px 24px 28px;
+  border-radius: 20px;
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+  position: relative;
+  margin-top: 20px;
+}
+
+.trainer-management-inline-90 {
+  position: absolute;
+  left: 24px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #059669;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(5,150,105,0.3);
+  border: 3px solid #fff;
+}
+
+.trainer-management-inline-91 {
+  font-size: 16px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 10px;
+  margin-top: 8px;
+}
+
+.trainer-management-inline-92 {
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.65;
+  margin: 0px;
+}
+
+.trainer-management-inline-93 {
+  max-width: 1100px;
+  margin: 0 auto;
+  background: linear-gradient(135deg,#059669 0%,#0d9488 100%);
+  border-radius: 28px;
+  padding: 48px 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 48px;
+  box-shadow: 0 24px 64px rgba(5,150,105,0.25);
+}
+
+.trainer-management-inline-94 {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.12);
+  padding: 6px 16px;
+  border-radius: 100px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #a7f3d0;
+  margin-bottom: 20px;
+}
+
+.trainer-management-inline-95 {
+  font-size: 30px;
+  font-weight: 900;
+  color: #fff;
+  margin-bottom: 12px;
+  line-height: 1.2;
+}
+
+.trainer-management-inline-96 {
+  font-size: 16px;
+  color: #a7f3d0;
+  line-height: 1.65;
+  max-width: 540px;
+  margin: 0px;
+}
+
+.trainer-management-inline-97 {
+  background: rgba(255,255,255,0.12);
+  padding: 28px;
+  border-radius: 20px;
+  flex-shrink: 0px;
+}
+
+.trainer-management-inline-98 {
+  background: #f8fafc;
+  padding: 96px 0;
+  border-top: 1px solid #f1f5f9;
+}
+
+.trainer-management-inline-99 {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+.trainer-management-inline-100 {
+  font-size: 44px;
+  font-weight: 900;
+  color: #0f172a;
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.trainer-management-inline-101 {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.trainer-management-inline-102 {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+}
+
+.trainer-management-inline-103 {
+  width: 100%;
+  padding: 20px 24px;
+  text-align: left;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 700;
+  font-size: 15px;
+  color: #0f172a;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.trainer-management-inline-104 {
+  transition: transform 0.2s;
+  flex-shrink: 0px;
+}
+
+.trainer-management-inline-105 {
+  padding: 0 24px 20px;
+  font-size: 15px;
+  color: #64748b;
+  line-height: 1.7;
+}
+
+.trainer-management-inline-106 {
+  background: linear-gradient(135deg,#059669 0%,#0f766e 100%);
+  padding: 96px 32px;
+  text-align: center;
+}
+
+.trainer-management-inline-107 {
+  max-width: 680px;
+  margin: 0 auto;
+  color: #fff;
+}
+
+.trainer-management-inline-108 {
+  width: 64px;
+  height: 64px;
+  background: rgba(255,255,255,0.12);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 32px;
+}
+
+.trainer-management-inline-109 {
+  font-size: 48px;
+  font-weight: 900;
+  margin-bottom: 20px;
+  line-height: 1.1;
+}
+
+.trainer-management-inline-110 {
+  font-size: 18px;
+  color: #a7f3d0;
+  line-height: 1.7;
+  margin-bottom: 40px;
+}
+
+.trainer-management-inline-111 {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.trainer-management-inline-112 {
+  padding: 16px 36px;
+  background: #fff;
+  color: #059669;
+  border: none;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+}
+
+.trainer-management-inline-113 {
+  display: inline;
+  vertical-align: middle;
+  margin-left: 6px;
+}
+
+.trainer-management-inline-114 {
+  padding: 16px 36px;
+  background: transparent;
+  color: #fff;
+  border: 2px solid rgba(255,255,255,0.35);
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.trainer-management-inline-115 {
+  font-size: 13px;
+  color: #6ee7b7;
+  font-weight: 500;
+}
+

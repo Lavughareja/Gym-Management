@@ -52,3 +52,6 @@ export const verifyAiCreditSignatureApi = async (payload: VerifySignaturePayload
   const response = await AxiosInstance.post(apiRoutes.verifyAiCreditSignature, payload);
   return response;
 };
+
+export const upgradeOrderApi = (data: { plan: string }) => AxiosInstance.post('/payment/upgrade-order', data);
+export const verifyUpgradeApi = (data: any) => AxiosInstance.post('/payment/verify-upgrade', data);
