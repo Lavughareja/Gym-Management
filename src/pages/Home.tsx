@@ -182,27 +182,27 @@ const integrations = [{
 const plans = [{
   name: 'Starter',
   desc: 'For small gyms just getting started.',
-  monthlyPrice: 29,
-  yearlyPrice: 24,
+  monthlyPrice: '1,999',
+  yearlyPrice: '1,499',
   features: ['Up to 100 Members', 'Basic Reports', 'Email Support', '1 Branch', '1 Admin']
 }, {
   name: 'Plus',
   desc: 'Perfect for growing fitness centers.',
-  monthlyPrice: 79,
-  yearlyPrice: 69,
+  monthlyPrice: '2,999',
+  yearlyPrice: '2,499',
   features: ['Up to 500 Members', 'Advanced Analytics', 'Priority Support', '2 Branches', '5 Staff Members']
 }, {
   name: 'Professional',
   desc: 'Everything you need to scale rapidly.',
-  monthlyPrice: 149,
-  yearlyPrice: 129,
+  monthlyPrice: '4,999',
+  yearlyPrice: '4,499',
   isPopular: true,
   features: ['Unlimited Members', 'Biometric Integration', 'WhatsApp Automation', '5 Branches', 'Unlimited Staff']
 }, {
   name: 'Enterprise',
   desc: 'For large franchises and networks.',
-  monthlyPrice: 299,
-  yearlyPrice: 249,
+  monthlyPrice: '9,999',
+  yearlyPrice: '8,999',
   features: ['Unlimited Everything', 'Custom Development', 'Dedicated Account Manager', 'White-label App', 'API Access']
 }];
 const testimonials = [{
@@ -800,9 +800,9 @@ const Pricing: React.FC = () => {
               <div className="gc-pricing-name">{p.name}</div>
               <div className="gc-pricing-desc">{p.desc}</div>
               <div className="gc-pricing-price">
-                <span className="gc-pricing-amount">${yearly ? p.yearlyPrice : p.monthlyPrice}</span>
+                <span className="gc-pricing-amount">₹{yearly ? p.yearlyPrice : p.monthlyPrice}</span>
                 <span className="gc-pricing-period">/mo</span>
-                {yearly && <div className="gc-pricing-annual-note">Billed annually at ${(yearly ? p.yearlyPrice : p.monthlyPrice) * 12}/yr</div>}
+                {yearly && <div className="gc-pricing-annual-note">Billed annually</div>}
               </div>
               <ul className="gc-pricing-features">
                 {p.features.map((f, j) => <li key={j}><CheckCircle2 /> {f}</li>)}

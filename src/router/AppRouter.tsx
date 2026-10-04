@@ -45,6 +45,7 @@ const PlatformTestimonials = lazy(() => import("../pages/PlatformTestimonialsPag
 const BlogList = lazy(() => import("../pages/BlogList").then((m) => ({ default: m.BlogList })));
 const BlogDetail = lazy(() => import("../pages/BlogDetail").then((m) => ({ default: m.BlogDetail })));
 const NotFound = lazy(() => import("../pages/NotFound"));
+const TrialExpired = lazy(() => import("../pages/TrialExpired"));
 
 // ── Loading Spinner ───────────────────────────────────────────────────────────
 const PageLoader = () => (
@@ -54,15 +55,7 @@ const PageLoader = () => (
   </div>
 );
 
-// ── SmartRedirect — redirect "/" based on auth state ─────────────────────────
-const SmartRedirect = () => {
-  if (isAuthenticated()) {
-    const user = getStoredUser();
-    const role = user?.role as UserRole;
-    return <Navigate to={getDashboardRoot(role)} replace />;
-  }
-  return <Home />;
-};
+// ── SmartRedirect removed — we want the landing page available at "/" to everyone
 
 // ── GuestRoute — redirect logged-in users away from login/signup ──────────────
 const GuestRoute = ({ children }: { children: React.ReactNode }) => {
@@ -100,6 +93,16 @@ const AppRouter = () => {
     }
   }, []);
 
+  // Load Razorpay script once
+  useEffect(() => {
+    if (!(window as any).Razorpay) {
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.async = true;
+      document.body.appendChild(script);
+    }
+  }, []);
+
   // Apply primary/secondary colors as CSS variables whenever branding changes
   useEffect(() => {
     const root = document.documentElement;
@@ -112,7 +115,7 @@ const AppRouter = () => {
       <Routes>
 
         {/* ── Public / Landing ──────────────────────────────────────────── */}
-        <Route path="/" element={<SmartRedirect />} />
+        <Route path="/" element={<Home />} />
         <Route path="/screenshots" element={React.createElement(WithBack(PlatformScreenshots as any))} />
         <Route path="/integrations" element={React.createElement(WithBack(PlatformIntegrations as any))} />
         <Route path="/testimonials" element={React.createElement(WithBack(PlatformTestimonials as any))} />
@@ -188,6 +191,9 @@ const AppRouter = () => {
             </ProtectedRoute>
           }
         />
+
+        {/* ── Trial Expired ─────────────────────────────────────────────── */}
+        <Route path="/trial-expired" element={<TrialExpired />} />
 
         {/* ── Fallback / 404 ────────────────────────────────────────────── */}
         <Route path="/404" element={<NotFound />} />

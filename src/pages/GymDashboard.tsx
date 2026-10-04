@@ -30,6 +30,7 @@ import CrmPanel from "../components/DashboardPanels/CrmPanel";
 import TrialMembersPanel from "../components/DashboardPanels/TrialMembers/TrialMembersPanel.tsx";
 import ExpenseTrackerPanel from "../components/DashboardPanels/ExpenseTrackerPanel";
 import UserProfileModal from "../components/UserProfileModal/UserProfileModal";
+import TrialBanner from "../components/TrialBanner/TrialBanner";
 
 // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Route Map â€” maps URL segments to panel IDs
@@ -290,6 +291,13 @@ const GymDashboard: React.FC<GymDashboardProps> = ({
           </div>
           <div className="gym-dashboard-inline-16" />
         </header>
+
+        {/* Trial countdown banner — only visible to unpaid admin/owner users */}
+        <TrialBanner
+          planEndDate={(user as any)?.planEndDate || localUser?.planEndDate || ''}
+          paymentStatus={!!(user as any)?.paymentStatus || !!localUser?.paymentStatus}
+          role={userObj.role || 'admin'}
+        />
 
         {activeTab === "overview" && <OverviewPanel ownerName={userObj?.name || "Admin"} gymName={userObj?.gymId?.name || userObj?.name + "'s Gym" || "Your Gym"} role={userObj?.role || "admin"} canAddMember={!!userObj?.canAddMember} setActiveTab={(id: string) => goToPanel(id)} setShowAddMember={setShowAddMember} setShowAddTrainer={setShowAddTrainer} />}
         {activeTab === "crm" && <CrmPanel role={userObj?.role || "admin"} gymName={userObj?.gymId?.name || "Your Gym"} />}

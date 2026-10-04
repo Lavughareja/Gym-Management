@@ -30,15 +30,17 @@ AxiosInstance.interceptors.request.use(
 
 // ── Response Interceptor ──────────────────────────────────────────────────────
 // Handles 401 globally → clears token and redirects to login.
+// Handles 403 TRIAL_EXPIRED → redirects to /trial-expired.
 // Handles 403 (device-limit) → lets the caller handle it via rejectWithValue.
 AxiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error?.response?.status;
+    const code = error?.response?.data?.code;
 
     if (status === 401) {
       const isLoginRequest = error?.config?.url?.includes('/login') || error?.config?.url?.includes('superadmin');
-      
+
       if (!isLoginRequest) {
         // Token expired / unauthorized — clear storage and redirect
         localStorage.removeItem(AUTH_TOKEN_KEY);
@@ -48,8 +50,13 @@ AxiosInstance.interceptors.response.use(
       }
     }
 
-    // 403 (device limit reached) is intentionally NOT redirected here;
-    // the redux action catches it and shows a proper UI message.
+    if (status === 403 && code === "TRIAL_EXPIRED") {
+      if (window.location.pathname !== "/trial-expired") {
+        window.location.href = "/trial-expired";
+      }
+    }
+
+    // Other 403s (device limit reached) pass through to the caller.
     return Promise.reject(error);
   }
 );

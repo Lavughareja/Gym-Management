@@ -6,30 +6,30 @@ const plans = [
   {
     name: 'Starter',
     desc: 'For small gyms just getting started.',
-    monthlyPrice: 29,
-    yearlyPrice: 24,
+    monthlyPrice: '1,999',
+    yearlyPrice: '1,499',
     features: ['Up to 100 Members', 'Basic Reports', 'Email Support', '1 Branch', '1 Admin'],
   },
   {
     name: 'Plus',
     desc: 'Perfect for growing fitness centers.',
-    monthlyPrice: 79,
-    yearlyPrice: 69,
+    monthlyPrice: '2,999',
+    yearlyPrice: '2,499',
     features: ['Up to 500 Members', 'Advanced Analytics', 'Priority Support', '2 Branches', '5 Staff Members'],
   },
   {
     name: 'Professional',
     desc: 'Everything you need to scale rapidly.',
-    monthlyPrice: 149,
-    yearlyPrice: 129,
+    monthlyPrice: '4,999',
+    yearlyPrice: '4,499',
     isPopular: true,
     features: ['Unlimited Members', 'Biometric Integration', 'WhatsApp Automation', '5 Branches', 'Unlimited Staff'],
   },
   {
     name: 'Enterprise',
     desc: 'For large franchises and networks.',
-    monthlyPrice: 299,
-    yearlyPrice: 249,
+    monthlyPrice: '9,999',
+    yearlyPrice: '8,999',
     features: ['Unlimited Everything', 'Custom Development', 'Dedicated Account Manager', 'White-label App', 'API Access'],
   }
 ];
@@ -89,10 +89,10 @@ export const PricingSection: React.FC = () => {
               <p className="text-sm text-gray-500 h-10 mb-6">{plan.desc}</p>
               
               <div className="mb-8">
-                <span className="text-4xl font-bold text-dark">${isYearly ? plan.yearlyPrice : plan.monthlyPrice}</span>
+                <span className="text-4xl font-bold text-dark">₹{isYearly ? plan.yearlyPrice : plan.monthlyPrice}</span>
                 <span className="text-gray-500">/mo</span>
                 {isYearly && (
-                  <p className="text-xs text-success mt-1">Billed annually at ${plan.yearlyPrice * 12}</p>
+                  <p className="text-xs text-success mt-1">Billed annually</p>
                 )}
               </div>
               

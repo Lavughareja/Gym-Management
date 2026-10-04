@@ -1,0 +1,74 @@
+/* ===== Trial Countdown Banner ===== */
+
+.trial-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-left: 4px solid #d97706;
+  border-radius: 0;
+  padding: 10px 20px;
+  font-size: 13.5px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.trial-banner-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.trial-banner-icon {
+  color: #d97706;
+  flex-shrink: 0;
+}
+
+.trial-banner-text {
+  color: #92400e;
+  font-weight: 500;
+}
+
+.trial-banner-text strong {
+  font-weight: 800;
+  color: #78350f;
+}
+
+.trial-banner-urgent {
+  background: #fef2f2;
+  border-color: #fca5a5;
+  border-left-color: #dc2626;
+}
+
+.trial-banner-urgent .trial-banner-icon {
+  color: #dc2626;
+}
+
+.trial-banner-urgent .trial-banner-text {
+  color: #991b1b;
+}
+
+.trial-banner-urgent .trial-banner-text strong {
+  color: #7f1d1d;
+}
+
+.trial-banner-upgrade-btn {
+  background: #1e3a5f;
+  color: #fff;
+  border: none;
+  padding: 7px 18px;
+  border-radius: 5px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.trial-banner-upgrade-btn:hover {
+  background: #163052;
+}
