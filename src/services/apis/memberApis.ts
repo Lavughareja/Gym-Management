@@ -23,6 +23,10 @@ export const getMembersApi = async () => {
   return await AxiosInstance.get(apiRoutes.getMembers);
 };
 
+export const getMemberDetailsApi = async (memberId: string) => {
+  return await AxiosInstance.get(`${apiRoutes.getMembers}/${memberId}`);
+};
+
 export const memberSetupApi = async (data: { token: string; password: string; dateOfBirth?: string }) => {
   const response = await AxiosInstance.post(apiRoutes.memberSetup, data);
   return response;

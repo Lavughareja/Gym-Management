@@ -93,15 +93,7 @@ const AppRouter = () => {
     }
   }, []);
 
-  // Load Razorpay script once
-  useEffect(() => {
-    if (!(window as any).Razorpay) {
-      const script = document.createElement('script');
-      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-      script.async = true;
-      document.body.appendChild(script);
-    }
-  }, []);
+  // Razorpay script will be dynamically loaded only when needed by payment components
 
   // Apply primary/secondary colors as CSS variables whenever branding changes
   useEffect(() => {

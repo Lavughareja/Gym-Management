@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Repeat, Users, Plus } from 'lucide-react';
+import { Repeat, Users, Plus, UserCircle, MoreVertical } from 'lucide-react';
 
 interface MembersTableProps {
   members: any[];
@@ -43,6 +43,7 @@ const PaymentBadge = ({ status }: { status: string }) => {
 
 export const MembersTable: React.FC<MembersTableProps> = ({ members, onAddMember, onViewMember, onResendInvite }) => {
   const [resending, setResending] = useState<Record<string, boolean>>({});
+  const [contextMenu, setContextMenu] = useState<{ x: number, y: number, member: any } | null>(null);
 
   const handleResend = async (email: string) => {
     if (!onResendInvite) return;
@@ -59,7 +60,7 @@ export const MembersTable: React.FC<MembersTableProps> = ({ members, onAddMember
         <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 960 }}>
           <thead>
             <tr style={{ background: '#f8fafc', borderBottom: '1px solid #f1f5f9' }}>
-              {['Member', 'Contact', 'Plan Details', 'Status', 'Payment', 'Today'].map((h, i) => (
+              {['Member', 'Contact', 'Plan Details', 'Status', 'Payment', 'Today', ''].map((h, i) => (
                 <th key={i} style={{ padding: '14px 16px', textAlign: 'left', fontSize: 11, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.08em', whiteSpace: 'nowrap', width: 'auto' }}>{h}</th>
               ))}
             </tr>
@@ -134,7 +135,25 @@ export const MembersTable: React.FC<MembersTableProps> = ({ members, onAddMember
                       </span>
                     </td>
 
-
+                    {/* Actions */}
+                    <td style={{ padding: '14px 16px', whiteSpace: 'nowrap', textAlign: 'right' }}>
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          setContextMenu({ 
+                            x: rect.left - 120, // offset to the left
+                            y: rect.bottom + 5, 
+                            member: m 
+                          });
+                        }}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, color: '#94a3b8', borderRadius: 6 }}
+                        onMouseEnter={e => e.currentTarget.style.color = '#0f172a'}
+                        onMouseLeave={e => e.currentTarget.style.color = '#94a3b8'}
+                      >
+                        <MoreVertical size={18} />
+                      </button>
+                    </td>
 
                   </tr>
                 );
@@ -154,6 +173,55 @@ export const MembersTable: React.FC<MembersTableProps> = ({ members, onAddMember
           <button style={{ padding: '8px 16px', fontSize: 13, fontWeight: 600, background: '#fff', color: '#374151', border: '1px solid #e5e7eb', borderRadius: 10, cursor: 'pointer' }}>Next</button>
         </div>
       </div>
+
+      {contextMenu && (
+        <>
+          <div 
+            style={{ position: 'fixed', inset: 0, zIndex: 998 }} 
+            onClick={() => setContextMenu(null)} 
+            onContextMenu={(e) => { e.preventDefault(); setContextMenu(null); }} 
+          />
+          <div style={{ 
+            position: 'fixed', 
+            top: contextMenu.y, 
+            left: contextMenu.x, 
+            zIndex: 999, 
+            background: '#fff', 
+            boxShadow: '0 4px 20px rgba(0,0,0,0.15)', 
+            borderRadius: 12, 
+            padding: '6px', 
+            minWidth: 160, 
+            border: '1px solid #e2e8f0' 
+          }}>
+            <button 
+              onClick={() => {
+                if (onViewMember) onViewMember(contextMenu.member);
+                setContextMenu(null);
+              }}
+              style={{ 
+                width: '100%', 
+                padding: '10px 12px', 
+                textAlign: 'left', 
+                background: 'none', 
+                border: 'none', 
+                fontSize: 13, 
+                fontWeight: 600,
+                color: '#334155', 
+                cursor: 'pointer', 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: 10,
+                borderRadius: 8,
+                transition: 'background 0.1s'
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = '#f1f5f9'; e.currentTarget.style.color = '#0f172a'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = '#334155'; }}
+            >
+              <UserCircle size={16} /> User Details
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 };

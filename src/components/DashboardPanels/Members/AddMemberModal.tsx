@@ -51,13 +51,22 @@ export const AddMemberModal: React.FC<Props> = ({ onClose, onSave }) => {
   const { plans: rawPlans } = useAppSelector((state: any) => state.plan);
   const plans: any[] = Array.isArray(rawPlans) ? rawPlans : [];
 
+  // Default website plans to show if user hasn't created any yet
+  const defaultPlans = [
+    { _id: '111111111111111111111111', name: 'Starter', durationMonths: 1, basePrice: 1999 },
+    { _id: '222222222222222222222222', name: 'Plus', durationMonths: 3, basePrice: 2999 },
+    { _id: '333333333333333333333333', name: 'Professional', durationMonths: 6, basePrice: 4999 },
+    { _id: '444444444444444444444444', name: 'Enterprise', durationMonths: 12, basePrice: 9999 },
+  ];
+  const displayPlans = plans.length > 0 ? plans : defaultPlans;
+
   const set = (key: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm(f => ({ ...f, [key]: e.target.value }));
 
   // Auto-calculate end date from startDate + plan duration + extraDays
   const calcEndDate = (): string => {
     if (!form.startDate || !form.planId) return '';
-    const selectedPlan = plans.find(p => (p._id || p.id) === form.planId);
+    const selectedPlan = displayPlans.find(p => (p._id || p.id) === form.planId);
     if (!selectedPlan) return '';
     
     const d = new Date(form.startDate);
@@ -206,14 +215,14 @@ export const AddMemberModal: React.FC<Props> = ({ onClose, onSave }) => {
               value={form.planId}
               onChange={(e) => {
                 set('planId')(e);
-                const p = plans.find(plan => (plan._id || plan.id) === e.target.value);
+                const p = displayPlans.find(plan => (plan._id || plan.id) === e.target.value);
                 if (p) {
                   setForm(f => ({ ...f, amountPaid: String(p.basePrice || 0) }));
                 }
               }}
             >
               <option value="">-- Choose a Plan --</option>
-              {plans.map(p => (
+              {displayPlans.map(p => (
                 <option key={p._id || p.id} value={p._id || p.id}>
                   {p.name} - {p.durationMonths} Months (₹{p.basePrice})
                 </option>
@@ -246,17 +255,16 @@ export const AddMemberModal: React.FC<Props> = ({ onClose, onSave }) => {
           </div>
 
           {/* Auto-calculated End Date */}
-          {endDate && (
-            <div style={{ marginBottom: 18 }}>
-              <label style={labelStyle}>End Date (Auto Calculated)</label>
-              <input
-                style={{ ...inputStyle, background: '#f0fdf4', border: '1.5px solid #bbf7d0', color: '#15803d', fontWeight: 700, cursor: 'not-allowed' }}
-                type="date"
-                value={endDate}
-                readOnly
-              />
-            </div>
-          )}
+          <div style={{ marginBottom: 18 }}>
+            <label style={labelStyle}>End Date (Auto Calculated)</label>
+            <input
+              style={{ ...inputStyle, background: '#f0fdf4', border: '1.5px solid #bbf7d0', color: '#15803d', fontWeight: 700, cursor: 'not-allowed' }}
+              type={endDate ? "date" : "text"}
+              placeholder="Select a plan to see end date"
+              value={endDate || ''}
+              readOnly
+            />
+          </div>
 
           {/* Amount Paid */}
           <div style={{ marginBottom: 8 }}>
