@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { ArrowRight, CheckCircle2, ChevronDown, Smartphone, BarChart2, Bell, Shield, CreditCard, Calendar, QrCode, MessageSquare, Activity, Star, Zap, UserCheck, Users } from 'lucide-react';
 import { Navbar, Footer } from '../Home';
 import "./MobileFriendly.css";
@@ -68,7 +68,7 @@ const scenarios = [{
 }];
 const faqs = [{
   q: "Is the app available for both iOS and Android?",
-  a: "Yes. Trainix mobile apps are natively available on both the Apple App Store for iOS devices and the Google Play Store for Android."
+  a: "Yes. GymInvite mobile apps are natively available on both the Apple App Store for iOS devices and the Google Play Store for Android."
 }, {
   q: "Do members have to pay to download the app?",
   a: "No, the member app is completely free for your clients to download and use as long as they are active members of your gym."
@@ -116,7 +116,7 @@ export const MobileFriendly: React.FC<MobileFriendlyProps> = ({
               </h1>
 
               <p className="mobile-friendly-inline-11">
-                Break free from the reception desk. Trainix provides dedicated native mobile apps for owners, trainers, and members — keeping everyone connected to the gym 24/7.
+                Break free from the reception desk. GymInvite provides dedicated native mobile apps for owners, trainers, and members — keeping everyone connected to the gym 24/7.
               </p>
 
               <div className="mobile-friendly-inline-12">
@@ -329,7 +329,7 @@ export const MobileFriendly: React.FC<MobileFriendlyProps> = ({
           <h2 style={{
           letterSpacing: -1.5
         }} className="mobile-friendly-inline-104">Unchain yourself from the desk.</h2>
-          <p className="mobile-friendly-inline-105">Download the Trainix app and start running your fitness business from anywhere in the world.</p>
+          <p className="mobile-friendly-inline-105">Download the GymInvite app and start running your fitness business from anywhere in the world.</p>
           <div className="mobile-friendly-inline-106">
             <button className="mobile-friendly-inline-107">
               Start Free Trial <ArrowRight size={17} className="mobile-friendly-inline-108" />

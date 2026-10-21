@@ -242,7 +242,7 @@ export const MemberDashboard: React.FC = () => {
   const localUserStr = localStorage.getItem("dashUser");
   const localUser = localUserStr ? JSON.parse(localUserStr) : null;
   const userName = (user as any)?.fullName || localUser?.ownerName || "Member";
-  const gymName = localUser?.gymId?.name || "Trainix Gym";
+  const gymName = localUser?.gymId?.name || "GymInvite Gym";
 
   // Derive active tab from URL
   const activeTab = getMemberPanelFromPath(location.pathname);
@@ -1489,11 +1489,11 @@ export const MemberDashboard: React.FC = () => {
       <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
         {/* Brand */}
         <div className="sidebar-brand">
-          <div className="brand-icon-wrapper member-dashboard-inline-179">
-            <img src="/logo.png" alt="Trainix Logo" className="member-dashboard-inline-180" />
+          <div className="brand-icon-wrapper member-dashboard-inline-179" style={{ background: 'none', boxShadow: 'none', padding: 0 }}>
+            <img src="/gym_logo.png" alt="GymInvite Logo" className="member-dashboard-inline-180" style={{ height: 48, width: 'auto', maxWidth: 80, objectFit: 'contain' }} />
           </div>
           <div>
-            <h1 className="brand-name">TRAINIX</h1>
+            <h1 className="brand-name">GymInvite</h1>
             <p className="brand-subtitle">Member Portal</p>
           </div>
         </div>
@@ -2304,7 +2304,7 @@ export const MemberDashboard: React.FC = () => {
             <Menu size={28} color="var(--text-primary)" />
           </button>
           <div className="member-dashboard-inline-431">
-            {branding.logoUrl ? <img src={branding.logoUrl} alt={branding.gymName} className="member-dashboard-inline-432" /> : <img src="/logo.png" alt="Logo" className="member-dashboard-inline-433" />}
+            {branding.logoUrl ? <img src={branding.logoUrl} alt={branding.gymName} className="member-dashboard-inline-432" /> : <img src="/gym_logo.png" alt="Logo" className="member-dashboard-inline-433" />}
             <span className="brand-name member-dashboard-inline-434">{branding.gymName.toUpperCase()}</span>
           </div>
           <div className="member-dashboard-inline-435" />

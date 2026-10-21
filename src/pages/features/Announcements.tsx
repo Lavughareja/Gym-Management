@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { ArrowRight, CheckCircle2, ChevronDown, MessageSquare, Bell, Send, Users, Clock, Smartphone, TrendingUp, Zap, Star, Megaphone, Radio, LayoutList, Image } from 'lucide-react';
 import { Navbar, Footer } from '../Home';
 import "./Announcements.css";
@@ -44,7 +44,7 @@ const tabs = [{
 const scenarios = [{
   icon: <Radio size={22} color="#2563eb" />,
   title: "Sunday class cancelled at 7 AM",
-  desc: "Coach calls in sick. You open Trainix, pick the Sunday 8AM batch, tap 'Notify'. All 40 members get a WhatsApp + push before they leave home."
+  desc: "Coach calls in sick. You open GymInvite, pick the Sunday 8AM batch, tap 'Notify'. All 40 members get a WhatsApp + push before they leave home."
 }, {
   icon: <TrendingUp size={22} color="#16a34a" />,
   title: "Fee revision — zero arguments",
@@ -80,8 +80,8 @@ const steps = [{
   desc: "Send immediately or schedule for the optimal time. The system handles delivery."
 }];
 const faqs = [{
-  q: "Does Trainix send WhatsApp messages to members automatically?",
-  a: "Yes. Trainix integrates with WhatsApp Business API to send templated messages. Announcements are sent as approved templates, ensuring delivery and compliance."
+  q: "Does GymInvite send WhatsApp messages to members automatically?",
+  a: "Yes. GymInvite integrates with WhatsApp Business API to send templated messages. Announcements are sent as approved templates, ensuring delivery and compliance."
 }, {
   q: "Can I target members who haven't visited in X days?",
   a: "Yes. The audience filter lets you segment by last attendance date, membership status, payment status, batch, trainer, or plan type — any combination you need."
@@ -393,7 +393,7 @@ export const Announcements: React.FC<AnnouncementsProps> = ({
                 <Megaphone size={13} /> Smart Scheduling
               </div>
               <h3 className="announcements-inline-100">Send at the right time. Automatically.</h3>
-              <p className="announcements-inline-101">Trainix analyses when your members are most active in the app and suggests the optimal send time for each announcement. Higher open rates, without the guesswork.</p>
+              <p className="announcements-inline-101">GymInvite analyses when your members are most active in the app and suggests the optimal send time for each announcement. Higher open rates, without the guesswork.</p>
             </div>
             <div className="announcements-inline-102">
               <Bell size={72} color="rgba(255,255,255,0.6)" />

@@ -224,8 +224,8 @@ const GymDashboard: React.FC<GymDashboardProps> = ({
       {/* Sidebar */}
       <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
         <div className="sidebar-brand">
-          <div className="brand-icon-wrapper gym-dashboard-inline-1">
-            {branding.logoUrl ? <img src={branding.logoUrl} alt={branding.gymName} className="gym-dashboard-inline-2" /> : <img src="/logo.png" alt="Trainix" className="gym-dashboard-inline-3" />}
+          <div className="brand-icon-wrapper gym-dashboard-inline-1" style={{ background: 'none', boxShadow: 'none', padding: 0 }}>
+            {branding.logoUrl ? <img src={branding.logoUrl} alt={branding.gymName} className="gym-dashboard-inline-2" style={{ height: 48, width: 'auto', maxWidth: 80, objectFit: 'contain' }} /> : <img src="/gym_logo.png" alt="GymInvite" className="gym-dashboard-inline-3" style={{ height: 48, width: 'auto', maxWidth: 80, objectFit: 'contain' }} />}
           </div>
           <div>
             <h1 className="brand-name">{branding.gymName.toUpperCase()}</h1>
@@ -286,7 +286,7 @@ const GymDashboard: React.FC<GymDashboardProps> = ({
             <Menu size={24} />
           </button>
           <div className="gym-dashboard-inline-12">
-            {branding.logoUrl ? <img src={branding.logoUrl} alt={branding.gymName} className="gym-dashboard-inline-13" /> : <img src="/logo.png" alt="Logo" className="gym-dashboard-inline-14" />}
+            {branding.logoUrl ? <img src={branding.logoUrl} alt={branding.gymName} className="gym-dashboard-inline-13" /> : <img src="/gym_logo.png" alt="Logo" className="gym-dashboard-inline-14" />}
             <span className="brand-name gym-dashboard-inline-15">{branding.gymName.toUpperCase()}</span>
           </div>
           <div className="gym-dashboard-inline-16" />

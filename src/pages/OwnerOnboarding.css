@@ -22,8 +22,10 @@
 }
 
 .owner-onboarding-inline-4 {
-  width: 32px;
-  height: 32px;
+  height: 40px;
+  width: auto;
+  max-width: 70px;
+  object-fit: contain;
 }
 
 .owner-onboarding-inline-5 {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const screens = [
@@ -24,7 +24,7 @@ export const SoftwareScreenshots: React.FC = () => {
             Built for speed.
           </h2>
           <p className="text-lg text-gray-600">
-            Every screen in Trainix is meticulously designed to give you exactly what you need, exactly when you need it.
+            Every screen in GymInvite is meticulously designed to give you exactly what you need, exactly when you need it.
           </p>
         </div>
 

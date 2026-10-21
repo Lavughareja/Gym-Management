@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { motion } from 'framer-motion';
 import { Fingerprint, ScanFace, QrCode, CreditCard, Cloud, Server, FileBarChart } from 'lucide-react';
 
@@ -10,7 +10,7 @@ export const BiometricSection: React.FC = () => {
           Seamless Biometric Sync.
         </h2>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-20">
-          Connect your fingerprint scanners, facial recognition devices, or RFID readers directly to Trainix. Live attendance syncing with zero manual work.
+          Connect your fingerprint scanners, facial recognition devices, or RFID readers directly to GymInvite. Live attendance syncing with zero manual work.
         </p>
 
         <div className="flex flex-col lg:flex-row items-center justify-center gap-6 lg:gap-12 relative">
@@ -57,7 +57,7 @@ export const BiometricSection: React.FC = () => {
             />
           </div>
 
-          {/* Trainix Node */}
+          {/* GymInvite Node */}
           <div className="w-32 h-32 rounded-3xl bg-dark shadow-2xl flex flex-col items-center justify-center text-white relative z-10">
             <Server size={32} className="mb-2" />
             <span className="font-bold text-sm tracking-widest">GYMCORE</span>

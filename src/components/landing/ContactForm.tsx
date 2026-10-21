@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Send, CheckCircle2 } from 'lucide-react';
 import axiosInstance from '../../axios/axiosInstance'; // Using configured axios instance
@@ -59,7 +59,7 @@ export const ContactForm = () => {
               Ready to scale your gym?
             </h2>
             <p className="text-lg text-gray-400 mb-10 max-w-md">
-              Book a free 30-minute personalized demo with our fitness tech experts. See how Trainix can transform your business.
+              Book a free 30-minute personalized demo with our fitness tech experts. See how GymInvite can transform your business.
             </p>
 
             <div className="space-y-6">

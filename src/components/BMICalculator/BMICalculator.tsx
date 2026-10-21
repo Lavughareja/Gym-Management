@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Download, Calculator, Info, CheckCircle2, X, AlertCircle } from 'lucide-react';
 
 const BMICalculator: React.FC = () => {
@@ -337,7 +337,7 @@ const BMICalculator: React.FC = () => {
             {/* Using #fff for pdf export clarity if body is dark, but normally would use var(--bg-card) */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #e5e7eb', paddingBottom: '20px', marginBottom: '32px' }}>
               <h2 style={{ fontSize: '1.8rem', fontWeight: 800, margin: 0, color: '#111827' }}>Health Report</h2>
-              <img src="/logo.png" alt="Trainix" style={{ height: '40px', objectFit: 'contain' }} />
+              <img src="/gym_logo.png" alt="GymInvite" style={{ height: '40px', objectFit: 'contain' }} />
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '32px', marginBottom: '40px' }}>

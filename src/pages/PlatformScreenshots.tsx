@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { Navbar, Footer } from './Home';
 import { Play, ArrowRight, Monitor, Smartphone, Maximize2, ShieldCheck, Activity, Search } from 'lucide-react';
 import './PlatformScreenshots.css';
@@ -42,7 +42,7 @@ export const PlatformScreenshots: React.FC<{ onBack: () => void }> = ({ onBack }
         <div className="gc-container ps-hero-content">
           <div className="ps-badge">
             <Monitor className="ps-badge-icon" /> 
-            <span>Inside Trainix</span>
+            <span>Inside GymInvite</span>
           </div>
           <h1 className="ps-title">See the Platform in Action</h1>
           <p className="ps-subtitle">
@@ -142,7 +142,7 @@ export const PlatformScreenshots: React.FC<{ onBack: () => void }> = ({ onBack }
           <div className="ps-cta-inner">
             <div className="ps-cta-content">
               <h2>Ready to see it with your own data?</h2>
-              <p>Book a personalized demo and let our experts show you how Trainix can transform your gym operations.</p>
+              <p>Book a personalized demo and let our experts show you how GymInvite can transform your gym operations.</p>
             </div>
             <div className="ps-cta-actions">
               <button className="ps-btn ps-btn-white">Schedule Demo</button>

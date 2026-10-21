@@ -111,9 +111,10 @@ const Login: React.FC = () => {
       </button>
 
       <div className="gym-card login-inline-3">
-        <div className="login-inline-4">
-          <div className="brand-icon-wrapper login-inline-5">
-            {step === 2 && branding.logoUrl ? <img src={branding.logoUrl} alt={branding.gymName} className="login-inline-6" /> : <img src="/logo.png" alt="Trainix Logo" className="login-inline-7" />}
+        <div className="login-inline-4" style={{ textAlign: 'center', marginBottom: 8 }}>
+          <div className="brand-icon-wrapper login-inline-5" style={{ background: 'none', boxShadow: 'none', display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+            {step === 2 && branding.logoUrl ? <img src={branding.logoUrl} alt={branding.gymName} className="login-inline-6" style={{ width: 120, height: 'auto', maxHeight: 75, objectFit: 'contain' }} /> : <img src="/gym_logo.png" alt="GymInvite Logo" className="login-inline-7" style={{ width: 120, height: 'auto', maxHeight: 75, objectFit: 'contain' }} />}
+            {!(step === 2 && branding.logoUrl) && <span style={{ fontWeight: 800, fontSize: '1.25rem', letterSpacing: '-0.02em', color: 'var(--primary)' }}>GymInvite</span>}
           </div>
         </div>
         

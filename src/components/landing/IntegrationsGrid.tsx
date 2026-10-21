@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { motion } from 'framer-motion';
 import { MessageCircle, Mail, CreditCard, Calendar, Video, Fingerprint, FileSpreadsheet, Cloud } from 'lucide-react';
 
@@ -23,7 +23,7 @@ export const IntegrationsGrid: React.FC = () => {
             Plays well with others.
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Connect Trainix with the tools you already use. Powerful integrations make managing your business seamless.
+            Connect GymInvite with the tools you already use. Powerful integrations make managing your business seamless.
           </p>
         </div>
 

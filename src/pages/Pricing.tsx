@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { Check, X, ShieldCheck, HelpCircle, Loader } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../utils/reduxHooks";
 import { createOrderAction, verifySignatureAction } from "../redux/actions/paymentActions";
@@ -227,7 +227,7 @@ export const Pricing: React.FC<PricingProps> = ({
       amount: price * 100,
       // Razorpay expects paise
       currency,
-      name: "Trainix Gym",
+      name: "GymInvite Gym",
       description: `${selectedPlan.name} Membership`,
       order_id: orderId,
       prefill: {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { Navbar, Footer } from './Home';
 import { ArrowRight, CheckCircle2, Cloud, Fingerprint, Calendar, MessageCircle, Video, CreditCard, Mail, Database, Globe } from 'lucide-react';
 import './PlatformIntegrationsPage.css';
@@ -94,7 +94,7 @@ export const PlatformIntegrations: React.FC<{
               Connect the tools you <span className="pi-text-gradient">already use</span>
             </h1>
             <p className="pi-subtitle">
-              Trainix acts as the central nervous system for your gym. Integrate seamlessly with your favorite payment gateways, communication tools, and biometric hardware.
+              GymInvite acts as the central nervous system for your gym. Integrate seamlessly with your favorite payment gateways, communication tools, and biometric hardware.
             </p>
             <div className="pi-hero-actions">
               <button className="pi-btn pi-btn-primary">
@@ -105,7 +105,7 @@ export const PlatformIntegrations: React.FC<{
           </div>
           <div className="pi-hero-visual">
             <div className="pi-connection-graphic">
-              <div className="pi-center-node">Trainix</div>
+              <div className="pi-center-node">GymInvite</div>
               {/* Orbits & Nodes */}
               <div className="pi-orbit pi-orbit-1"></div>
               <div className="pi-orbit pi-orbit-2"></div>
@@ -158,7 +158,7 @@ export const PlatformIntegrations: React.FC<{
           <div className="pi-highlight-box">
             <div className="pi-highlight-content">
               <h2>Plug and Play Biometrics</h2>
-              <p>Don't waste time manual syncing. Trainix securely connects to your local network biometric devices (eSSL, ZKTeco, Matrix) via our lightweight desktop bridge.</p>
+              <p>Don't waste time manual syncing. GymInvite securely connects to your local network biometric devices (eSSL, ZKTeco, Matrix) via our lightweight desktop bridge.</p>
               <ul className="pi-highlight-list">
                 <li><CheckCircle2 color="#10B981" /> Real-time attendance syncing</li>
                 <li><CheckCircle2 color="#10B981" /> Automatic access control for unpaid members</li>
@@ -185,7 +185,7 @@ export const PlatformIntegrations: React.FC<{
           <div className="pi-api-content">
             <Globe className="pi-api-icon" size={48} />
             <h2>Build your own integration</h2>
-            <p>Need something custom? Our robust REST API and Webhooks allow developers to connect Trainix with virtually any software platform.</p>
+            <p>Need something custom? Our robust REST API and Webhooks allow developers to connect GymInvite with virtually any software platform.</p>
             <div className="pi-api-code">
               <code>
                 <span className="code-method">GET</span> /api/v1/members<br />

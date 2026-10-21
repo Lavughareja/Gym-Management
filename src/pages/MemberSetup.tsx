@@ -99,9 +99,10 @@ export const MemberSetup: React.FC = () => {
   }
   return <div className="page-container member-setup-inline-4">
       <div className="gym-card member-setup-inline-5">
-        <div className="member-setup-inline-6">
-          <div className="brand-icon-wrapper member-setup-inline-7">
-            {branding.logoUrl ? <img src={branding.logoUrl} alt={branding.gymName} className="member-setup-inline-8" /> : <img src="/logo.png" alt="Trainix Logo" className="member-setup-inline-9" />}
+        <div className="member-setup-inline-6" style={{ textAlign: 'center', marginBottom: 8 }}>
+          <div className="brand-icon-wrapper member-setup-inline-7" style={{ background: 'none', boxShadow: 'none', display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+            {branding.logoUrl ? <img src={branding.logoUrl} alt={branding.gymName} className="member-setup-inline-8" style={{ width: 120, height: 'auto', maxHeight: 75, objectFit: 'contain' }} /> : <img src="/gym_logo.png" alt="GymInvite Logo" className="member-setup-inline-9" style={{ width: 120, height: 'auto', maxHeight: 75, objectFit: 'contain' }} />}
+            {!branding.logoUrl && <span style={{ fontWeight: 800, fontSize: '1.25rem', letterSpacing: '-0.02em', color: 'var(--primary)' }}>GymInvite</span>}
           </div>
         </div>
         

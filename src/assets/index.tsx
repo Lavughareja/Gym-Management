@@ -1,10 +1,10 @@
-import React from 'react';
+﻿import React from 'react';
 
 export interface IconProps extends React.SVGProps<SVGSVGElement> {
   size?: number | string;
 }
 
-export const TrainixLogo: React.FC<IconProps> = ({ size = 44, className = '', ...props }) => {
+export const GymInviteLogo: React.FC<IconProps> = ({ size = 44, className = '', ...props }) => {
   return (
     <svg
       width={size}

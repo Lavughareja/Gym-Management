@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { X, Plus, Minus, Loader } from "lucide-react";
 import { createAiCreditOrderApi, verifyAiCreditSignatureApi } from "../../services/apis/paymentApis";
 import { useAppDispatch } from "../../utils/reduxHooks";
@@ -71,7 +71,7 @@ export const PurchaseAICreditsModal: React.FC<Props> = ({ onClose, onSuccess, us
         key: import.meta.env.VITE_RAZORPAY_KEY_ID || "YOUR_RAZORPAY_KEY",
         amount: amount.toString(),
         currency,
-        name: "Trainix Gym",
+        name: "GymInvite Gym",
         description: `Purchase ${quantity} AI Credits`,
         order_id: orderId,
         handler: async function (response: any) {

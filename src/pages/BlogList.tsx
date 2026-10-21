@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+﻿import React, { useState, useEffect } from "react";
 import { ArrowLeft, ArrowRight, Loader, BookOpen, Clock, User } from "lucide-react";
 import { fetchPublicBlogsApi } from "../SuperAdmin/services/superAdminApis";
 import { Navbar } from "./Home";
@@ -43,7 +43,7 @@ export const BlogList: React.FC<{
 
         <div className="blog-list-inline-4">
           <h1 className="blog-list-inline-5">
-            Trainix <span className="blog-list-inline-6">Blog</span>
+            GymInvite <span className="blog-list-inline-6">Blog</span>
           </h1>
           <p className="blog-list-inline-7">
             Discover tips, strategies, and industry insights to help you grow your gym and manage your business effectively.

@@ -136,7 +136,7 @@ const steps = [{
 }, {
   num: '04',
   title: 'Manage Everything',
-  desc: 'Sit back and watch your gym run efficiently on autopilot with Trainix.'
+  desc: 'Sit back and watch your gym run efficiently on autopilot with GymInvite.'
 }];
 const integrations = [{
   icon: MessageCircle,
@@ -209,39 +209,39 @@ const testimonials = [{
   name: 'Sarah Jenkins',
   role: 'Owner, Elevate Fitness Studio',
   image: 'https://i.pravatar.cc/150?img=44',
-  text: 'Trainix completely transformed how we run our daily operations. The biometric integration alone saved us hours of manual work every week.',
+  text: 'GymInvite completely transformed how we run our daily operations. The biometric integration alone saved us hours of manual work every week.',
   rating: 5,
   type: 'Fitness Studio'
 }, {
   name: 'Marcus Rodriguez',
   role: 'Head Coach, Iron & Chalk CrossFit',
   image: 'https://i.pravatar.cc/150?img=11',
-  text: 'Moving our 300+ members from spreadsheets to Trainix was seamless. The automated WhatsApp reminders for payments have reduced our outstanding dues by 80%.',
+  text: 'Moving our 300+ members from spreadsheets to GymInvite was seamless. The automated WhatsApp reminders for payments have reduced our outstanding dues by 80%.',
   rating: 5,
   type: 'CrossFit'
 }, {
   name: 'Elena Rostova',
   role: 'Founder, Zen Flow Yoga',
   image: 'https://i.pravatar.cc/150?img=5',
-  text: 'We needed something simple yet powerful for our boutique studio. Trainix\'s beautiful interface and member portal is exactly what our high-end clients expect.',
+  text: 'We needed something simple yet powerful for our boutique studio. GymInvite\'s beautiful interface and member portal is exactly what our high-end clients expect.',
   rating: 5,
   type: 'Yoga Studio'
 }];
 const faqs = [{
-  q: 'How long does it take to set up Trainix?',
+  q: 'How long does it take to set up GymInvite?',
   a: 'Most gyms are fully set up within 24 hours. Our onboarding team will help you import your existing member data, set up your branches, and configure your biometric devices during your first onboarding call.'
 }, {
   q: 'Can I import my existing members from Excel?',
   a: 'Yes! We have a one-click CSV import tool. You can easily migrate all your members, their active plans, and billing history without losing any data.'
 }, {
   q: 'Do you support biometric fingerprint scanners?',
-  a: 'Absolutely. Trainix integrates natively with most popular biometric devices (Fingerprint, Face Recognition, RFID). Attendance is synced to the cloud in real-time.'
+  a: 'Absolutely. GymInvite integrates natively with most popular biometric devices (Fingerprint, Face Recognition, RFID). Attendance is synced to the cloud in real-time.'
 }, {
   q: 'Can I manage multiple branches?',
   a: 'Yes, our Plus, Professional, and Enterprise plans support multi-branch management. You can view consolidated reports or switch between branches with a single click.'
 }, {
   q: 'How do automated WhatsApp notifications work?',
-  a: 'Trainix automatically sends WhatsApp messages for payment reminders, successful renewals, birthday greetings, and attendance alerts. You don\'t have to lift a finger.'
+  a: 'GymInvite automatically sends WhatsApp messages for payment reminders, successful renewals, birthday greetings, and attendance alerts. You don\'t have to lift a finger.'
 }, {
   q: 'Is my data secure in the cloud?',
   a: 'We use bank-level AES-256 encryption. Your data is backed up daily across multiple secure AWS servers, ensuring 99.99% uptime and complete data safety.'
@@ -351,7 +351,7 @@ const resourcesLinks = [{
   href: '/?page=testimonials',
   icon: <Star className="home-inline-22" />,
   title: 'Testimonials',
-  desc: 'What gym owners say about Trainix'
+  desc: 'What gym owners say about GymInvite'
 }, {
   href: '/#faq',
   icon: <MessageSquare className="home-inline-23" />,
@@ -406,10 +406,8 @@ export const Navbar: React.FC<{
         <div className="gc-navbar-inner">
           {/* Logo */}
           <div className="gc-navbar-logo home-inline-25" onClick={() => navigate('/')}>
-            <div className="gc-navbar-logo-icon">
-              <Dumbbell className="home-inline-26" />
-            </div>
-            <span className="gc-navbar-logo-text">Trainix</span>
+            <img src="/gym_logo.png" alt="GymInvite Logo" style={{ height: 44, width: 'auto', maxWidth: 75, objectFit: 'contain' }} />
+            <span className="gc-navbar-logo-text">GymInvite</span>
           </div>
 
           {/* Nav links */}
@@ -508,7 +506,7 @@ const Hero: React.FC = () => {
           <div>
             <div className="gc-hero-badge">
               <span className="gc-hero-badge-dot"></span>
-              Trainix 2.0 is now live
+              GymInvite 2.0 is now live
             </div>
             <h1 className="gc-hero-title">
               Everything Your Gym Needs.<br />
@@ -658,7 +656,7 @@ const Screenshots: React.FC = () => {
       <div className="gc-container">
         <div className="gc-section-head">
           <h2 className="gc-section-title">Designed for clarity.<br /><span>Built for speed.</span></h2>
-          <p className="gc-section-subtitle">Every screen in Trainix is meticulously designed to give you exactly what you need, exactly when you need it.</p>
+          <p className="gc-section-subtitle">Every screen in GymInvite is meticulously designed to give you exactly what you need, exactly when you need it.</p>
         </div>
         <div className="gc-screen-tabs">
           {screenTabs.map((t, i) => <button key={i} className={`gc-screen-tab ${active === i ? 'gc-screen-tab-active' : ''}`} onClick={() => setActive(i)}>{t}</button>)}
@@ -718,7 +716,7 @@ const Comparison: React.FC = () => <section className="gc-compare" id="compare">
     <div className="gc-container">
       <div className="gc-section-head">
         <h2 className="gc-section-title gc-section-title-white">Stop doing it the hard way.</h2>
-        <p className="gc-section-subtitle gc-section-subtitle-white">See why modern gym owners are switching from spreadsheets to Trainix.</p>
+        <p className="gc-section-subtitle gc-section-subtitle-white">See why modern gym owners are switching from spreadsheets to GymInvite.</p>
       </div>
       <div className="gc-compare-grid">
         <div className="gc-compare-card">
@@ -731,7 +729,7 @@ const Comparison: React.FC = () => <section className="gc-compare" id="compare">
         </div>
         <div className="gc-compare-card gc-compare-card-accent">
           <div className="gc-compare-label gc-compare-label-green">
-            <CheckCircle2 className="home-inline-35" /> Using Trainix
+            <CheckCircle2 className="home-inline-35" /> Using GymInvite
           </div>
           <ul className="gc-compare-list gc-compare-list-white">
             {newWay.map((item, i) => <li key={i}><CheckCircle2 className="home-inline-36" /> {item}</li>)}
@@ -746,7 +744,7 @@ const Steps: React.FC = () => <section className="gc-section gc-section-white" i
     <div className="gc-container">
       <div className="gc-section-head">
         <h2 className="gc-section-title">Get started in minutes.</h2>
-        <p className="gc-section-subtitle">Transitioning to Trainix is frictionless. We handle the heavy lifting.</p>
+        <p className="gc-section-subtitle">Transitioning to GymInvite is frictionless. We handle the heavy lifting.</p>
       </div>
       <div className="gc-steps-grid">
         <div className="gc-steps-line"></div>
@@ -764,7 +762,7 @@ const Integrations: React.FC = () => <section className="gc-section gc-section-g
     <div className="gc-container">
       <div className="gc-section-head">
         <h2 className="gc-section-title">Plays well with others.</h2>
-        <p className="gc-section-subtitle">Connect Trainix with the tools you already use. Powerful integrations make managing your business seamless.</p>
+        <p className="gc-section-subtitle">Connect GymInvite with the tools you already use. Powerful integrations make managing your business seamless.</p>
       </div>
       <div className="gc-int-grid">
         {integrations.map((int, i) => <div className="gc-int-card" key={i}>
@@ -928,7 +926,7 @@ const Contact: React.FC = () => {
         <div className="gc-contact-grid">
           <div>
             <h2 className="gc-contact-title">Ready to scale your gym?</h2>
-            <p className="gc-contact-desc">Book a free 30-minute personalized demo with our fitness tech experts. See how Trainix can transform your business.</p>
+            <p className="gc-contact-desc">Book a free 30-minute personalized demo with our fitness tech experts. See how GymInvite can transform your business.</p>
             <div className="gc-contact-points">
               {['Customized walkthrough of the platform', 'Pricing discussion based on your needs', 'Data migration from your current system', 'No commitment required'].map((item, i) => (
                 <div className="gc-contact-point" key={i}>
@@ -995,8 +993,8 @@ export const Footer: React.FC = () => <footer className="gc-footer">
       <div className="gc-footer-top">
         <div>
           <div className="gc-footer-brand-name">
-            <div className="gc-footer-brand-icon"></div>
-            Trainix
+            <img src="/gym_logo.png" alt="GymInvite Logo" style={{ height: 40, width: 'auto', maxWidth: 70, objectFit: 'contain', marginRight: 8 }} />
+            GymInvite
           </div>
           <p className="gc-footer-brand-desc">The modern gym management platform built for fitness businesses that want to grow smarter, not harder.</p>
         </div>
@@ -1020,7 +1018,7 @@ export const Footer: React.FC = () => <footer className="gc-footer">
         </div>
       </div>
       <div className="gc-footer-bottom">
-        <span className="gc-footer-copy">© {new Date().getFullYear()} Trainix. All rights reserved.</span>
+        <span className="gc-footer-copy">© {new Date().getFullYear()} GymInvite. All rights reserved.</span>
         <span className="gc-footer-copy">Built with ❤️ for gym owners worldwide</span>
       </div>
     </div>

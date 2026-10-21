@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { ArrowRight, CheckCircle2, ChevronDown, Wallet, TrendingDown, Receipt, PieChart, Building2, ListOrdered } from 'lucide-react';
 import { Navbar, Footer } from '../Home';
 import "./ExpenseTracking.css";
@@ -28,7 +28,7 @@ const tabs = [{
   label: "Profit Dashboard",
   sub: "Revenue vs Expenses",
   title: "Know your true bottom line.",
-  desc: "Trainix automatically subtracts your logged expenses from your membership revenue, giving you a real-time view of your actual net profit for the day, week, or month.",
+  desc: "GymInvite automatically subtracts your logged expenses from your membership revenue, giving you a real-time view of your actual net profit for the day, week, or month.",
   bullets: ["Real-time P&L calculation", "Visual breakdown charts", "Compare month-over-month"]
 }, {
   label: "Staff Approvals",

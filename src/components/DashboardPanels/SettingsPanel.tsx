@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+﻿import React, { useEffect, useState, useRef } from "react";
 import { Plus, X, Laptop, ShieldCheck, Wifi, MapPin, Loader, Image, Copy, Check } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../utils/reduxHooks";
 import { useSelector } from "react-redux";
@@ -87,7 +87,7 @@ const SettingsPanel: React.FC<Props> = ({ gymName }) => {
       }
 
       const options = {
-        key: 'rzp_test_StgMX0peQZajFc',
+        key: res.data.key || import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_StgMX0peQZajFc',
         amount: order.amount,
         currency: order.currency,
         name: branding.gymName,
@@ -594,7 +594,7 @@ const SettingsPanel: React.FC<Props> = ({ gymName }) => {
             </div>
             {subdomainStatus === "available" && <p style={{ fontSize: "0.8rem", color: "#16a34a", marginTop: 4 }}>Available</p>}
             {subdomainStatus === "taken" && <p style={{ fontSize: "0.8rem", color: "#dc2626", marginTop: 4 }}>Already taken</p>}
-            <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: 4 }}>{brandingForm.subdomain ? `${brandingForm.subdomain}.trainix.com` : "yourname.trainix.com"}</p>
+            <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: 4 }}>{brandingForm.subdomain ? `${brandingForm.subdomain}.GymInvite.com` : "yourname.GymInvite.com"}</p>
           </div>
 
           {/* Primary Color */}

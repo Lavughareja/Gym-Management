@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { ArrowRight, CheckCircle2, ChevronDown, Target, Magnet, MessageSquare, PhoneCall, UserPlus, TrendingUp, Filter, Calendar } from 'lucide-react';
 import { Navbar, Footer } from '../Home';
 import "./CRMLeads.css";
@@ -26,7 +26,7 @@ const tabs = [{
   label: "Lead Capture",
   sub: "Never lose a prospect",
   title: "Capture every inquiry instantly.",
-  desc: "Whether they walk in, call, or fill out a web form, log the lead in Trainix in 10 seconds. Tag the source (Instagram, Walk-in, Referral) so you know exactly where your best customers come from.",
+  desc: "Whether they walk in, call, or fill out a web form, log the lead in GymInvite in 10 seconds. Tag the source (Instagram, Walk-in, Referral) so you know exactly where your best customers come from.",
   bullets: ["Quick-add lead form", "Lead source tracking", "Auto-assign to sales staff"]
 }, {
   label: "Follow-ups",
@@ -44,7 +44,7 @@ const tabs = [{
 const scenarios = [{
   icon: <MessageSquare size={22} color="#0284c7" />,
   title: "Lead says 'Call me on Friday'",
-  desc: "You log the lead, add a note 'Interested in PT', and schedule a follow-up for Friday at 11 AM. On Friday morning, Trainix reminds you to call."
+  desc: "You log the lead, add a note 'Interested in PT', and schedule a follow-up for Friday at 11 AM. On Friday morning, GymInvite reminds you to call."
 }, {
   icon: <UserPlus size={22} color="#16a34a" />,
   title: "1-Click conversion to member",
@@ -68,7 +68,7 @@ const scenarios = [{
 }];
 const faqs = [{
   q: "Can I connect my Facebook/Instagram ads directly?",
-  a: "Yes! Using our Zapier integration or webhooks, leads generated from Meta ads can automatically flow into your Trainix CRM in real-time."
+  a: "Yes! Using our Zapier integration or webhooks, leads generated from Meta ads can automatically flow into your GymInvite CRM in real-time."
 }, {
   q: "How does the system remind staff to follow up?",
   a: "Staff have a 'Today's Tasks' dashboard. Any scheduled follow-up calls or trials for that day appear there automatically."

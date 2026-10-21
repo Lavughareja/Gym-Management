@@ -1,11 +1,11 @@
-import React from 'react';
+﻿import React from 'react';
 import { motion } from 'framer-motion';
 
 const steps = [
   { num: '01', title: 'Book Demo', desc: 'Schedule a personalized walkthrough of the platform with our fitness tech experts.' },
   { num: '02', title: 'Create Gym', desc: 'Set up your branches, define membership plans, and configure your dashboard.' },
   { num: '03', title: 'Add Members', desc: 'Import your existing members via CSV or start adding them one by one.' },
-  { num: '04', title: 'Manage Everything', desc: 'Sit back and watch your gym run efficiently on autopilot with Trainix.' },
+  { num: '04', title: 'Manage Everything', desc: 'Sit back and watch your gym run efficiently on autopilot with GymInvite.' },
 ];
 
 export const StepsSection: React.FC = () => {
@@ -17,7 +17,7 @@ export const StepsSection: React.FC = () => {
             Get started in minutes.
           </h2>
           <p className="text-lg text-gray-600">
-            Transitioning to Trainix is frictionless. We handle the heavy lifting.
+            Transitioning to GymInvite is frictionless. We handle the heavy lifting.
           </p>
         </div>
 

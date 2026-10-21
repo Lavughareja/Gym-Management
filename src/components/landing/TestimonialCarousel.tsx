@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, ChevronLeft, ChevronRight, Quote } from 'lucide-react';
 
@@ -8,7 +8,7 @@ const testimonials = [
     name: "Sarah Jenkins",
     role: "Owner, Elevate Fitness Studio",
     image: "https://i.pravatar.cc/150?img=44",
-    text: "Trainix completely transformed how we run our daily operations. The biometric integration alone saved us hours of manual work every week. It's the most polished software we've ever used.",
+    text: "GymInvite completely transformed how we run our daily operations. The biometric integration alone saved us hours of manual work every week. It's the most polished software we've ever used.",
     rating: 5,
     type: "Fitness Studio"
   },
@@ -17,7 +17,7 @@ const testimonials = [
     name: "Marcus Rodriguez",
     role: "Head Coach, Iron & Chalk CrossFit",
     image: "https://i.pravatar.cc/150?img=11",
-    text: "Moving our 300+ members from spreadsheets to Trainix was seamless. The automated WhatsApp reminders for payments have reduced our outstanding dues by 80%. Highly recommended.",
+    text: "Moving our 300+ members from spreadsheets to GymInvite was seamless. The automated WhatsApp reminders for payments have reduced our outstanding dues by 80%. Highly recommended.",
     rating: 5,
     type: "CrossFit"
   },
@@ -26,7 +26,7 @@ const testimonials = [
     name: "Elena Rostova",
     role: "Founder, Zen Flow Yoga",
     image: "https://i.pravatar.cc/150?img=5",
-    text: "We needed something simple yet powerful for our boutique studio. Trainix's beautiful interface and member portal is exactly what our high-end clients expect.",
+    text: "We needed something simple yet powerful for our boutique studio. GymInvite's beautiful interface and member portal is exactly what our high-end clients expect.",
     rating: 5,
     type: "Yoga Studio"
   }

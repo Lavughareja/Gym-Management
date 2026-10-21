@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { ArrowRight, CheckCircle2, ChevronDown, LineChart, PieChart, Activity, TrendingUp, BarChart3, Presentation } from 'lucide-react';
 import { Navbar, Footer } from '../Home';
 import "./AnalyticsReports.css";
@@ -61,7 +61,7 @@ const faqs = [{
   a: "Yes, you can set monthly targets for Revenue, New Members, and Retention, and track your progress visually."
 }, {
   q: "Is there a limit to how far back I can view data?",
-  a: "No, Trainix stores your historical data indefinitely, allowing you to run Year-over-Year (YoY) comparisons effortlessly."
+  a: "No, GymInvite stores your historical data indefinitely, allowing you to run Year-over-Year (YoY) comparisons effortlessly."
 }];
 export const AnalyticsReports: React.FC<AnalyticsReportsProps> = ({
   onBack

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { ArrowRight, CheckCircle2, ChevronDown, Fingerprint, ScanFace, QrCode, ShieldCheck, UserX, Clock, Database, Smartphone, Shield } from 'lucide-react';
 import { Navbar, Footer } from '../Home';
 import "./BiometricQR.css";
@@ -26,13 +26,13 @@ const tabs = [{
   label: "QR Code Entry",
   sub: "Zero hardware cost",
   title: "Dynamic QR codes on the Member App.",
-  desc: "Members simply open their Trainix app, scan the dynamic QR code at the reception tablet or turnstile, and walk right in. The code refreshes every 10 seconds to prevent screenshot sharing.",
+  desc: "Members simply open their GymInvite app, scan the dynamic QR code at the reception tablet or turnstile, and walk right in. The code refreshes every 10 seconds to prevent screenshot sharing.",
   bullets: ["No physical cards required", "Anti-screenshot protection", "Real-time subscription check"]
 }, {
   label: "Face Recognition",
   sub: "Frictionless access",
   title: "Walk in without slowing down.",
-  desc: "Integrate with top-tier face recognition terminals. The camera scans the member's face, verifies their active status in Trainix, and opens the door in under 0.3 seconds.",
+  desc: "Integrate with top-tier face recognition terminals. The camera scans the member's face, verifies their active status in GymInvite, and opens the door in under 0.3 seconds.",
   bullets: ["Zero touch entry", "Eliminates buddy-punching", "Fastest check-in method"]
 }, {
   label: "Fingerprint Biometrics",
@@ -52,7 +52,7 @@ const scenarios = [{
 }, {
   icon: <Smartphone size={22} color="#d946ef" />,
   title: "Lost RFID Card",
-  desc: "Member lost their card? No need to charge them for a new one. They just use the Trainix mobile app QR scanner to get in."
+  desc: "Member lost their card? No need to charge them for a new one. They just use the GymInvite mobile app QR scanner to get in."
 }];
 const faqs = [{
   q: "Which biometric machines do you support?",
@@ -62,10 +62,10 @@ const faqs = [{
   a: "Yes! You can simply place an iPad or Android tablet at the reception desk showing the 'QR Scanner Mode'. Members scan their phones against the tablet camera to check in."
 }, {
   q: "What happens if the internet goes down?",
-  a: "Our supported biometric devices have local memory. They will continue to allow active members in based on the last sync, and push the attendance logs to Trainix once the internet is restored."
+  a: "Our supported biometric devices have local memory. They will continue to allow active members in based on the last sync, and push the attendance logs to GymInvite once the internet is restored."
 }, {
   q: "Do QR codes prevent screenshot sharing?",
-  a: "Yes. The QR code in the Trainix Member App is dynamic and refreshes every few seconds. A screenshot sent to a friend will be invalid by the time they try to use it."
+  a: "Yes. The QR code in the GymInvite Member App is dynamic and refreshes every few seconds. A screenshot sent to a friend will be invalid by the time they try to use it."
 }];
 export const BiometricQR: React.FC<BiometricQRProps> = ({
   onBack
@@ -299,7 +299,7 @@ export const BiometricQR: React.FC<BiometricQRProps> = ({
           <h2 style={{
           letterSpacing: -1.5
         }} className="biometric-qr-inline-87">Stop revenue leakage at the door.</h2>
-          <p className="biometric-qr-inline-88">Upgrade your access control with Trainix and ensure only paying members step onto the gym floor.</p>
+          <p className="biometric-qr-inline-88">Upgrade your access control with GymInvite and ensure only paying members step onto the gym floor.</p>
           <div className="biometric-qr-inline-89">
             <button className="biometric-qr-inline-90">
               Start Free Trial <ArrowRight size={17} className="biometric-qr-inline-91" />

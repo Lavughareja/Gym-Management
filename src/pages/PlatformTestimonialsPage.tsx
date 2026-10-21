@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+﻿import React, { useEffect } from 'react';
 import { Navbar, Footer } from './Home';
 import { Star, Play, Quote, TrendingUp, Users, ShieldCheck, Heart } from 'lucide-react';
 import './PlatformTestimonialsPage.css';
@@ -6,12 +6,12 @@ import './PlatformTestimonialsPage.css';
 const LOGOS = ['GoldsGym', 'AnytimeFit', 'CrossFit', 'Equinox', 'F45', 'Barry\'s', 'SnapFitness', 'Crunch'];
 
 const TESTIMONIALS = [
-  { id: 1, name: 'Sarah Jenkins', role: 'Owner, Elevate Studio', img: 'https://i.pravatar.cc/150?img=44', rating: 5, text: 'Trainix completely transformed how we run our daily operations. The biometric integration alone saved us hours of manual work every week. Our revenue increased by 30% in the first quarter.', type: 'Fitness Studio' },
-  { id: 2, name: 'Marcus Rodriguez', role: 'Head Coach, Iron & Chalk', img: 'https://i.pravatar.cc/150?img=11', rating: 5, text: 'Moving our 300+ members from spreadsheets to Trainix was seamless. The automated WhatsApp reminders for payments have reduced our outstanding dues by 80%. Highly recommended for any serious gym owner.', type: 'CrossFit' },
-  { id: 3, name: 'Elena Rostova', role: 'Founder, Zen Flow', img: 'https://i.pravatar.cc/150?img=5', rating: 5, text: 'We needed something simple yet powerful for our boutique studio. Trainix\'s beautiful interface and member portal is exactly what our high-end clients expect. The analytics dashboard is a game changer.', type: 'Yoga Studio' },
-  { id: 4, name: 'David Chen', role: 'Manager, Peak Performance', img: 'https://i.pravatar.cc/150?img=33', rating: 4, text: 'The trainer management module makes commission calculations so easy. Before Trainix, it was a nightmare. Now, payouts are done in a click.', type: 'Commercial Gym' },
+  { id: 1, name: 'Sarah Jenkins', role: 'Owner, Elevate Studio', img: 'https://i.pravatar.cc/150?img=44', rating: 5, text: 'GymInvite completely transformed how we run our daily operations. The biometric integration alone saved us hours of manual work every week. Our revenue increased by 30% in the first quarter.', type: 'Fitness Studio' },
+  { id: 2, name: 'Marcus Rodriguez', role: 'Head Coach, Iron & Chalk', img: 'https://i.pravatar.cc/150?img=11', rating: 5, text: 'Moving our 300+ members from spreadsheets to GymInvite was seamless. The automated WhatsApp reminders for payments have reduced our outstanding dues by 80%. Highly recommended for any serious gym owner.', type: 'CrossFit' },
+  { id: 3, name: 'Elena Rostova', role: 'Founder, Zen Flow', img: 'https://i.pravatar.cc/150?img=5', rating: 5, text: 'We needed something simple yet powerful for our boutique studio. GymInvite\'s beautiful interface and member portal is exactly what our high-end clients expect. The analytics dashboard is a game changer.', type: 'Yoga Studio' },
+  { id: 4, name: 'David Chen', role: 'Manager, Peak Performance', img: 'https://i.pravatar.cc/150?img=33', rating: 4, text: 'The trainer management module makes commission calculations so easy. Before GymInvite, it was a nightmare. Now, payouts are done in a click.', type: 'Commercial Gym' },
   { id: 5, name: 'Priya Sharma', role: 'Owner, FitLife', img: 'https://i.pravatar.cc/150?img=49', rating: 5, text: 'I love how easy it is to communicate with members via the broadcast feature. The mobile app experience is flawless, and support is incredibly responsive!', type: 'Gym Network' },
-  { id: 6, name: 'James Wilson', role: 'Director, MuscleFactory', img: 'https://i.pravatar.cc/150?img=14', rating: 5, text: 'Managing 5 branches used to be chaotic. With Trainix, I get a consolidated view of all my businesses on one dashboard. I can finally sleep peacefully knowing everything is tracked.', type: 'Franchise' },
+  { id: 6, name: 'James Wilson', role: 'Director, MuscleFactory', img: 'https://i.pravatar.cc/150?img=14', rating: 5, text: 'Managing 5 branches used to be chaotic. With GymInvite, I get a consolidated view of all my businesses on one dashboard. I can finally sleep peacefully knowing everything is tracked.', type: 'Franchise' },
 ];
 
 export const PlatformTestimonials: React.FC<{ onBack: () => void }> = ({ onBack }) => {
@@ -36,7 +36,7 @@ export const PlatformTestimonials: React.FC<{ onBack: () => void }> = ({ onBack 
             <span className="ptest-gradient-text">fastest growing gyms</span>
           </h1>
           <p className="ptest-subtitle">
-            Don't just take our word for it. Hear from thousands of gym owners, managers, and personal trainers who use Trainix to scale their businesses.
+            Don't just take our word for it. Hear from thousands of gym owners, managers, and personal trainers who use GymInvite to scale their businesses.
           </p>
           
           <div className="ptest-hero-stats">
@@ -79,7 +79,7 @@ export const PlatformTestimonials: React.FC<{ onBack: () => void }> = ({ onBack 
             </div>
             <div className="ptest-video-content">
               <Quote size={40} className="ptest-quote-icon" />
-              <h3>"Trainix didn't just save us time; it actively helped us increase our member retention by 40% in just six months."</h3>
+              <h3>"GymInvite didn't just save us time; it actively helped us increase our member retention by 40% in just six months."</h3>
               <div className="ptest-video-author">
                 <img src="https://i.pravatar.cc/150?img=68" alt="Author" />
                 <div>
@@ -130,7 +130,7 @@ export const PlatformTestimonials: React.FC<{ onBack: () => void }> = ({ onBack 
             <div className="ptest-metric-card">
               <TrendingUp size={32} className="ptest-metric-icon" />
               <h3>+40% Revenue</h3>
-              <p>Average revenue increase reported by gyms within their first year of using Trainix billing automations.</p>
+              <p>Average revenue increase reported by gyms within their first year of using GymInvite billing automations.</p>
             </div>
             <div className="ptest-metric-card">
               <Users size={32} className="ptest-metric-icon" />

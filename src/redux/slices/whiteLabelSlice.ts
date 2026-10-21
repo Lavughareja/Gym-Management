@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+﻿import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { resolveWhiteLabelBySubdomain } from '../../services/apis/whiteLabelApis';
 
@@ -29,7 +29,7 @@ interface WhiteLabelState {
 
 const DEFAULT_BRANDING: GymBranding = {
   gymId:          null,
-  gymName:        'Trainix',
+  gymName:        'GymInvite',
   logoUrl:        null,
   primaryColor:   '#2563eb',
   secondaryColor: '#1d4ed8',
@@ -108,7 +108,7 @@ const whiteLabelSlice = createSlice({
       .addCase(resolveWhiteLabelAction.rejected, (state) => {
         state.loading  = false;
         state.resolved = true;
-        // Keep default Trainix branding on failure
+        // Keep default GymInvite branding on failure
       });
   },
 });

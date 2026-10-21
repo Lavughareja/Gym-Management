@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { ArrowRight, CheckCircle2, ChevronDown, CreditCard, Clock, BellRing, Smartphone, ShieldCheck, Banknote } from 'lucide-react';
 import { Navbar, Footer } from '../Home';
 import "./PaymentTracking.css";
@@ -22,7 +22,7 @@ const tabs = [{
   label: "Auto Reminders",
   sub: "Set it and forget it",
   title: "Never chase a payment again.",
-  desc: "Trainix automatically sends WhatsApp and Push Notification reminders to members 3 days before expiry, on the day of expiry, and post-expiry, completely removing the awkwardness of asking for money.",
+  desc: "GymInvite automatically sends WhatsApp and Push Notification reminders to members 3 days before expiry, on the day of expiry, and post-expiry, completely removing the awkwardness of asking for money.",
   bullets: ["WhatsApp Integration", "Customizable message templates", "Multi-stage reminder logic"]
 }, {
   label: "Pending Dues",
@@ -44,24 +44,24 @@ const scenarios = [{
 }, {
   icon: <Banknote size={22} color="#10b981" />,
   title: "Partial Cash Payment",
-  desc: "A student wants to pay half their yearly fee in cash today, and the rest next month. You easily log a partial payment, and Trainix automatically schedules a reminder for the balance."
+  desc: "A student wants to pay half their yearly fee in cash today, and the rest next month. You easily log a partial payment, and GymInvite automatically schedules a reminder for the balance."
 }, {
   icon: <CreditCard size={22} color="#059669" />,
   title: "Turnstile Lockout",
-  desc: "A member who is 5 days overdue tries to scan their QR code at the door. Trainix gently blocks entry and prompts them to pay their pending balance right there on their phone."
+  desc: "A member who is 5 days overdue tries to scan their QR code at the door. GymInvite gently blocks entry and prompts them to pay their pending balance right there on their phone."
 }];
 const faqs = [{
   q: "Can I log manual cash payments?",
   a: "Yes, you can easily log cash, cheque, or external bank transfers. The system will instantly generate a digital receipt for the member."
 }, {
-  q: "Does Trainix take a cut of my online payments?",
-  a: "No! Trainix charges zero transaction fees. You only pay the standard processing fees of your payment gateway (e.g., Stripe or Razorpay)."
+  q: "Does GymInvite take a cut of my online payments?",
+  a: "No! GymInvite charges zero transaction fees. You only pay the standard processing fees of your payment gateway (e.g., Stripe or Razorpay)."
 }, {
   q: "Are the WhatsApp messages sent from my own number?",
   a: "Yes, we integrate with the official WhatsApp Cloud API so messages are branded with your gym's name and number."
 }, {
   q: "Can I track post-dated cheques?",
-  a: "Yes, you can log post-dated cheques and set their clearance dates. Trainix will remind you to deposit them on the correct day."
+  a: "Yes, you can log post-dated cheques and set their clearance dates. GymInvite will remind you to deposit them on the correct day."
 }];
 export const PaymentTracking: React.FC<PaymentTrackingProps> = ({
   onBack
@@ -346,7 +346,7 @@ export const PaymentTracking: React.FC<PaymentTrackingProps> = ({
           <h2 style={{
           letterSpacing: -1.5
         }} className="payment-tracking-inline-110">Take control of your cashflow.</h2>
-          <p className="payment-tracking-inline-111">Stop chasing members for payments and let Trainix handle the heavy lifting of billing and collections.</p>
+          <p className="payment-tracking-inline-111">Stop chasing members for payments and let GymInvite handle the heavy lifting of billing and collections.</p>
           <div className="payment-tracking-inline-112">
             <button className="payment-tracking-inline-113">
               Start Free Trial <ArrowRight size={17} className="payment-tracking-inline-114" />

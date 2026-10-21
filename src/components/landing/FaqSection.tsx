@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
 export const FaqSection: React.FC = () => {
@@ -11,7 +11,7 @@ export const FaqSection: React.FC = () => {
     },
     {
       question: 'Can I import my existing members?',
-      answer: 'Absolutely. We provide a simple Excel/CSV import tool to bring all your members and their active plans into Trainix in seconds.'
+      answer: 'Absolutely. We provide a simple Excel/CSV import tool to bring all your members and their active plans into GymInvite in seconds.'
     },
     {
       question: 'Do you support multi-location gyms?',

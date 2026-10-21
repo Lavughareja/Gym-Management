@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { ArrowRight, CheckCircle2, ChevronDown, LineChart, Calculator, Scale, Camera, TrendingUp, Apple, Utensils } from 'lucide-react';
 import { Navbar, Footer } from '../Home';
 import "./BMIMacroReports.css";
@@ -22,13 +22,13 @@ const tabs = [{
   label: "Body Metrics",
   sub: "Track everything",
   title: "A complete picture of their health.",
-  desc: "Log weight, body fat percentage, muscle mass, and detailed circumferences (chest, arms, waist). Trainix automatically graphs these over time so members can visually see their transformation.",
+  desc: "Log weight, body fat percentage, muscle mass, and detailed circumferences (chest, arms, waist). GymInvite automatically graphs these over time so members can visually see their transformation.",
   bullets: ["Visual progress charts", "Fat vs Muscle analysis", "Automated BMI calculation"]
 }, {
   label: "Progress Photos",
   sub: "See the change",
   title: "Before and After, organized.",
-  desc: "Members or trainers can snap front, back, and side profile photos. Trainix stores them chronologically with date overlays, making it incredibly easy to generate side-by-side comparison graphics.",
+  desc: "Members or trainers can snap front, back, and side profile photos. GymInvite stores them chronologically with date overlays, making it incredibly easy to generate side-by-side comparison graphics.",
   bullets: ["Secure chronological storage", "1-click comparison collages", "Great for social media testimonials"]
 }, {
   label: "Macro Tracking",
@@ -55,7 +55,7 @@ const faqs = [{
   a: "Yes, members can input their own weight and measurements via their app. However, trainers can lock this feature so that only official gym staff can enter verified data."
 }, {
   q: "Does it integrate with smart scales (like InBody)?",
-  a: "Yes! Trainix can import CSV exports from major smart scale brands like InBody and Tanita, automatically populating the member's profile with extreme detail."
+  a: "Yes! GymInvite can import CSV exports from major smart scale brands like InBody and Tanita, automatically populating the member's profile with extreme detail."
 }, {
   q: "Are the progress photos private?",
   a: "Absolutely. Privacy is our top priority. Progress photos are encrypted and only accessible by the member and their assigned personal trainer."

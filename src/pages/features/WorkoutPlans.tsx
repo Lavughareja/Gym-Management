@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { ArrowRight, CheckCircle2, ChevronDown, Dumbbell, ClipboardList, Target, CalendarRange, Flame, Activity, ListChecks } from 'lucide-react';
 import { Navbar, Footer } from '../Home';
 import "./WorkoutPlans.css";
@@ -61,7 +61,7 @@ const faqs = [{
   a: "Yes, you can create a 12-week program and put it behind a paywall. Members can purchase it directly through the app, unlocking a new revenue stream for your gym."
 }, {
   q: "Is the exercise database customizable?",
-  a: "Trainix comes with 500+ built-in exercises, but you can add your own custom movements, complete with your own video demonstrations."
+  a: "GymInvite comes with 500+ built-in exercises, but you can add your own custom movements, complete with your own video demonstrations."
 }];
 export const WorkoutPlans: React.FC<WorkoutPlansProps> = ({
   onBack

@@ -41,9 +41,10 @@ const ResetPassword: React.FC = () => {
   };
   return <div className="reset-password-inline-1">
       <div className="gym-card reset-password-inline-2">
-        <div className="reset-password-inline-3">
-          <div className="brand-icon-wrapper reset-password-inline-4">
-            <img src="/logo.png" alt="Trainix Logo" className="reset-password-inline-5" />
+        <div className="reset-password-inline-3" style={{ textAlign: 'center', marginBottom: 8 }}>
+          <div className="brand-icon-wrapper reset-password-inline-4" style={{ background: 'none', boxShadow: 'none', display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+            <img src="/gym_logo.png" alt="GymInvite Logo" className="reset-password-inline-5" style={{ width: 120, height: 'auto', maxHeight: 75, objectFit: 'contain' }} />
+            <span style={{ fontWeight: 800, fontSize: '1.25rem', letterSpacing: '-0.02em', color: 'var(--primary)' }}>GymInvite</span>
           </div>
         </div>
 

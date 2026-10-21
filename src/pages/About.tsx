@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Award, Compass, Users, Calendar, Dumbbell } from 'lucide-react';
 import "./About.css";
 interface GymZone {
@@ -95,9 +95,9 @@ export const About: React.FC = () => {
       {/* Philosophy and Facility Info */}
       <div className="about-grid">
         <div className="about-content">
-          <h3>The Trainix Philosophy</h3>
+          <h3>The GymInvite Philosophy</h3>
           <p>
-            Established in 2018, Trainix was founded on the idea that high-quality fitness coaching should be supported by professional-grade equipment. We strip away the gimmicks of corporate clubs to focus entirely on results-driven strength, cardiovascular endurance, and recovery.
+            Established in 2018, GymInvite was founded on the idea that high-quality fitness coaching should be supported by professional-grade equipment. We strip away the gimmicks of corporate clubs to focus entirely on results-driven strength, cardiovascular endurance, and recovery.
           </p>
           
           <div className="about-inline-2">

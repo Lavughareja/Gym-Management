@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { motion } from 'framer-motion';
 import { XCircle, CheckCircle2 } from 'lucide-react';
 
@@ -30,7 +30,7 @@ export const ComparisonSection: React.FC = () => {
             Stop doing it the hard way.
           </h2>
           <p className="text-lg text-gray-400">
-            See why modern gym owners are switching from spreadsheets to Trainix.
+            See why modern gym owners are switching from spreadsheets to GymInvite.
           </p>
         </div>
 
@@ -66,7 +66,7 @@ export const ComparisonSection: React.FC = () => {
             {/* Glow effect inside card */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 blur-3xl rounded-full translate-x-1/2 -translate-y-1/2"></div>
 
-            <div className="text-primary font-semibold tracking-wider uppercase mb-8 text-sm relative z-10">Using Trainix</div>
+            <div className="text-primary font-semibold tracking-wider uppercase mb-8 text-sm relative z-10">Using GymInvite</div>
             <ul className="space-y-6 relative z-10">
               {newWay.map((item, i) => (
                 <li key={i} className="flex items-start gap-4 text-white">

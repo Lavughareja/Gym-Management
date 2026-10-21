@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { ArrowRight, CheckCircle2, ChevronDown, FileText, Send, Printer, Download, FileDigit, Smartphone } from 'lucide-react';
 import { Navbar, Footer } from '../Home';
 import "./InvoicesBilling.css";
@@ -22,7 +22,7 @@ const tabs = [{
   label: "Auto-Invoicing",
   sub: "Generated instantly",
   title: "Professional invoices, zero effort.",
-  desc: "Every time a member makes a payment (online or offline), Trainix instantly generates a beautiful, branded PDF invoice complete with your gym's logo and tax details.",
+  desc: "Every time a member makes a payment (online or offline), GymInvite instantly generates a beautiful, branded PDF invoice complete with your gym's logo and tax details.",
   bullets: ["Auto-emailed to members", "Branded PDF generation", "Tax-compliant formatting"]
 }, {
   label: "Digital Records",

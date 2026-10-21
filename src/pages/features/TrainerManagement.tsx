@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { ArrowLeft, ArrowRight, CheckCircle2, ChevronDown, DollarSign, Calendar, BarChart2, Users, Clock, Star, Clipboard, Smartphone, TrendingUp, Zap, ShieldCheck, Award } from 'lucide-react';
 import { Navbar, Footer } from '../Home';
 import "./TrainerManagement.css";
@@ -28,7 +28,7 @@ const tabs = [{
   label: "Payouts",
   sub: "Auto commission engine",
   title: "Accurate payouts. Zero arguments.",
-  desc: "Define each trainer's commission structure once — fixed salary, revenue share, or per-session fees. Trainix auto-calculates payouts every month based on actual sessions logged, PT renewals, and attendance data.",
+  desc: "Define each trainer's commission structure once — fixed salary, revenue share, or per-session fees. GymInvite auto-calculates payouts every month based on actual sessions logged, PT renewals, and attendance data.",
   bullets: ["Fixed, % share, or hybrid commission models", "Salary slips auto-generated as PDF", "Payout history visible to trainer in their app"]
 }, {
   label: "Scheduling",
@@ -95,7 +95,7 @@ const faqs = [{
   a: "You can bulk-reassign all their active members to one or more trainers in a single action. Members are notified automatically over WhatsApp."
 }, {
   q: "Is the trainer app a separate download?",
-  a: "No. Trainers use the same Trainix mobile app with a trainer-specific view. There is nothing additional to install or configure."
+  a: "No. Trainers use the same GymInvite mobile app with a trainer-specific view. There is nothing additional to install or configure."
 }];
 
 /* ─── component ───────────────────────────────────── */

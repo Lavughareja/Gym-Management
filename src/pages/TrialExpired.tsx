@@ -3,6 +3,7 @@ import { AlertCircle, CheckCircle2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { AxiosInstance } from '../axios/axiosInstance';
 import { AUTH_TOKEN_KEY } from '../utils/constant';
+import { loadRazorpay } from '../utils/razorpayUtils';
 import './TrialExpired.css';
 
 const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID || '';
@@ -75,11 +76,46 @@ const TrialExpired: React.FC = () => {
     try {
       // Step 1: Create upgrade order
       const res = await AxiosInstance.post('/payment/upgrade-order', { plan: plan.id });
-      const { order } = res.data;
+      const { order, isMock, key } = res.data;
 
-      // Step 2: Open Razorpay checkout
+      // Handle Mock Mode directly
+      if (isMock) {
+        await AxiosInstance.post('/payment/verify-upgrade', {
+          razorpayOrderId: order.orderId,
+          razorpayPaymentId: 'pay_mock_' + Date.now(),
+          razorpaySignature: 'sig_mock_' + Date.now(),
+        });
+
+        try {
+          const profileRes = await AxiosInstance.get('/auth/me');
+          const updatedUser = profileRes.data?.user || profileRes.data;
+          if (updatedUser) {
+            const stored = localStorage.getItem('dashUser');
+            const parsed = stored ? JSON.parse(stored) : {};
+            localStorage.setItem('dashUser', JSON.stringify({ ...parsed, ...updatedUser }));
+          }
+        } catch {
+          // non-fatal
+        }
+
+        setSuccess('Plan upgraded successfully! Redirecting to dashboard...');
+        setTimeout(() => navigate('/dashboard/overview'), 2000);
+        return;
+      }
+
+      // Step 2: Ensure Razorpay SDK is loaded
+      const isLoaded = await loadRazorpay();
+      if (!isLoaded || !(window as any).Razorpay) {
+        setError('Payment gateway failed to load. Please check your internet connection.');
+        setLoadingPlan(null);
+        return;
+      }
+
+      const razorpayKey = key || RAZORPAY_KEY_ID || 'rzp_test_StgMX0peQZajFc';
+
+      // Step 3: Open Razorpay checkout
       const options = {
-        key: RAZORPAY_KEY_ID,
+        key: razorpayKey,
         amount: order.amount,
         currency: order.currency || 'INR',
         order_id: order.orderId,
@@ -87,7 +123,7 @@ const TrialExpired: React.FC = () => {
         description: `${plan.name} Plan - Monthly`,
         prefill: { email: order.email || '' },
         handler: async (response: any) => {
-          // Step 3: Verify payment
+          // Step 4: Verify payment
           try {
             await AxiosInstance.post('/payment/verify-upgrade', {
               razorpayOrderId: response.razorpay_order_id,
@@ -112,6 +148,7 @@ const TrialExpired: React.FC = () => {
             setTimeout(() => navigate('/dashboard/overview'), 2000);
           } catch (err: any) {
             setError(err?.response?.data?.message || 'Payment verification failed. Please contact support.');
+            setLoadingPlan(null);
           }
         },
         modal: {
@@ -121,13 +158,13 @@ const TrialExpired: React.FC = () => {
       };
 
       const rzp = new (window as any).Razorpay(options);
-      rzp.on('payment.failed', () => {
-        setError('Payment failed. Please try again.');
+      rzp.on('payment.failed', (resp: any) => {
+        setError(resp?.error?.description || 'Payment failed. Please try again.');
         setLoadingPlan(null);
       });
       rzp.open();
     } catch (err: any) {
-      setError(err?.response?.data?.message || 'Failed to initiate payment. Please try again.');
+      setError(err?.response?.data?.message || err?.message || 'Failed to initiate payment. Please try again.');
       setLoadingPlan(null);
     }
   };

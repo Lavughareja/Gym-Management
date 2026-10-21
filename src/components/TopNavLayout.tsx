@@ -43,10 +43,8 @@ export const TopNavLayout: React.FC<TopNavLayoutProps> = ({ children, onLoginCli
 
             {/* Logo */}
             <div className="flex items-center gap-2 cursor-pointer z-50">
-              <div className="w-8 h-8 rounded-lg bg-dark flex items-center justify-center">
-                <div className="w-4 h-4 bg-white rounded-sm"></div>
-              </div>
-              <span className="text-xl font-bold tracking-tight">Trainix</span>
+              <img src="/gym_logo.png" alt="GymInvite Logo" style={{ height: 44, width: 'auto', maxWidth: 75, objectFit: 'contain' }} />
+              <span className="text-xl font-bold tracking-tight">GymInvite</span>
             </div>
 
             {/* Desktop Navigation */}
@@ -140,10 +138,8 @@ export const TopNavLayout: React.FC<TopNavLayoutProps> = ({ children, onLoginCli
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
             <div className="lg:col-span-2">
               <div className="flex items-center gap-2 mb-6">
-                <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center">
-                  <div className="w-4 h-4 bg-dark rounded-sm"></div>
-                </div>
-                <span className="text-xl font-bold tracking-tight text-white">Trainix</span>
+                <img src="/gym_logo.png" alt="GymInvite Logo" style={{ height: 44, width: 'auto', maxWidth: 75, objectFit: 'contain' }} />
+                <span className="text-xl font-bold tracking-tight text-white">GymInvite</span>
               </div>
               <p className="text-gray-400 mb-6 max-w-sm">
                 The complete operating system for modern gyms and fitness studios. Manage everything from one powerful platform.
@@ -188,7 +184,7 @@ export const TopNavLayout: React.FC<TopNavLayoutProps> = ({ children, onLoginCli
 
           <div className="pt-8 border-t border-gray-800 flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-gray-500 text-sm">
-              &copy; {new Date().getFullYear()} Trainix Technologies. All rights reserved.
+              &copy; {new Date().getFullYear()} GymInvite Technologies. All rights reserved.
             </p>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-success"></div>

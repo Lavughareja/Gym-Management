@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { ArrowRight, CheckCircle2, ChevronDown, Shield, Users, Key, Lock, Settings, UserCog, UserX, AlertTriangle, EyeOff, Search, Edit3 } from 'lucide-react';
 import { Navbar, Footer } from '../Home';
 import "./RolePermissions.css";
@@ -32,7 +32,7 @@ const tabs = [{
   label: "Audit Logs",
   sub: "Track every single action",
   title: "Know exactly who did what, and when.",
-  desc: "Every action in Trainix is logged. If a member's expiry date is extended, the audit log shows exactly which staff member did it and at what exact time. Total accountability, zero finger-pointing.",
+  desc: "Every action in GymInvite is logged. If a member's expiry date is extended, the audit log shows exactly which staff member did it and at what exact time. Total accountability, zero finger-pointing.",
   bullets: ["Timestamped action tracking", "Filter logs by staff member", "Undelete / Restore capabilities"]
 }, {
   label: "Data Masking",

@@ -50,11 +50,11 @@ const SuperAdminLayout: React.FC<SuperAdminLayoutProps> = ({ children }) => {
         {/* Logo */}
         <div style={styles.logo}>
           <div style={styles.logoIcon}>
-            <img src="/logo.png" alt="Logo" style={{ width: 32, height: 32, display: "block" }} />
+            <img src="/gym_logo.png" alt="Logo" style={{ height: 44, width: "auto", maxWidth: 70, objectFit: "contain", display: "block" }} />
           </div>
           {sidebarOpen && (
             <span style={styles.logoText}>
-              Trainin<span style={{ color: "#3b82f6" }}>X</span>
+              Gym<span style={{ color: '#3b82f6' }}>Invite</span>
             </span>
           )}
         </div>

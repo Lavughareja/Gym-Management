@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+﻿import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../utils/reduxHooks";
 import { registerOwnerAction } from "../redux/actions/authActions";
@@ -154,7 +154,7 @@ export const OwnerOnboarding: React.FC = () => {
       key: import.meta.env.VITE_RAZORPAY_KEY_ID ?? "",
       amount: price * 100,
       currency,
-      name: "Trainix Gym",
+      name: "GymInvite Gym",
       description: `${plan} Plan Membership`,
       order_id: orderId,
       prefill: {
@@ -206,8 +206,8 @@ export const OwnerOnboarding: React.FC = () => {
     {/* Header / Brand */}
     <div className="owner-onboarding-inline-2">
       <div onClick={() => navigate("/")} className="owner-onboarding-inline-3">
-        <img src="/logo.png" alt="Trainix" className="owner-onboarding-inline-4" />
-        <span className="owner-onboarding-inline-5">Trainix</span>
+        <img src="/gym_logo.png" alt="GymInvite" className="owner-onboarding-inline-4" />
+        <span className="owner-onboarding-inline-5">GymInvite</span>
       </div>
     </div>
 
@@ -246,7 +246,7 @@ export const OwnerOnboarding: React.FC = () => {
         {step === 1 && <form onSubmit={handleStep1Submit} className="owner-onboarding-inline-14">
           <div className="owner-onboarding-inline-15">
             <h2 className="owner-onboarding-inline-16">Create your account</h2>
-            <p className="owner-onboarding-inline-17">Join Trainix today and manage your gym seamlessly</p>
+            <p className="owner-onboarding-inline-17">Join GymInvite today and manage your gym seamlessly</p>
           </div>
 
           <div>

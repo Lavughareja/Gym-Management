@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+﻿import React, { useEffect } from 'react';
 import { CheckCircle2, ArrowRight } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { featuresData } from '../data/featuresData';
@@ -83,7 +83,7 @@ export const FeatureDetail: React.FC<FeatureDetailProps> = ({
                    {feature.title} Module
                  </h3>
                  <p className="feature-detail-inline-8">
-                   Manage everything seamlessly within the Trainix dashboard. No more spreadsheets.
+                   Manage everything seamlessly within the GymInvite dashboard. No more spreadsheets.
                  </p>
                  <div className="feature-detail-inline-9">
                    <div className="feature-detail-inline-10"></div>

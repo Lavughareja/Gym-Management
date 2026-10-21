@@ -1,4 +1,4 @@
-import { createAsyncThunk } from "@reduxjs/toolkit";
+﻿import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
   fetchDashboardStatsApi,
   fetchAllGymsApi,
@@ -34,7 +34,7 @@ export const superAdminLoginAction = createAsyncThunk(
 
       const user = {
         fullName: response?.data?.fullName || "Super Admin",
-        email:    response?.data?.email    || "superadmin@traininx.com",
+        email:    response?.data?.email    || "superadmin@gyminvite.com",
         role:     response?.data?.role     || "superadmin",
       };
       localStorage.setItem("sa_user", JSON.stringify(user));

@@ -1,4 +1,4 @@
-import './FaqManagement.css';
+﻿import './FaqManagement.css';
 import React, { useState, useEffect } from "react";
 import { Plus, Pencil, Trash2, Check, X, Loader, MessageSquare, Eye, EyeOff } from "lucide-react";
 import {
@@ -168,7 +168,7 @@ const FaqManagement: React.FC = () => {
 
             <div className="form-group">
               <label className="label">Question *</label>
-              <input className="input" placeholder="e.g. How do I setup Trainix?" value={form.question}
+              <input className="input" placeholder="e.g. How do I setup GymInvite?" value={form.question}
                 onChange={(e) => setForm({ ...form, question: e.target.value })} />
             </div>
 

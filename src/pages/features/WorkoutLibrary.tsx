@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { ArrowRight, CheckCircle2, ChevronDown, PlayCircle, Dumbbell, MonitorPlay, HelpCircle, Video, ListVideo, Layers } from 'lucide-react';
 import { Navbar, Footer } from '../Home';
 import "./WorkoutLibrary.css";
@@ -26,7 +26,7 @@ const tabs = [{
   label: "500+ Built-in Exercises",
   sub: "Ready on day one",
   title: "A massive library out of the box.",
-  desc: "Trainix comes pre-loaded with over 500 high-quality exercise videos covering everything from weightlifting and machines to yoga and stretching. Assign them instantly.",
+  desc: "GymInvite comes pre-loaded with over 500 high-quality exercise videos covering everything from weightlifting and machines to yoga and stretching. Assign them instantly.",
   bullets: ["Professionally shot videos", "Categorized by muscle group", "Clear written instructions"]
 }, {
   label: "Add Custom Videos",
@@ -56,10 +56,10 @@ const scenarios = [{
 }];
 const faqs = [{
   q: "Is the video library included in all plans?",
-  a: "Yes, the core library of 500+ exercises is included for free in all Trainix plans."
+  a: "Yes, the core library of 500+ exercises is included for free in all GymInvite plans."
 }, {
   q: "Do the videos take up space on the member's phone?",
-  a: "No. The videos stream dynamically from our servers, meaning the Trainix app remains lightweight and fast."
+  a: "No. The videos stream dynamically from our servers, meaning the GymInvite app remains lightweight and fast."
 }, {
   q: "Can I limit who sees my custom videos?",
   a: "Yes. Custom exercises can be assigned specifically to premium PT clients, keeping your proprietary workouts exclusive."
@@ -315,14 +315,14 @@ export const WorkoutLibrary: React.FC<WorkoutLibraryProps> = ({
           <h2 style={{
           letterSpacing: -1.5
         }} className="workout-library-inline-97">Empower your members.</h2>
-          <p className="workout-library-inline-98">Give them the confidence to lift properly with 500+ HD video tutorials right in the Trainix app.</p>
+          <p className="workout-library-inline-98">Give them the confidence to lift properly with 500+ HD video tutorials right in the GymInvite app.</p>
           <div className="workout-library-inline-99">
             <button className="workout-library-inline-100">
               Start Free Trial <ArrowRight size={17} className="workout-library-inline-101" />
             </button>
             <button className="workout-library-inline-102">Talk to Sales</button>
           </div>
-          <p className="workout-library-inline-103">Included free in all Trainix plans</p>
+          <p className="workout-library-inline-103">Included free in all GymInvite plans</p>
         </div>
       </section>
 

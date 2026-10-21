@@ -1,4 +1,4 @@
-export interface FeatureContent {
+﻿export interface FeatureContent {
   title: string;
   desc: string;
   longDesc?: string;
@@ -120,10 +120,10 @@ export const featuresData: Record<string, FeatureContent> = {
       ],
 
       faqs: [
-        { q: "Will visitors know this is a SaaS form?", a: "No. Your gym's logo, hero image, tagline, social links and color theme dominate the page. There's no Trainix branding visible to visitors on Pro plans." },
+        { q: "Will visitors know this is a SaaS form?", a: "No. Your gym's logo, hero image, tagline, social links and color theme dominate the page. There's no GymInvite branding visible to visitors on Pro plans." },
         { q: "What if I don't have a payment gateway?", a: "You can use the 'Reserve / Pay at Gym' flow. Visitors book the plan, their lead is captured in the CRM, and they pay in cash or via your physical POS when they visit." },
         { q: "How are trial slots generated?", a: "You set a template once (e.g., 'Yoga, 7 AM, 15 slots', 'General Floor, anytime, unlimited'). The system automatically generates the rolling 7-day calendar for visitors to pick from." },
-        { q: "Where do leads go?", a: "Straight into your Trainix CRM. You get a push notification on the staff app, and an automated WhatsApp confirmation is sent to the lead immediately." },
+        { q: "Where do leads go?", a: "Straight into your GymInvite CRM. You get a push notification on the staff app, and an automated WhatsApp confirmation is sent to the lead immediately." },
         { q: "Can I run different coupons for trials vs sign-ups?", a: "Yes. Coupons can be restricted to specific plans, trial sessions, or general memberships. You can also cap total redemptions." }
       ]
     }

@@ -1119,10 +1119,10 @@
 }
 
 .member-dashboard-inline-180 {
-  width: 44px;
-  height: 44px;
+  height: 48px;
+  width: auto;
+  max-width: 80px;
   object-fit: contain;
-  border-radius: 10px;
 }
 
 .member-dashboard-inline-181 {

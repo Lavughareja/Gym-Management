@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { ArrowRight, CheckCircle2, ChevronDown, CalendarCheck, Clock, Fingerprint, QrCode, Users, BarChart3, Bell, UserX } from 'lucide-react';
 import { Navbar, Footer } from '../Home';
 import "./AttendanceTracking.css";
@@ -38,7 +38,7 @@ const tabs = [{
   label: "Hardware Sync",
   sub: "Biometrics & Scanners",
   title: "Hardware that just works.",
-  desc: "Trainix syncs flawlessly with biometric fingerprint scanners, face recognition devices, and QR turnstiles. The moment a finger is placed, the check-in reflects on your dashboard in 0.5 seconds.",
+  desc: "GymInvite syncs flawlessly with biometric fingerprint scanners, face recognition devices, and QR turnstiles. The moment a finger is placed, the check-in reflects on your dashboard in 0.5 seconds.",
   bullets: ["Essl / Mantra / Realtime device support", "Face recognition ready", "Instant cloud sync via API"]
 }];
 const scenarios = [{
@@ -60,7 +60,7 @@ const scenarios = [{
 }, {
   icon: <QrCode size={22} color="#10b981" />,
   title: "Contactless QR entry",
-  desc: "Instead of buying expensive biometric machines, you put an iPad at the front desk. Members open their Trainix app, scan the QR, and walk right in."
+  desc: "Instead of buying expensive biometric machines, you put an iPad at the front desk. Members open their GymInvite app, scan the QR, and walk right in."
 }, {
   icon: <Users size={22} color="#f59e0b" />,
   title: "End of month payroll",
@@ -68,13 +68,13 @@ const scenarios = [{
 }];
 const faqs = [{
   q: "Which biometric machines are compatible?",
-  a: "We integrate with 99% of cloud-push devices in the market, including Essl, Realtime, Mantra, and ZKTeco. If it supports HTTP Push APIs, it works with Trainix."
+  a: "We integrate with 99% of cloud-push devices in the market, including Essl, Realtime, Mantra, and ZKTeco. If it supports HTTP Push APIs, it works with GymInvite."
 }, {
   q: "Do I need a biometric machine to use Attendance?",
   a: "No! You can use our Mobile App QR Code scanner, or the receptionist can manually click 'Mark Present' on the dashboard when a member walks in."
 }, {
   q: "What happens if the internet goes down at the gym?",
-  a: "Most modern biometric machines store attendance logs locally (up to 100,000 logs). The moment the internet is restored, the machine will push all pending logs to the Trainix cloud automatically."
+  a: "Most modern biometric machines store attendance logs locally (up to 100,000 logs). The moment the internet is restored, the machine will push all pending logs to the GymInvite cloud automatically."
 }, {
   q: "Can I restrict members from entering if their plan expired?",
   a: "Yes. We can link directly to turnstiles or magnetic doors. If a member's plan is expired or they have unpaid dues, the door simply will not open for them."

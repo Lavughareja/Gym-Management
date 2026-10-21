@@ -73,11 +73,11 @@ export const SidebarLayout: React.FC<SidebarLayoutProps> = ({ children, onLoginC
       <aside className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
         {/* Brand Section */}
         <div className="sidebar-brand">
-          <div className="brand-icon-wrapper" style={{ background: 'none', boxShadow: 'none', padding: 0 }}>
-            <img src="/logo.png" alt="Trainix Logo" style={{ width: 44, height: 44, objectFit: 'contain', borderRadius: 10 }} />
+          <div className="brand-icon-wrapper" style={{ background: 'none', boxShadow: 'none', padding: 0, flexShrink: 0 }}>
+            <img src="/gym_logo.png" alt="GymInvite Logo" style={{ height: 48, width: 'auto', maxWidth: 80, objectFit: 'contain' }} />
           </div>
           <div>
-            <h1 className="brand-name">Trainix</h1>
+            <h1 className="brand-name">GymInvite</h1>
             <p className="brand-subtitle">Gym Management Portal</p>
           </div>
         </div>
@@ -150,8 +150,8 @@ export const SidebarLayout: React.FC<SidebarLayoutProps> = ({ children, onLoginC
           </button>
           
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <img src="/logo.png" alt="Trainix Logo" style={{ width: 32, height: 32, objectFit: 'contain', borderRadius: 8 }} />
-            <span className="brand-name" style={{ fontSize: '1rem' }}>Trainix</span>
+            <img src="/gym_logo.png" alt="GymInvite Logo" style={{ height: 38, width: 'auto', maxWidth: 65, objectFit: 'contain' }} />
+            <span className="brand-name" style={{ fontSize: '1rem' }}>GymInvite</span>
           </div>
 
           <div style={{ width: 40 }}>

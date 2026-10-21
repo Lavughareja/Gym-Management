@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Minus } from 'lucide-react';
 
 const faqs = [
   {
-    q: "How long does it take to set up Trainix?",
+    q: "How long does it take to set up GymInvite?",
     a: "Most gyms are fully set up within 24 hours. Our onboarding team will help you import your existing member data, set up your branches, and configure your biometric devices during your first onboarding call."
   },
   {
@@ -13,7 +13,7 @@ const faqs = [
   },
   {
     q: "Do you support biometric fingerprint scanners?",
-    a: "Absolutely. Trainix integrates natively with most popular biometric devices (Fingerprint, Face Recognition, RFID). Attendance is synced to the cloud in real-time."
+    a: "Absolutely. GymInvite integrates natively with most popular biometric devices (Fingerprint, Face Recognition, RFID). Attendance is synced to the cloud in real-time."
   },
   {
     q: "Can I manage multiple branches?",
@@ -21,7 +21,7 @@ const faqs = [
   },
   {
     q: "How do automated WhatsApp notifications work?",
-    a: "Trainix automatically sends WhatsApp messages for payment reminders, successful renewals, birthday greetings, and attendance alerts. You don't have to lift a finger."
+    a: "GymInvite automatically sends WhatsApp messages for payment reminders, successful renewals, birthday greetings, and attendance alerts. You don't have to lift a finger."
   },
   {
     q: "Is my data secure in the cloud?",

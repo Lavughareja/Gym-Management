@@ -1,4 +1,4 @@
-import './SuperAdminLogin.css';
+﻿import './SuperAdminLogin.css';
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import type { AppDispatch } from "../../redux/store";
@@ -41,9 +41,9 @@ const SuperAdminLogin: React.FC = () => {
       <div className="card">
         {/* Header with Logo */}
         <div className="header">
-          <img src="/logo.png" alt="TraininX Logo" className="logo" />
+          <img src="/gym_logo.png" alt="GymInvite Logo" className="logo" />
           <h1 className="title">
-            Trainin<span style={{ color: "#3b82f6" }}>X</span>
+            Gym<span style={{ color: "#3b82f6" }}>Invite</span>
           </h1>
           <p className="subtitle">Super Admin Portal</p>
         </div>

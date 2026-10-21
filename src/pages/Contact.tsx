@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Clock, Send, CheckCircle, Navigation } from 'lucide-react';
 import "./Contact.css";
 export const Contact: React.FC = () => {
@@ -92,7 +92,7 @@ export const Contact: React.FC = () => {
                 </div>
                 <div>
                   <span className="contact-info-title">Email Address</span>
-                  <p className="contact-info-text">support@trainix.com</p>
+                  <p className="contact-info-text">support@GymInvite.com</p>
                 </div>
               </div>
             </div>
@@ -135,7 +135,7 @@ export const Contact: React.FC = () => {
                 {/* SVG representing location nodes */}
                 <div className="contact-inline-9">
                   <Navigation size={18} className="contact-inline-10" />
-                  <span className="map-badge">Trainix Gym Headquarters</span>
+                  <span className="map-badge">GymInvite Gym Headquarters</span>
                 </div>
                 <span className="contact-inline-11">Intersection of Core St & Calbell Ave</span>
                 <span className="contact-inline-12">GPS: 40.7128° N, 74.0060° W</span>
