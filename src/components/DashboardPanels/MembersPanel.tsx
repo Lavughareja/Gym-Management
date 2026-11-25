@@ -5,6 +5,7 @@ import { MembersTable } from './Members/MembersTable';
 import { MembersFilter } from './Members/MembersFilter';
 import { AddMemberModal } from './Members/AddMemberModal';
 import { MemberDetails } from './Members/MemberDetails';
+import { CsvImportModal } from './Members/CsvImportModal';
 
 interface Props {
   role: string;
@@ -18,6 +19,20 @@ const MembersPanel: React.FC<Props> = ({ role, canAddMember, showAddMember, setS
   const members: any[] = Array.isArray(rawMembers) ? rawMembers : [];
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedMember, setSelectedMember] = useState<any>(null);
+  const [showCsvImport, setShowCsvImport] = useState(false);
+
+  const handleDownloadTemplate = () => {
+    const csv = "fullName,email,mobileNo,deviceUserId,planEndDate,amountPaid\nJohn Doe,john@example.com,9876543210,101,2026-12-31,1999\n";
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "members_import_template.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
 
   // ── Real calculations from member data ──────────────────────────────────────
   const now = new Date();
@@ -50,7 +65,9 @@ const MembersPanel: React.FC<Props> = ({ role, canAddMember, showAddMember, setS
     m.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     m.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     m.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    m.mobileNo?.includes(searchTerm)
+    m.mobileNo?.includes(searchTerm) ||
+    m.biometricId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    String(m.deviceUserId || '').includes(searchTerm)
   );
 
   return (
@@ -65,10 +82,16 @@ const MembersPanel: React.FC<Props> = ({ role, canAddMember, showAddMember, setS
 
         {((canAddMember || role === "admin" || role === "superadmin" || role === "owner") && !['gymmanager', 'manager', 'trainer'].includes(role?.toLowerCase())) && (
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <button style={{ padding: '9px 16px', background: '#fff', border: '1px solid #e2e8f0', color: '#475569', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 7, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+            <button
+              onClick={handleDownloadTemplate}
+              style={{ padding: '9px 16px', background: '#fff', border: '1px solid #e2e8f0', color: '#475569', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 7, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
+            >
               <Download size={14} /> Template
             </button>
-            <button style={{ padding: '9px 16px', background: '#fff', border: '1px solid #e2e8f0', color: '#475569', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 7, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+            <button
+              onClick={() => setShowCsvImport(true)}
+              style={{ padding: '9px 16px', background: '#fff', border: '1px solid #e2e8f0', color: '#475569', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 7, boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}
+            >
               <Upload size={14} /> Import
             </button>
             <button
@@ -125,6 +148,10 @@ const MembersPanel: React.FC<Props> = ({ role, canAddMember, showAddMember, setS
           member={selectedMember}
           onClose={() => setSelectedMember(null)}
         />
+      )}
+
+      {showCsvImport && (
+        <CsvImportModal onClose={() => setShowCsvImport(false)} />
       )}
     </div>
   );

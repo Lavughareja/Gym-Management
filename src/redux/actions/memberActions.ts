@@ -1,5 +1,12 @@
 import type { AppDispatch } from "../store";
-import { getMembersApi, addMemberApi, bulkImportMembersApi, resendMemberInvitationApi } from "../../services/apis/memberApis";
+import {
+  getMembersApi,
+  addMemberApi,
+  bulkImportMembersApi,
+  resendMemberInvitationApi,
+  updateMemberDeviceUserApi,
+  syncMemberToDeviceApi,
+} from "../../services/apis/memberApis";
 import { fetchMembersStart, fetchMembersSuccess, fetchMembersFailure } from "../slices/memberSlice";
 import { showSnackbar } from "../slices/snackbarSlice";
 
@@ -31,10 +38,14 @@ export const fetchMembersAction = () => async (dispatch: AppDispatch) => {
 
 export const addMemberAction = (memberData: any) => async (dispatch: AppDispatch) => {
   try {
-    await addMemberApi(memberData);
-    dispatch(showSnackbar({ message: "Member added successfully!", type: "success" }));
+    const res = await addMemberApi(memberData);
+    const deviceUserId = res.data?.user?.deviceUserId;
+    const msg = deviceUserId
+      ? `Member added successfully (Device User ID: ${deviceUserId})`
+      : "Member added successfully!";
+    dispatch(showSnackbar({ message: msg, type: "success" }));
     dispatch(fetchMembersAction());
-    return true;
+    return res.data || true;
   } catch (error: any) {
     dispatch(showSnackbar({ message: error?.response?.data?.message || "Failed to add member", type: "error" }));
     return false;
@@ -43,13 +54,43 @@ export const addMemberAction = (memberData: any) => async (dispatch: AppDispatch
 
 export const bulkImportMembersAction = (formData: FormData) => async (dispatch: AppDispatch) => {
   try {
-    await bulkImportMembersApi(formData);
-    dispatch(showSnackbar({ message: "Members imported successfully!", type: "success" }));
+    const res = await bulkImportMembersApi(formData);
+    dispatch(showSnackbar({ message: res.data?.message || "Members imported successfully!", type: "success" }));
     dispatch(fetchMembersAction());
-    return true;
+    return res.data || true;
   } catch (error: any) {
     dispatch(showSnackbar({ message: error?.response?.data?.message || "Failed to import members", type: "error" }));
     return false;
+  }
+};
+
+export const updateMemberDeviceUserAction = (
+  memberId: string,
+  data: { deviceUserId: number | string; biometricDeviceId?: string; pushToDevice?: boolean }
+) => async (dispatch: AppDispatch) => {
+  try {
+    const res = await updateMemberDeviceUserApi(memberId, data);
+    dispatch(showSnackbar({ message: res.data?.message || "Machine User ID updated", type: "success" }));
+    dispatch(fetchMembersAction());
+    return res.data;
+  } catch (error: any) {
+    dispatch(showSnackbar({ message: error?.response?.data?.message || "Failed to update Machine User ID", type: "error" }));
+    return null;
+  }
+};
+
+export const syncMemberToDeviceAction = (
+  memberId: string,
+  data?: { biometricDeviceId?: string }
+) => async (dispatch: AppDispatch) => {
+  try {
+    const res = await syncMemberToDeviceApi(memberId, data);
+    dispatch(showSnackbar({ message: res.data?.message || "Member pushed to machine", type: "success" }));
+    dispatch(fetchMembersAction());
+    return res.data;
+  } catch (error: any) {
+    dispatch(showSnackbar({ message: error?.response?.data?.message || "Failed to push member to machine", type: "error" }));
+    return null;
   }
 };
 

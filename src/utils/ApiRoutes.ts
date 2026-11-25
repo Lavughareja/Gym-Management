@@ -31,7 +31,7 @@ export const apiRoutes = {
   attendanceHistory: "/attendance/history",
 
   // ── Members ───────────────────────────────────────────────────────────────
-  bulkImportMembers: "/manager/members/bulk-import",
+  bulkImportMembers: "/members/import-csv",
   addMember: "/members",
   getMembers: "/members",
   memberSetup: "/members/setup",

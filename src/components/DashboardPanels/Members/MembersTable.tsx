@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-import { Repeat, Users, Plus, UserCircle, MoreVertical } from 'lucide-react';
+import { Repeat, Users, Plus, UserCircle, MoreVertical, Link2, UploadCloud } from 'lucide-react';
+import { useAppDispatch } from '../../../utils/reduxHooks';
+import { syncMemberToDeviceAction } from '../../../redux/actions/memberActions';
+import { LinkDeviceUserModal } from './LinkDeviceUserModal';
 
 interface MembersTableProps {
   members: any[];
@@ -42,8 +45,10 @@ const PaymentBadge = ({ status }: { status: string }) => {
 };
 
 export const MembersTable: React.FC<MembersTableProps> = ({ members, onAddMember, onViewMember, onResendInvite }) => {
+  const dispatch = useAppDispatch();
   const [resending, setResending] = useState<Record<string, boolean>>({});
   const [contextMenu, setContextMenu] = useState<{ x: number, y: number, member: any } | null>(null);
+  const [linkModalMember, setLinkModalMember] = useState<any>(null);
 
   const handleResend = async (email: string) => {
     if (!onResendInvite) return;
@@ -101,7 +106,10 @@ export const MembersTable: React.FC<MembersTableProps> = ({ members, onAddMember
                         </div>
                         <div>
                           <div style={{ fontWeight: 700, fontSize: 14, color: '#0f172a' }}>{m.name || 'Unknown'}</div>
-                          <div style={{ fontSize: 11, color: '#94a3b8', fontFamily: 'monospace', marginTop: 2 }}>{m.memberId || `#${rowId.substring(0, 6)}`}</div>
+                          <div style={{ fontSize: 11, color: '#94a3b8', fontFamily: 'monospace', marginTop: 2 }}>
+                            {m.biometricId || m.memberId || `#${rowId.substring(0, 6)}`}
+                            {m.deviceUserId !== undefined && m.deviceUserId !== null && m.deviceUserId !== '' ? ` | Machine ID: ${m.deviceUserId}` : ''}
+                          </div>
                         </div>
                       </div>
                     </td>
@@ -219,8 +227,69 @@ export const MembersTable: React.FC<MembersTableProps> = ({ members, onAddMember
             >
               <UserCircle size={16} /> User Details
             </button>
+            <button
+              onClick={() => {
+                setLinkModalMember(contextMenu.member);
+                setContextMenu(null);
+              }}
+              style={{
+                width: '100%',
+                padding: '10px 12px',
+                textAlign: 'left',
+                background: 'none',
+                border: 'none',
+                fontSize: 13,
+                fontWeight: 600,
+                color: '#334155',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                borderRadius: 8,
+                transition: 'background 0.1s'
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = '#f1f5f9'; e.currentTarget.style.color = '#0f172a'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = '#334155'; }}
+            >
+              <Link2 size={16} /> Link Machine ID
+            </button>
+            <button
+              onClick={() => {
+                const target = contextMenu.member;
+                const memberId = target._id || target.id;
+                setContextMenu(null);
+                dispatch(syncMemberToDeviceAction(memberId, target.biometricDeviceId ? { biometricDeviceId: target.biometricDeviceId } : undefined));
+              }}
+              style={{
+                width: '100%',
+                padding: '10px 12px',
+                textAlign: 'left',
+                background: 'none',
+                border: 'none',
+                fontSize: 13,
+                fontWeight: 600,
+                color: '#334155',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                borderRadius: 8,
+                transition: 'background 0.1s'
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = '#f1f5f9'; e.currentTarget.style.color = '#0f172a'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'none'; e.currentTarget.style.color = '#334155'; }}
+            >
+              <UploadCloud size={16} /> Push to Machine
+            </button>
           </div>
         </>
+      )}
+
+      {linkModalMember && (
+        <LinkDeviceUserModal
+          member={linkModalMember}
+          onClose={() => setLinkModalMember(null)}
+        />
       )}
     </div>
   );

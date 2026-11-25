@@ -1,9 +1,18 @@
-﻿import React, { useEffect, useState, useRef } from "react";
-import { Plus, X, Laptop, ShieldCheck, Wifi, MapPin, Loader, Image, Copy, Check } from "lucide-react";
+import React, { useEffect, useState, useRef } from "react";
+import { Plus, X, Laptop, ShieldCheck, Wifi, MapPin, Loader, Image, Copy, Check, RefreshCw, Users, Pencil, Plug } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "../../utils/reduxHooks";
 import { useSelector } from "react-redux";
 import type { RootState } from "../../redux/store";
-import { fetchDevicesAction, addDeviceAction, deleteDeviceAction } from "../../redux/actions/deviceActions";
+import {
+  fetchDevicesAction,
+  addDeviceAction,
+  updateDeviceAction,
+  deleteDeviceAction,
+  testDeviceConnectionAction,
+  syncDeviceLogsAction,
+  syncAllDevicesAction,
+} from "../../redux/actions/deviceActions";
+import { getMachineUsersApi, type MachineUser, type DeviceProvider } from "../../services/apis/biometricApis";
 import { getGymInvoiceSettingsApi, updateGymInvoiceSettingsApi } from "../../services/apis/invoiceApis";
 import { getOwnerBrandingApi, updateOwnerBrandingApi, uploadOwnerLogoApi, checkSubdomainApi } from "../../services/apis/whiteLabelApis";
 import { setGymBranding } from "../../redux/slices/whiteLabelSlice";

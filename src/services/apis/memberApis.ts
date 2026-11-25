@@ -10,9 +10,38 @@ export const bulkImportMembersApi = async (formData: FormData) => {
   return response;
 };
 
-export const addMemberApi = async (data: { fullName: string; email: string; mobileNo: string; planId?: string; durationMonths?: string | number; extraDays?: string | number; startDate?: string; secondaryPhone?: string; emergencyNumber?: string; bloodGroup?: string; amountPaid?: number | string; dateOfBirth?: string }) => {
+export const addMemberApi = async (data: {
+  fullName: string;
+  email: string;
+  mobileNo: string;
+  planId?: string;
+  durationMonths?: string | number;
+  extraDays?: string | number;
+  startDate?: string;
+  secondaryPhone?: string;
+  emergencyNumber?: string;
+  bloodGroup?: string;
+  amountPaid?: number | string;
+  dateOfBirth?: string;
+  deviceUserId?: number | string;
+  biometricDeviceId?: string;
+}) => {
   const response = await AxiosInstance.post(apiRoutes.addMember, data);
   return response;
+};
+
+export const updateMemberDeviceUserApi = async (
+  memberId: string,
+  data: { deviceUserId: number | string; biometricDeviceId?: string; pushToDevice?: boolean }
+) => {
+  return await AxiosInstance.patch(`${apiRoutes.getMembers}/${memberId}/device-user`, data);
+};
+
+export const syncMemberToDeviceApi = async (
+  memberId: string,
+  data?: { biometricDeviceId?: string }
+) => {
+  return await AxiosInstance.post(`${apiRoutes.getMembers}/${memberId}/sync-to-device`, data || {});
 };
 
 export const resendMemberInvitationApi = async (data: { email: string }) => {

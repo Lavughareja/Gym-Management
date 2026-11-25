@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { X, Loader2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Loader2, CheckCircle2 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '../../../utils/reduxHooks';
 import { addMemberAction } from '../../../redux/actions/memberActions';
+import { fetchDevicesAction } from '../../../redux/actions/deviceActions';
 
 interface Props {
   onClose: () => void;
@@ -33,6 +34,7 @@ export const AddMemberModal: React.FC<Props> = ({ onClose, onSave }) => {
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [createdResult, setCreatedResult] = useState<any>(null);
 
   const [form, setForm] = useState({
     fullName: '',
@@ -46,10 +48,20 @@ export const AddMemberModal: React.FC<Props> = ({ onClose, onSave }) => {
     startDate: '',
     amountPaid: '',
     extraDays: '',
+    deviceUserId: '',
+    biometricDeviceId: '',
   });
 
   const { plans: rawPlans } = useAppSelector((state: any) => state.plan);
+  const { devices: rawDevices } = useAppSelector((state: any) => state.device);
   const plans: any[] = Array.isArray(rawPlans) ? rawPlans : [];
+  const devices: any[] = Array.isArray(rawDevices) ? rawDevices : [];
+
+  useEffect(() => {
+    if (devices.length === 0) {
+      dispatch(fetchDevicesAction());
+    }
+  }, [dispatch, devices.length]);
 
   // Default website plans to show if user hasn't created any yet
   const defaultPlans = [
@@ -97,9 +109,17 @@ export const AddMemberModal: React.FC<Props> = ({ onClose, onSave }) => {
       if (form.extraDays) payload.extraDays = Number(form.extraDays);
       if (form.startDate) payload.startDate = form.startDate;
       if (form.amountPaid) payload.amountPaid = Number(form.amountPaid);
+      if (form.deviceUserId.trim()) payload.deviceUserId = Number(form.deviceUserId);
+      if (form.biometricDeviceId) payload.biometricDeviceId = form.biometricDeviceId;
 
-      const success = await dispatch(addMemberAction(payload));
-      if (success) onSave(payload);
+      const result = await dispatch(addMemberAction(payload));
+      if (result) {
+        if (typeof result === 'object' && (result.user || result.machineSync)) {
+          setCreatedResult(result);
+        } else {
+          onSave(payload);
+        }
+      }
     } catch {
       setError('Failed to add member. Please try again.');
     } finally {
@@ -267,7 +287,7 @@ export const AddMemberModal: React.FC<Props> = ({ onClose, onSave }) => {
           </div>
 
           {/* Amount Paid */}
-          <div style={{ marginBottom: 8 }}>
+          <div style={{ marginBottom: 18 }}>
             <label style={labelStyle}>Amount Paid (₹)</label>
             <input
               style={inputStyle}
@@ -279,6 +299,54 @@ export const AddMemberModal: React.FC<Props> = ({ onClose, onSave }) => {
             />
           </div>
 
+          {/* Biometric Device User ID + Device */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 8 }}>
+            <div>
+              <label style={labelStyle}>Device User ID</label>
+              <input
+                style={inputStyle}
+                type="number"
+                min="1"
+                placeholder="Auto-generated if empty"
+                value={form.deviceUserId}
+                onChange={set('deviceUserId')}
+              />
+            </div>
+            <div>
+              <label style={labelStyle}>Biometric Device</label>
+              <select
+                style={inputStyle}
+                value={form.biometricDeviceId}
+                onChange={set('biometricDeviceId')}
+              >
+                <option value="">-- Optional --</option>
+                {devices.map((d: any) => (
+                  <option key={d._id || d.id} value={d._id || d.id}>
+                    {d.name} ({d.provider})
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Created Result */}
+          {createdResult && (
+            <div style={{ marginTop: 14, padding: '12px 14px', background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 10, color: '#166534', fontSize: 13 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700, marginBottom: 4 }}>
+                <CheckCircle2 size={16} /> Member Created
+              </div>
+              {createdResult.user?.deviceUserId !== undefined && (
+                <div>Device User ID: <strong>{createdResult.user.deviceUserId}</strong></div>
+              )}
+              {createdResult.machineSync && (
+                <div style={{ marginTop: 2 }}>
+                  Machine Sync: <strong>{typeof createdResult.machineSync === 'string' ? createdResult.machineSync : createdResult.machineSync.status || (createdResult.machineSync.success ? 'Synced' : 'Failed')}</strong>
+                  {createdResult.machineSync.message ? ` — ${createdResult.machineSync.message}` : ''}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Error */}
           {error && (
             <div style={{ marginTop: 12, padding: '10px 14px', background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, color: '#dc2626', fontSize: 13, fontWeight: 500 }}>
@@ -289,44 +357,65 @@ export const AddMemberModal: React.FC<Props> = ({ onClose, onSave }) => {
 
         {/* Footer buttons */}
         <div style={{ padding: '16px 28px 24px', display: 'flex', gap: 12 }}>
-          <button
-            onClick={handleSubmit}
-            disabled={loading}
-            style={{
-              flex: 1,
-              padding: '13px 0',
-              background: loading ? '#93c5fd' : '#2563eb',
-              color: '#fff',
-              border: 'none',
-              borderRadius: 10,
-              fontSize: 15,
-              fontWeight: 700,
-              cursor: loading ? 'not-allowed' : 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 8,
-            }}
-          >
-            {loading && <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />}
-            {loading ? 'Adding...' : 'Add Member'}
-          </button>
-          <button
-            onClick={onClose}
-            style={{
-              flex: 1,
-              padding: '13px 0',
-              background: '#fff',
-              color: '#2563eb',
-              border: '1.5px solid #2563eb',
-              borderRadius: 10,
-              fontSize: 15,
-              fontWeight: 700,
-              cursor: 'pointer',
-            }}
-          >
-            Cancel
-          </button>
+          {createdResult ? (
+            <button
+              onClick={() => onSave(createdResult)}
+              style={{
+                flex: 1,
+                padding: '13px 0',
+                background: '#16a34a',
+                color: '#fff',
+                border: 'none',
+                borderRadius: 10,
+                fontSize: 15,
+                fontWeight: 700,
+                cursor: 'pointer',
+              }}
+            >
+              Done
+            </button>
+          ) : (
+            <>
+              <button
+                onClick={handleSubmit}
+                disabled={loading}
+                style={{
+                  flex: 1,
+                  padding: '13px 0',
+                  background: loading ? '#93c5fd' : '#2563eb',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: 10,
+                  fontSize: 15,
+                  fontWeight: 700,
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                }}
+              >
+                {loading && <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />}
+                {loading ? 'Adding...' : 'Add Member'}
+              </button>
+              <button
+                onClick={onClose}
+                style={{
+                  flex: 1,
+                  padding: '13px 0',
+                  background: '#fff',
+                  color: '#2563eb',
+                  border: '1.5px solid #2563eb',
+                  borderRadius: 10,
+                  fontSize: 15,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                }}
+              >
+                Cancel
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>
